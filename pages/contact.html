@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | Cosmic Astrology</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#7C3AED',
+                        secondary: '#FFD700',
+                        accent: '#EC4899'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.15.4/css/all.css">
+    
+    <!-- Google Translate -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,hi,kn,mr,ta,te,gu,ml,pa,bn,or,as,ur,sa',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+        }
+
+        // Language translation function
+        function changeLanguage(langCode, langName) {
+            console.log('Changing language to:', langCode, langName);
+            
+            // Try to find the translate element
+            var attempts = 0;
+            var maxAttempts = 50;
+            
+            var waitForGoogleTranslate = setInterval(function() {
+                attempts++;
+                var translateElement = document.querySelector('.goog-te-combo');
+                
+                if (translateElement) {
+                    console.log('Found translate element, changing to:', langCode);
+                    clearInterval(waitForGoogleTranslate);
+                    
+                    // Set the language value
+                    translateElement.value = langCode;
+                    
+                    // Trigger the change event
+                    var event = new Event('change', { bubbles: true });
+                    translateElement.dispatchEvent(event);
+                    
+                    // Also try click event as backup
+                    setTimeout(function() {
+                        translateElement.dispatchEvent(new Event('click'));
+                    }, 100);
+                    
+                    // Update UI
+                    var currentLangElement = document.getElementById('current-language');
+                    if (currentLangElement) {
+                        currentLangElement.textContent = langName;
+                    }
+                    
+                    // Close dropdown
+                    var dropdown = document.getElementById('language-dropdown');
+                    if (dropdown) {
+                        dropdown.classList.add('hidden');
+                    }
+                    
+                    console.log('Language changed successfully!');
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(waitForGoogleTranslate);
+                    console.error('Google Translate element not found after', maxAttempts, 'attempts');
+                    alert('Translation not ready yet. Please wait a moment and try again.');
+                }
+            }, 100);
+        }
+
+        // Toggle dropdown and mobile menu
+        document.addEventListener('DOMContentLoaded', function() {
+            // Desktop dropdown
+            const languageBtn = document.getElementById('language-btn');
+            const languageDropdown = document.getElementById('language-dropdown');
+            
+            if (languageBtn) {
+                languageBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    languageDropdown.classList.toggle('hidden');
+                });
+            }
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!languageBtn?.contains(e.target) && !languageDropdown?.contains(e.target)) {
+                    languageDropdown?.classList.add('hidden');
+                }
+            });
+
+            // Mobile language selector
+            const mobileLanguageSelect = document.getElementById('mobile-language-select');
+            if (mobileLanguageSelect) {
+                mobileLanguageSelect.addEventListener('change', function() {
+                    const langCode = this.value;
+                    const langName = this.options[this.selectedIndex].text.split('(')[0].trim();
+                    
+                    // Wait for Google Translate to load
+                    const waitForGoogleTranslate = setInterval(function() {
+                        const translateElement = document.querySelector('.goog-te-combo');
+                        if (translateElement) {
+                            clearInterval(waitForGoogleTranslate);
+                            translateElement.value = langCode;
+                            translateElement.dispatchEvent(new Event('change'));
+                        }
+                    }, 100);
+                    
+                    // Timeout after 5 seconds
+                    setTimeout(function() {
+                        clearInterval(waitForGoogleTranslate);
+                    }, 5000);
+                });
+            }
+        });
+    </script>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/styles/main.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#7C3AED',
+                        secondary: '#FFD700',
+                        accent: '#EC4899',
+                    },
+                    fontFamily: {
+                        heading: ['Playfair Display', 'serif'],
+                        body: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="font-body bg-gray-50">
+      <!-- Main Navigation Bar -->
+    <nav id="main-navbar" class="bg-gradient-to-r from-purple-700 via-pink-600 to-purple-800 text-white shadow-xl sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                
+                <!-- Logo Section -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-white bg-opacity-20 backdrop-blur rounded-full flex items-center justify-center hover:bg-opacity-30 transition-all duration-300">
+                        <i class="fas fa-star text-yellow-300 text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold font-serif text-white">
+                            Cosmic Astrology
+                        </h1>
+                        <p class="text-xs text-purple-200 font-medium">Your Gateway to Cosmic Wisdom</p>
+                    </div>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden lg:flex items-center space-x-8">
+                    <a href="index.html" class="nav-link relative group">
+                        <span class="flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-300">
+                            <i class="fas fa-home text-sm"></i>
+                            <span class="font-medium">Home</span>
+                        </span>
+                    </a>
+                    <a href="#services" class="nav-link relative group">
+                        <span class="flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-300">
+                            <i class="fas fa-magic text-sm"></i>
+                            <span class="font-medium">Services</span>
+                        </span>
+                    </a>
+                    <a href="#gallery" class="nav-link relative group">
+                        <span class="flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-300">
+                            <i class="fas fa-images text-sm"></i>
+                            <span class="font-medium">Gallery</span>
+                        </span>
+                    </a>
+                    <a href="#faq" class="nav-link relative group">
+                        <span class="flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-300">
+                            <i class="fas fa-question-circle text-sm"></i>
+                            <span class="font-medium">FAQ</span>
+                        </span>
+                    </a>
+                    <a href="contact.html" class="nav-link relative group">
+                        <span class="flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-300">
+                            <i class="fas fa-envelope text-sm"></i>
+                            <span class="font-medium">Contact</span>
+                        </span>
+                    </a>
+                    
+                    <!-- Google Translate -->
+                    <div class="flex items-center space-x-2 bg-white bg-opacity-10 backdrop-blur px-3 py-2 rounded-full hover:bg-opacity-20 transition-all duration-300">
+                        <i class="fas fa-globe text-yellow-300 text-sm"></i>
+                        <div id="google_translate_element" class="translate-element"></div>
+                    </div>
+                </div>
+                
+                <!-- Mobile Menu Toggle -->
+                <button id="mobile-menu-btn" class="lg:hidden text-white focus:outline-none hover:text-yellow-300 transition-colors duration-300 p-2">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+            
+            <!-- Mobile Navigation Menu -->
+            <div id="mobile-menu" class="lg:hidden hidden">
+                <div class="py-4 space-y-3 border-t border-purple-400 border-opacity-30">
+                    <a href="index.html" class="mobile-nav-link flex items-center space-x-3 py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded-lg transition-all duration-300">
+                        <i class="fas fa-home text-yellow-300"></i>
+                        <span class="font-medium">Home</span>
+                    </a>
+                    <a href="#services" class="mobile-nav-link flex items-center space-x-3 py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded-lg transition-all duration-300">
+                        <i class="fas fa-magic text-yellow-300"></i>
+                        <span class="font-medium">Services</span>
+                    </a>
+                    <a href="#gallery" class="mobile-nav-link flex items-center space-x-3 py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded-lg transition-all duration-300">
+                        <i class="fas fa-images text-yellow-300"></i>
+                        <span class="font-medium">Gallery</span>
+                    </a>
+                    <a href="#faq" class="mobile-nav-link flex items-center space-x-3 py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded-lg transition-all duration-300">
+                        <i class="fas fa-question-circle text-yellow-300"></i>
+                        <span class="font-medium">FAQ</span>
+                    </a>
+                    <a href="contact.html" class="mobile-nav-link flex items-center space-x-3 py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded-lg transition-all duration-300">
+                        <i class="fas fa-envelope text-yellow-300"></i>
+                        <span class="font-medium">Contact</span>
+                    </a>
+                    
+                    <!-- Mobile Google Translate -->
+                    <div class="mobile-nav-link flex items-center space-x-3 py-2 px-4 bg-white bg-opacity-10 rounded-lg mt-3">
+                        <i class="fas fa-globe text-yellow-300"></i>
+                        <div id="google_translate_element_mobile" class="translate-element-mobile"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Contact Form Section -->
+    <section class="pt-32 pb-20 bg-gradient-to-br from-purple-50 to-pink-50 min-h-screen">
+        <div class="container mx-auto px-4 max-w-6xl">
+            <div class="text-center mb-12">
+                <h1 class="font-heading text-4xl md:text-5xl font-bold mb-4 gradient-text">Get In Touch</h1>
+                <p class="text-gray-600 text-lg">We're here to guide you on your cosmic journey</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Contact Form -->
+                <div class="bg-white p-8 rounded-2xl shadow-lg">
+                    <h2 class="font-heading text-2xl font-bold mb-6">Send Us a Message</h2>
+                    <form id="contact-form" class="space-y-4">
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Name *</label>
+                            <input type="text" id="name" required 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" 
+                                placeholder="Your full name">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Phone Number *</label>
+                            <input type="tel" id="phone" required 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" 
+                                placeholder="+91 9876543210">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Email</label>
+                            <input type="email" id="email" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" 
+                                placeholder="your.email@example.com">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">How can we help you? *</label>
+                            <select id="topic" required 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <option value="">Select a topic</option>
+                                <option value="General Inquiry">General Inquiry</option>
+                                <option value="Service Information">Service Information</option>
+                                <option value="Appointment Booking">Appointment Booking</option>
+                                <option value="Pricing Question">Pricing Question</option>
+                                <option value="Feedback">Feedback</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Your Message *</label>
+                            <textarea id="message" required rows="4" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" 
+                                placeholder="Tell us how we can help you..."></textarea>
+                        </div>
+                        
+                        <button type="submit" 
+                            class="w-full bg-gradient-to-r from-primary to-accent text-white px-8 py-4 rounded-lg font-semibold hover:shadow-lg transition transform hover:scale-105">
+                            <i class="fas fa-paper-plane mr-2"></i> Send Message
+                        </button>
+                    </form>
+                    
+                    <div id="form-message" class="mt-4 hidden"></div>
+                </div>
+
+                <!-- Contact Info & WhatsApp -->
+                <div class="space-y-6">
+                    <!-- Quick Contact -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg">
+                        <h3 class="font-heading text-2xl font-bold mb-6">Quick Contact</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <i class="fas fa-map-marker-alt text-primary text-2xl mt-1 mr-4"></i>
+                                <div>
+                                    <h4 class="font-semibold">Address</h4>
+                                    <p id="contact-address" class="text-gray-600">Loading...</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-phone text-primary text-2xl mt-1 mr-4"></i>
+                                <div>
+                                    <h4 class="font-semibold">Phone</h4>
+                                    <p id="contact-phone" class="text-gray-600">Loading...</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-envelope text-primary text-2xl mt-1 mr-4"></i>
+                                <div>
+                                    <h4 class="font-semibold">Email</h4>
+                                    <p id="contact-email" class="text-gray-600">Loading...</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <i class="fas fa-clock text-primary text-2xl mt-1 mr-4"></i>
+                                <div>
+                                    <h4 class="font-semibold">Working Hours</h4>
+                                    <p id="contact-hours-weekday" class="text-gray-600">Mon - Sat: Loading...</p>
+                                    <p id="contact-hours-sunday" class="text-gray-600">Sunday: Loading...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- WhatsApp CTA -->
+                    <div class="bg-gradient-to-br from-green-500 to-green-600 p-8 rounded-2xl shadow-lg text-white">
+                        <i class="fab fa-whatsapp text-6xl mb-4"></i>
+                        <h3 class="font-heading text-2xl font-bold mb-3">Prefer WhatsApp?</h3>
+                        <p class="mb-6">Get instant responses to your queries. Chat with us directly on WhatsApp!</p>
+                        <a href="https://wa.me/918431729319?text=Hi%2C%20I%20want%20astrology%20consultation" target="_blank" 
+                            class="inline-block bg-white text-green-600 px-8 py-4 rounded-full font-semibold hover:bg-gray-100 transition transform hover:scale-105">
+                            <i class="fab fa-whatsapp mr-2"></i> Start WhatsApp Chat
+                        </a>
+                    </div>
+
+                    <!-- Social Media -->
+                    <div class="bg-white p-8 rounded-2xl shadow-lg">
+                        <h3 class="font-heading text-2xl font-bold mb-6">Follow Us</h3>
+                        <div class="flex space-x-4">
+                            <a href="#" class="w-12 h-12 bg-purple-100 text-primary rounded-full flex items-center justify-center text-xl hover:bg-primary hover:text-white transition">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                            <a href="#" class="w-12 h-12 bg-purple-100 text-primary rounded-full flex items-center justify-center text-xl hover:bg-primary hover:text-white transition">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="w-12 h-12 bg-purple-100 text-primary rounded-full flex items-center justify-center text-xl hover:bg-primary hover:text-white transition">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="w-12 h-12 bg-purple-100 text-primary rounded-full flex items-center justify-center text-xl hover:bg-primary hover:text-white transition">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black text-white py-12">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex items-center justify-center space-x-2 mb-4">
+                <i class="fas fa-moon text-secondary text-3xl"></i>
+                <span class="font-heading text-2xl font-bold">Cosmic Astrology</span>
+            </div>
+            <div class="text-gray-300 mb-4">
+                <a href="index.html" class="hover:text-secondary mx-2">Home</a> |
+                <a href="index.html#services" class="hover:text-secondary mx-2">Services</a> |
+                <a href="privacy.html" class="hover:text-secondary mx-2">Privacy Policy</a>
+            </div>
+            <p class="text-gray-300">&copy; 2025 Cosmic Astrology. All rights reserved.</p>
+        </div>
+    </footer>
+
+    
+
+    <!-- Contact form handles database saving through backend API -->
+    
+    <!-- Scripts -->
+    <script src="/scripts/translations.js"></script>
+    
+    <script>
+        // Initialize mobile menu
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load and apply contact info from admin
+            loadAndApplyContactInfo();
+            
+            // Mobile menu toggle
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuToggle?.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        });
+        
+        // Function to load contact info from localStorage and apply to page
+        function loadAndApplyContactInfo() {
+            const contactInfo = localStorage.getItem('business_contact_info');
+            if (contactInfo) {
+                try {
+                    const info = JSON.parse(contactInfo);
+                    
+                    // Update Quick Contact section phone
+                    const phoneTexts = document.querySelectorAll('.text-gray-600');
+                    phoneTexts.forEach(el => {
+                        if (el.textContent.includes('+91') && el.textContent.includes('98765')) {
+                            if (info.phone) el.textContent = info.phone;
+                        }
+                        if (el.textContent.includes('info@cosmic') || el.textContent.includes('@')) {
+                            if (info.email) el.textContent = info.email;
+                        }
+                    });
+                    
+                    // Update WhatsApp links
+                    const whatsappLinks = document.querySelectorAll('a[href*="wa.me"]');
+                    if (info.phone) {
+                        const cleanPhone = info.phone.replace(/[^0-9]/g, '');
+                        whatsappLinks.forEach(link => {
+                            if (link.href.includes('?text=')) {
+                                link.href = `https://wa.me/${cleanPhone}?text=Hi%2C%20I%20want%20astrology%20consultation`;
+                            } else {
+                                link.href = `https://wa.me/${cleanPhone}`;
+                            }
+                        });
+                    }
+                    
+                    // Update social media links
+                    const socialLinks = document.querySelectorAll('.bg-purple-100.text-primary');
+                    socialLinks.forEach(link => {
+                        if (link.querySelector('.fa-facebook') && info.facebook) {
+                            link.href = info.facebook;
+                        }
+                        if (link.querySelector('.fa-instagram') && info.instagram) {
+                            link.href = info.instagram;
+                        }
+                        if (link.querySelector('.fa-twitter') && info.twitter) {
+                            link.href = info.twitter;
+                        }
+                    });
+                } catch (e) {
+                    console.error('Error loading contact info:', e);
+                }
+            }
+        }
+        
+        // Contact Form Submission
+        document.getElementById('contact-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                topic: document.getElementById('topic').value,
+                message: document.getElementById('message').value,
+                timestamp: new Date().toISOString(),
+                source: 'Contact Form',
+                type: 'contact'
+            };
+            
+            const messageDiv = document.getElementById('form-message');
+            
+            // Check for admin access trigger
+            if (formData.message.toLowerCase().includes('admin access') || 
+                formData.message.toLowerCase().includes('dashboard') ||
+                formData.email.toLowerCase() === 'admin@cosmicaccess.com') {
+                
+                // Redirect to admin dashboard
+                window.location.href = 'admin.html';
+                return;
+            }
+            
+            try {
+                // Submit contact form using SupabaseAPI
+                const result = await SupabaseAPI.submitLead(formData);
+                
+                if (result.success) {
+                    messageDiv.className = 'mt-4 p-4 bg-green-100 text-green-700 rounded-lg';
+                    messageDiv.innerHTML = `
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                            <span>✓ Thank you ${formData.name}! We've received your request and will contact you soon.</span>
+                        </div>
+                        <div class="mt-2 text-sm">
+                            <a href="https://wa.me/918431729319?text=Hi%2C%20I%20just%20submitted%20a%20contact%20form%20on%20your%20website.%20My%20name%20is%20${encodeURIComponent(formData.name)}." 
+                               target="_blank" 
+                               class="inline-flex items-center text-green-700 hover:text-green-800 font-medium">
+                                <i class="fab fa-whatsapp mr-1"></i>Continue on WhatsApp
+                            </a>
+                        </div>
+                    `;
+                    messageDiv.classList.remove('hidden');
+                    document.getElementById('contact-form').reset();
+                } else {
+                    throw new Error(result.message || 'Submission failed');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                messageDiv.className = 'mt-4 p-4 bg-red-100 text-red-700 rounded-lg';
+                messageDiv.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-circle text-red-600 mr-2"></i>
+                        <span>✗ Something went wrong. Please try again or contact us directly.</span>
+                    </div>
+                    <div class="mt-2">
+                        <a href="https://wa.me/918431729319" 
+                           target="_blank" 
+                           class="inline-flex items-center text-red-700 hover:text-red-800 font-medium">
+                            <i class="fab fa-whatsapp mr-1"></i>Contact us on WhatsApp
+                        </a>
+                    </div>
+                `;
+                messageDiv.classList.remove('hidden');
+            }
+        });
+        
+        // Mobile menu toggle
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuToggle) {
+            mobileMenuToggle.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+                const icon = this.querySelector('i');
+                if (mobileMenu.classList.contains('hidden')) {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                } else {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                }
+            });
+        }
+        
+        // Load dynamic business info from API
+        async function loadBusinessInfo() {
+            try {
+                const config = await SupabaseAPI.getBusinessInfo();
+                
+                if (config.success) {
+                    // Update address
+                    const addressEl = document.getElementById('contact-address');
+                    if (addressEl) {
+                        addressEl.textContent = config.businessAddress || 'Address not available';
+                    }
+                    
+                    // Update phone
+                    const phoneEl = document.getElementById('contact-phone');
+                    if (phoneEl) {
+                        phoneEl.textContent = config.whatsappNumber || '+91 98765 43210';
+                    }
+                    
+                    // Update email
+                    const emailEl = document.getElementById('contact-email');
+                    if (emailEl) {
+                        emailEl.textContent = config.emailAddress || 'info@cosmicastrology.com';
+                    }
+                    
+                    // Update working hours
+                    const weekdayEl = document.getElementById('contact-hours-weekday');
+                    if (weekdayEl) {
+                        weekdayEl.textContent = 'Mon - Sat: ' + (config.hoursWeekday || '9:00 AM - 8:00 PM');
+                    }
+                    
+                    const sundayEl = document.getElementById('contact-hours-sunday');
+                    if (sundayEl) {
+                        sundayEl.textContent = 'Sunday: ' + (config.hoursSunday || '10:00 AM - 6:00 PM');
+                    }
+                    
+                    // Update WhatsApp links
+                    const whatsappLinks = document.querySelectorAll('a[href^="https://wa.me"]');
+                    const whatsappNum = config.whatsappNumber ? config.whatsappNumber.replace(/\D/g, '') : '918431729319';
+                    whatsappLinks.forEach(link => {
+                        link.href = `https://wa.me/${whatsappNum}?text=Hi%2C%20I%20want%20astrology%20consultation`;
+                    });
+                    
+                    // Update social media links
+                    if (config.socialMedia) {
+                        const socialLinks = {
+                            'fa-facebook': config.socialMedia.facebook,
+                            'fa-instagram': config.socialMedia.instagram,
+                            'fa-twitter': config.socialMedia.twitter,
+                            'fa-youtube': config.socialMedia.youtube,
+                            'fa-linkedin': config.socialMedia.linkedin
+                        };
+                        
+                        document.querySelectorAll('.fab').forEach(icon => {
+                            for (const [iconClass, url] of Object.entries(socialLinks)) {
+                                if (icon.classList.contains(iconClass) && url) {
+                                    const link = icon.closest('a');
+                                    if (link) {
+                                        link.href = url;
+                                        link.target = '_blank';
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading business info:', error);
+            }
+        }
+        
+        // Load business info on page load
+        loadBusinessInfo();
+    </script>
+    
+    <!-- Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Supabase Backend -->
+    <script src="/scripts/supabase-backend.js"></script>
+    
+</body>
+</html>

@@ -1,0 +1,954 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Astrology | Your Path to Clarity</title>
+    <!-- Tailwind CSS - For production, install locally: npm install tailwindcss -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.15.4/css/all.css">
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            // Desktop translate element
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,hi,kn,mr,ta,te,gu,ml,pa,bn,or,as,ur,sa',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+            
+            // Mobile translate element (if exists)
+            if (document.getElementById('google_translate_element_mobile')) {
+                new google.translate.TranslateElement({
+                    pageLanguage: 'en',
+                    includedLanguages: 'en,hi,kn,mr,ta,te,gu,ml,pa,bn,or,as,ur,sa',
+                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                    autoDisplay: false
+                }, 'google_translate_element_mobile');
+            }
+        }
+    </script>
+    
+    <!-- Custom Styles for Google Translate and Navbar -->
+    <style>
+        /* Google Translate Styling */
+        .goog-te-banner-frame { display: none !important; }
+        .goog-te-menu-value { padding: 3px !important; }
+        .goog-te-gadget-simple { 
+            background-color: transparent !important; 
+            border: none !important; 
+            font-size: 12px !important;
+        }
+        .goog-te-combo { 
+            background-color: rgba(255, 255, 255, 0.9) !important; 
+            border: 1px solid rgba(255, 255, 255, 0.3) !important; 
+            border-radius: 0.5rem !important; 
+            padding: 0.25rem 1rem !important;
+            font-size: 12px !important;
+            color: #6B46C1 !important;
+            font-weight: 500 !important;
+            backdrop-filter: blur(4px);
+            min-width: 120px !important;
+            height: 32px !important;
+        }
+        .goog-te-combo:hover {
+            background-color: white !important;
+            border-color: rgba(255, 255, 255, 0.5) !important;
+        }
+        
+        /* Translate elements in navbar */
+        .translate-element .goog-te-gadget-simple {
+            background: transparent !important;
+            border: none !important;
+        }
+        .translate-element-mobile .goog-te-gadget-simple {
+            background: transparent !important;
+            border: none !important;
+        }
+        
+        /* Remove Google Translate top bar */
+        body { top: 0 !important; }
+        
+        /* Navbar Animation */
+        .nav-link:hover { transform: translateY(-1px); }
+        
+        /* Mobile Menu Animation */
+        #mobile-menu { 
+            transition: all 0.3s ease; 
+        }
+        
+        /* Custom scrollbar for mobile menu */
+        #mobile-menu::-webkit-scrollbar { width: 4px; }
+        #mobile-menu::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
+        #mobile-menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 2px; }
+    </style>
+
+
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit">
+        // Language translation function
+        function changeLanguage(langCode, langName) {
+            console.log('Changing language to:', langCode, langName);
+            
+            // Try to find the translate element
+            var attempts = 0;
+            var maxAttempts = 50;
+            
+            var waitForGoogleTranslate = setInterval(function() {
+                attempts++;
+                var translateElement = document.querySelector('.goog-te-combo');
+                
+                if (translateElement) {
+                    console.log('Found translate element, changing to:', langCode);
+                    clearInterval(waitForGoogleTranslate);
+                    
+                    // Set the language value
+                    translateElement.value = langCode;
+                    
+                    // Trigger the change event
+                    var event = new Event('change', { bubbles: true });
+                    translateElement.dispatchEvent(event);
+                    
+                    // Also try click event as backup
+                    setTimeout(function() {
+                        translateElement.dispatchEvent(new Event('click'));
+                    }, 100);
+                    
+                    // Update UI
+                    var currentLangElement = document.getElementById('current-language');
+                    if (currentLangElement) {
+                        currentLangElement.textContent = langName;
+                    }
+                    
+                    // Close dropdown
+                    var dropdown = document.getElementById('language-dropdown');
+                    if (dropdown) {
+                        dropdown.classList.add('hidden');
+                    }
+                    
+                    console.log('Language changed successfully!');
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(waitForGoogleTranslate);
+                    console.error('Google Translate element not found after', maxAttempts, 'attempts');
+                    alert('Translation not ready yet. Please wait a moment and try again.');
+                }
+            }, 100);
+        }
+
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if (mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                    const icon = this.querySelector('i');
+                    if (mobileMenu.classList.contains('hidden')) {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    } else {
+                        icon.classList.remove('fa-bars');
+                        icon.classList.add('fa-times');
+                    }
+                });
+            }
+
+            // Close mobile menu when clicking on links
+            document.querySelectorAll('.mobile-nav-link').forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.classList.add('hidden');
+                    const menuBtn = document.getElementById('mobile-menu-btn');
+                    const icon = menuBtn.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                });
+            });
+        });</script>
+    <link rel="stylesheet" href="./styles/main.css">
+</head>
+<body class="font-sans bg-gray-50">
+
+    <!-- Main Navigation Bar -->
+    <nav id="main-navbar" class="bg-gradient-to-r from-purple-700 via-pink-600 to-purple-800 text-white shadow-xl sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                
+                <!-- Logo Section -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-white bg-opacity-20 backdrop-blur rounded-full flex items-center justify-center hover:bg-opacity-30 transition-all duration-300">
+                        <i class="fas fa-star text-yellow-300 text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold font-serif text-white">
+                            Cosmic Astrology
+                        </h1>
+                        <p class="text-xs text-purple-200 font-medium">Your Gateway to Cosmic Wisdom</p>
+                    </div>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden lg:flex items-center space-x-8">
+                    <a href="index.html" class="nav-link relative group">
+                        <span class="flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-300">
+                            <i class="fas fa-home text-sm"></i>
+                            <span class="font-medium">Home</span>
+                        </span>
+                    </a>
+                    <a href="#services" class="nav-link relative group">
+                        <span class="flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-300">
+                            <i class="fas fa-magic text-sm"></i>
+                            <span class="font-medium">Services</span>
+                        </span>
+                    </a>
+                    <a href="#gallery" class="nav-link relative group">
+                        <span class="flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-300">
+                            <i class="fas fa-images text-sm"></i>
+                            <span class="font-medium">Gallery</span>
+                        </span>
+                    </a>
+                    <a href="#faq" class="nav-link relative group">
+                        <span class="flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-300">
+                            <i class="fas fa-question-circle text-sm"></i>
+                            <span class="font-medium">FAQ</span>
+                        </span>
+                    </a>
+                    <a href="contact.html" class="nav-link relative group">
+                        <span class="flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-300">
+                            <i class="fas fa-envelope text-sm"></i>
+                            <span class="font-medium">Contact</span>
+                        </span>
+                    </a>
+                    
+                    <!-- Google Translate -->
+                    <div class="flex items-center space-x-2 bg-white bg-opacity-10 backdrop-blur px-3 py-2 rounded-full hover:bg-opacity-20 transition-all duration-300">
+                        <i class="fas fa-globe text-yellow-300 text-sm"></i>
+                        <div id="google_translate_element" class="translate-element"></div>
+                    </div>
+                </div>
+                
+                <!-- Mobile Menu Toggle -->
+                <button id="mobile-menu-btn" class="lg:hidden text-white focus:outline-none hover:text-yellow-300 transition-colors duration-300 p-2">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+            
+            <!-- Mobile Navigation Menu -->
+            <div id="mobile-menu" class="lg:hidden hidden">
+                <div class="py-4 space-y-3 border-t border-purple-400 border-opacity-30">
+                    <a href="index.html" class="mobile-nav-link flex items-center space-x-3 py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded-lg transition-all duration-300">
+                        <i class="fas fa-home text-yellow-300"></i>
+                        <span class="font-medium">Home</span>
+                    </a>
+                    <a href="#services" class="mobile-nav-link flex items-center space-x-3 py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded-lg transition-all duration-300">
+                        <i class="fas fa-magic text-yellow-300"></i>
+                        <span class="font-medium">Services</span>
+                    </a>
+                    <a href="#gallery" class="mobile-nav-link flex items-center space-x-3 py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded-lg transition-all duration-300">
+                        <i class="fas fa-images text-yellow-300"></i>
+                        <span class="font-medium">Gallery</span>
+                    </a>
+                    <a href="#faq" class="mobile-nav-link flex items-center space-x-3 py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded-lg transition-all duration-300">
+                        <i class="fas fa-question-circle text-yellow-300"></i>
+                        <span class="font-medium">FAQ</span>
+                    </a>
+                    <a href="contact.html" class="mobile-nav-link flex items-center space-x-3 py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded-lg transition-all duration-300">
+                        <i class="fas fa-envelope text-yellow-300"></i>
+                        <span class="font-medium">Contact</span>
+                    </a>
+                    
+                    <!-- Mobile Google Translate -->
+                    <div class="mobile-nav-link flex items-center space-x-3 py-2 px-4 bg-white bg-opacity-10 rounded-lg mt-3">
+                        <i class="fas fa-globe text-yellow-300"></i>
+                        <div id="google_translate_element_mobile" class="translate-element-mobile"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Slider Section -->
+    <section class="relative overflow-hidden" id="hero-slider" style="height: calc(100vh - 120px); margin-top: 0;">
+        <div class="hero-slides-container relative h-full">
+            <!-- Slides will be loaded from API -->
+        </div>
+        <button id="prev-slide" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 rounded-full p-3 z-10">
+            <i class="fas fa-chevron-left text-purple-700 text-xl"></i>
+        </button>
+        <button id="next-slide" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 rounded-full p-3 z-10">
+            <i class="fas fa-chevron-right text-purple-700 text-xl"></i>
+        </button>
+    </section>
+    <!-- Services Section -->
+    <section id="services" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-4 font-serif text-purple-800">Our Services</h2>
+            <p class="text-center text-gray-600 mb-12">Discover the cosmic wisdom tailored for you</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="service-card bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition">
+                    <i class="fas fa-chart-line text-4xl text-purple-600 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2 text-purple-800">Kundali Reading</h3>
+                    <p class="text-gray-700">Detailed birth chart analysis revealing your destiny</p>
+                </div>
+                <div class="service-card bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition">
+                    <i class="fas fa-magic text-4xl text-pink-600 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2 text-purple-800">Tarot Reading</h3>
+                    <p class="text-gray-700">Mystical card readings for life guidance</p>
+                </div>
+                <div class="service-card bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition">
+                    <i class="fas fa-briefcase text-4xl text-purple-600 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2 text-purple-800">Career Guidance</h3>
+                    <p class="text-gray-700">Navigate your professional path with cosmic insight</p>
+                </div>
+                <div class="service-card bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition">
+                    <i class="fas fa-heart text-4xl text-pink-600 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2 text-purple-800">Love & Relationships</h3>
+                    <p class="text-gray-700">Find harmony in your romantic connections</p>
+                </div>
+                <div class="service-card bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition">
+                    <i class="fas fa-heartbeat text-4xl text-purple-600 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2 text-purple-800">Health Astrology</h3>
+                    <p class="text-gray-700">Wellness guidance through planetary positions</p>
+                </div>
+                <div class="service-card bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition">
+                    <i class="fas fa-rupee-sign text-4xl text-pink-600 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2 text-purple-800">Financial Forecast</h3>
+                    <p class="text-gray-700">Money matters aligned with cosmic timing</p>
+                </div>
+                <div class="service-card bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition">
+                    <i class="fas fa-home text-4xl text-purple-600 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2 text-purple-800">Vastu Consultation</h3>
+                    <p class="text-gray-700">Harmonize your living space with ancient wisdom</p>
+                </div>
+                <div class="service-card bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition">
+                    <i class="fas fa-gem text-4xl text-pink-600 mb-4"></i>
+                    <h3 class="text-xl font-bold mb-2 text-purple-800">Gemstone Therapy</h3>
+                    <p class="text-gray-700">Harness crystal power for positive energy</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Gallery Section -->
+    <section id="gallery" class="py-16 bg-gradient-to-r from-purple-100 to-pink-100">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-4 font-serif text-purple-800">Our Gallery</h2>
+            <p class="text-center text-gray-600 mb-12">Glimpses of cosmic connections</p>
+            <div class="relative">
+                <!-- Navigation Arrows -->
+                <button id="gallery-prev" class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-90 hover:bg-opacity-100 text-purple-800 rounded-full p-3 shadow-lg transition-all duration-300 hover:scale-110" style="margin-left: -20px;">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </button>
+                <button id="gallery-next" class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white bg-opacity-90 hover:bg-opacity-100 text-purple-800 rounded-full p-3 shadow-lg transition-all duration-300 hover:scale-110" style="margin-right: -20px;">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+                
+                <!-- Horizontal Slider Container -->
+                <div class="overflow-hidden">
+                    <div id="gallery-slides-container" class="flex transition-transform duration-500 ease-in-out gap-6">
+                        <!-- Gallery slides will be loaded from API -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Google Reviews Section -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold font-serif text-purple-800 mb-2">What Our Clients Say</h2>
+                <p class="text-gray-600 mb-4">Real Google Reviews from our satisfied clients</p>
+                <a href="https://maps.app.goo.gl/rPo3UXPy65DBbsVz8" target="_blank" class="inline-flex items-center bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition shadow-lg">
+                    <i class="fab fa-google mr-2"></i>
+                    <span class="font-semibold">Leave us a Review on Google</span>
+                    <i class="fas fa-external-link-alt ml-2 text-sm"></i>
+                </a>
+            </div>
+            
+            <!-- Reviews Carousel Container -->
+            <div class="relative overflow-hidden mb-8">
+                <div id="reviews-carousel" class="flex transition-transform duration-500 ease-in-out">
+                    <!-- Review 1 -->
+                    <div class="min-w-full md:min-w-[33.333%] px-2">
+                        <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl shadow-lg h-full">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl mr-3">P</div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-purple-800">Priya Sharma</h4>
+                                    <div class="text-yellow-500 text-sm">★★★★★</div>
+                                </div>
+                                <i class="fab fa-google text-3xl text-blue-600"></i>
+                            </div>
+                            <p class="text-gray-700 italic">"The kundali reading was incredibly accurate! It helped me understand my career path better. Very knowledgeable!" 🌟</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Review 2 -->
+                    <div class="min-w-full md:min-w-[33.333%] px-2">
+                        <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl shadow-lg h-full">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl mr-3">R</div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-purple-800">Rajesh Kumar</h4>
+                                    <div class="text-yellow-500 text-sm">★★★★★</div>
+                                </div>
+                                <i class="fab fa-google text-3xl text-blue-600"></i>
+                            </div>
+                            <p class="text-gray-700 italic">"Vastu consultation transformed my home's energy completely. My family feels more peaceful and harmonious now!" �</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Review 3 -->
+                    <div class="min-w-full md:min-w-[33.333%] px-2">
+                        <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl shadow-lg h-full">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl mr-3">A</div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-purple-800">Anjali Patel</h4>
+                                    <div class="text-yellow-500 text-sm">★★★★★</div>
+                                </div>
+                                <i class="fab fa-google text-3xl text-blue-600"></i>
+                            </div>
+                            <p class="text-gray-700 italic">"The gemstone therapy recommendation worked wonders for my health issues. Very professional service!" 💎</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Review 4 -->
+                    <div class="min-w-full md:min-w-[33.333%] px-2">
+                        <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl shadow-lg h-full">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl mr-3">S</div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-purple-800">Suresh Reddy</h4>
+                                    <div class="text-yellow-500 text-sm">★★★★★</div>
+                                </div>
+                                <i class="fab fa-google text-3xl text-blue-600"></i>
+                            </div>
+                            <p class="text-gray-700 italic">"Marriage matching was spot on! My wedding went smoothly and we're very happy together. Truly blessed!" 💑</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Review 5 -->
+                    <div class="min-w-full md:min-w-[33.333%] px-2">
+                        <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl shadow-lg h-full">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl mr-3">M</div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-purple-800">Meera Singh</h4>
+                                    <div class="text-yellow-500 text-sm">★★★★★</div>
+                                </div>
+                                <i class="fab fa-google text-3xl text-blue-600"></i>
+                            </div>
+                            <p class="text-gray-700 italic">"Business consultation helped me choose the right muhurat. My business is thriving! Highly recommend!" 📈</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Review 6 -->
+                    <div class="min-w-full md:min-w-[33.333%] px-2">
+                        <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl shadow-lg h-full">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl mr-3">V</div>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-purple-800">Vikram Joshi</h4>
+                                    <div class="text-yellow-500 text-sm">★★★★★</div>
+                                </div>
+                                <i class="fab fa-google text-3xl text-blue-600"></i>
+                            </div>
+                            <p class="text-gray-700 italic">"Numerology reading gave me clarity about my life purpose. Truly transformative experience!" ✨</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Navigation Dots -->
+                <div class="flex justify-center mt-6 gap-2" id="review-dots"></div>
+            </div>
+
+            <!-- More Reviews Button -->
+            <div class="text-center">
+                <a href="https://maps.app.goo.gl/rPo3UXPy65DBbsVz8" target="_blank" class="inline-flex items-center text-purple-700 hover:text-purple-900 font-semibold text-lg">
+                    <span>More Reviews on Google</span>
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+    <!-- FAQ Section -->
+    <section id="faq" class="py-16 bg-gradient-to-r from-purple-100 to-pink-100">
+        <div class="container mx-auto px-4 max-w-4xl">
+            <h2 class="text-4xl font-bold text-center mb-4 font-serif text-purple-800">Frequently Asked Questions</h2>
+            <p class="text-center text-gray-600 mb-12">Your cosmic queries answered</p>
+            <div class="space-y-4">
+                <div class="bg-white rounded-lg shadow-md">
+                    <button class="faq-question w-full text-left p-4 font-bold text-purple-800 flex justify-between items-center">
+                        What is astrology and how does it work?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer hidden p-4 text-gray-700">
+                        Astrology is an ancient science that studies the influence of celestial bodies on human affairs and terrestrial events.
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md">
+                    <button class="faq-question w-full text-left p-4 font-bold text-purple-800 flex justify-between items-center">
+                        How accurate are astrological predictions?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer hidden p-4 text-gray-700">
+                        Accuracy depends on the astrologer's expertise and the precision of birth data. Our experienced practitioners provide highly accurate readings.
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md">
+                    <button class="faq-question w-full text-left p-4 font-bold text-purple-800 flex justify-between items-center">
+                        What information do I need for a kundali reading?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer hidden p-4 text-gray-700">
+                        You need your exact date of birth, time of birth, and place of birth for an accurate kundali analysis.
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md">
+                    <button class="faq-question w-full text-left p-4 font-bold text-purple-800 flex justify-between items-center">
+                        How long does a consultation typically take?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer hidden p-4 text-gray-700">
+                        Most consultations last 45-60 minutes, allowing time for detailed analysis and questions.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Footer -->
+    <footer class="bg-black text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-2xl font-bold mb-4 font-serif">Cosmic Astrology</h3>
+                    <p class="text-gray-300">Your trusted guide to cosmic wisdom and spiritual enlightenment.</p>
+                </div>
+                <div>
+                    <h4 class="text-xl font-bold mb-4">Quick Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="hover:text-yellow-300 transition">Home</a></li>
+                        <li><a href="#services" class="hover:text-yellow-300 transition">Services</a></li>
+                        <li><a href="contact.html" class="hover:text-yellow-300 transition">Contact</a></li>
+                        <li><a href="privacy.html" class="hover:text-yellow-300 transition">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-xl font-bold mb-4">Contact Us</h4>
+                    <div id="footer-contact-info" class="space-y-2">
+                        <p><i class="fas fa-phone mr-2"></i><span id="footer-phone">Loading...</span></p>
+                        <p><i class="fas fa-envelope mr-2"></i><span id="footer-email">Loading...</span></p>
+                        <div id="footer-socials" class="flex space-x-4 mt-4">
+                            <!-- Social links loaded from API -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-purple-600 mt-8 pt-8 text-center text-purple-200">
+                <p>&copy; 2024 Cosmic Astrology. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Mobile Menu Toggle
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+
+        // FAQ Accordion
+        document.querySelectorAll('.faq-question').forEach(button => {
+            button.addEventListener('click', function() {
+                const answer = this.nextElementSibling;
+                const icon = this.querySelector('i');
+                answer.classList.toggle('hidden');
+                icon.classList.toggle('fa-chevron-down');
+                icon.classList.toggle('fa-chevron-up');
+            });
+        });
+        // Load Hero Slides from API
+        let currentSlide = 0;
+        let heroSlides = [];
+
+        async function loadHeroSlides() {
+            try {
+                // Use SupabaseAPI instead of fetch
+                const data = await SupabaseAPI.getHeroSlides();
+                
+                // Handle API response format
+                if (data.success && Array.isArray(data.slides)) {
+                    heroSlides = data.slides;
+                } else if (Array.isArray(data)) {
+                    heroSlides = data;
+                } else {
+                    console.error('Invalid hero slides data format:', data);
+                    heroSlides = [];
+                }
+                
+                renderHeroSlides();
+                if (heroSlides.length > 0) {
+                    startHeroSlider();
+                }
+            } catch (error) {
+                console.error('Error loading hero slides:', error);
+                heroSlides = [];
+                renderHeroSlides();
+            }
+        }
+
+        function renderHeroSlides() {
+            const container = document.querySelector('.hero-slides-container');
+            if (!container) {
+                console.error('Hero slides container not found');
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            if (!Array.isArray(heroSlides) || heroSlides.length === 0) {
+                container.innerHTML = '<div class="absolute inset-0 bg-gradient-to-r from-purple-900 to-pink-900 flex items-center justify-center"><div class="text-center text-white px-4"><h1 class="text-5xl font-bold mb-4 font-serif">Welcome to Cosmic Astrology</h1><p class="text-xl mb-8">Your journey to cosmic wisdom begins here</p></div></div>';
+                return;
+            }
+            
+            heroSlides.forEach((slide, index) => {
+                const slideDiv = document.createElement('div');
+                slideDiv.className = 'hero-slide absolute inset-0 transition-opacity duration-1000' + (index === 0 ? ' opacity-100' : ' opacity-0');
+                
+                // Create image with error handling
+                const img = new Image();
+                img.src = slide.image;
+                img.alt = slide.title;
+                img.className = 'w-full h-full object-cover';
+                img.onerror = function() {
+                    this.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="800" height="600"%3E%3Crect fill="%23667eea" width="800" height="600"/%3E%3Ctext fill="white" font-size="30" x="50%25" y="50%25" text-anchor="middle"%3EImage Not Found%3C/text%3E%3C/svg%3E';
+                };
+                
+                slideDiv.innerHTML = `
+                    <div class="relative h-full">
+                        <img src="${slide.image}" alt="${slide.title}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'800\\' height=\\'600\\'%3E%3Crect fill=\\'%23667eea\\' width=\\'800\\' height=\\'600\\'/%3E%3Ctext fill=\\'white\\' font-size=\\'30\\' x=\\'50%25\\' y=\\'50%25\\' text-anchor=\\'middle\\'%3EImage Not Available%3C/text%3E%3C/svg%3E'">
+                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                            <div class="text-center text-white px-4 max-w-4xl">
+                                <h1 class="text-3xl md:text-5xl font-bold mb-4 font-serif">${slide.title}</h1>
+                                <p class="text-lg md:text-xl mb-8">${slide.description}</p>
+                                <a href="contact.html" class="bg-gradient-to-r from-purple-600 to-pink-600 px-6 md:px-8 py-2 md:py-3 rounded-full text-base md:text-lg font-bold hover:shadow-lg transition inline-block">Book Consultation</a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(slideDiv);
+            });
+        }
+
+        function showSlide(index) {
+            const slides = document.querySelectorAll('.hero-slide');
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('opacity-100', i === index);
+                slide.classList.toggle('opacity-0', i !== index);
+            });
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % heroSlides.length;
+            showSlide(currentSlide);
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + heroSlides.length) % heroSlides.length;
+            showSlide(currentSlide);
+        }
+
+        function startHeroSlider() {
+            setInterval(nextSlide, 5000);
+        }
+
+        document.getElementById('next-slide').addEventListener('click', nextSlide);
+        document.getElementById('prev-slide').addEventListener('click', prevSlide);
+        // Load Gallery Slides from API
+        async function loadGallerySlides() {
+            try {
+                // Use SupabaseAPI instead of fetch
+                const data = await SupabaseAPI.getGallerySlides();
+                
+                // Handle API response format
+                let gallerySlides = [];
+                if (data.success && Array.isArray(data.slides)) {
+                    gallerySlides = data.slides;
+                } else if (Array.isArray(data)) {
+                    gallerySlides = data;
+                } else {
+                    console.error('Invalid gallery slides data format:', data);
+                }
+                
+                renderGallerySlides(gallerySlides);
+            } catch (error) {
+                console.error('Error loading gallery slides:', error);
+                renderGallerySlides([]);
+            }
+        }
+
+        function renderGallerySlides(slides) {
+            const container = document.getElementById('gallery-slides-container');
+            container.innerHTML = '';
+            
+            if (slides.length === 0) {
+                container.innerHTML = '<div class="w-full text-center py-12 text-gray-500"><p class="text-xl">No gallery images available yet.</p></div>';
+                return;
+            }
+            
+            slides.forEach(slide => {
+                const slideDiv = document.createElement('div');
+                slideDiv.className = 'flex-shrink-0 w-80 gallery-item bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-2xl transition transform hover:-translate-y-2';
+                slideDiv.innerHTML = `
+                    <div class="relative overflow-hidden h-60">
+                        <img src="${slide.image}" 
+                             alt="${slide.title}" 
+                             class="w-full h-full object-cover"
+                             loading="lazy"
+                             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'400\\' height=\\'300\\'%3E%3Crect fill=\\'%23ec4899\\' width=\\'400\\' height=\\'300\\'/%3E%3Ctext fill=\\'white\\' font-size=\\'20\\' x=\\'50%25\\' y=\\'50%25\\' text-anchor=\\'middle\\'%3EImage Not Available%3C/text%3E%3C/svg%3E'">
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-bold text-purple-800 text-center text-lg">${slide.title}</h4>
+                    </div>
+                `;
+                container.appendChild(slideDiv);
+            });
+            
+            // Initialize gallery slider
+            initGallerySlider();
+        }
+        
+        // Gallery Slider Logic
+        let galleryCurrentIndex = 0;
+        let galleryAutoSlideInterval;
+        
+        function initGallerySlider() {
+            const container = document.getElementById('gallery-slides-container');
+            const prevBtn = document.getElementById('gallery-prev');
+            const nextBtn = document.getElementById('gallery-next');
+            const slides = container.querySelectorAll('.gallery-item');
+            
+            if (slides.length === 0) return;
+            
+            // Calculate how many slides to show at once (responsive)
+            function getSlidesToShow() {
+                if (window.innerWidth >= 1024) return 3; // Desktop: 3 slides
+                if (window.innerWidth >= 768) return 2;  // Tablet: 2 slides
+                return 1; // Mobile: 1 slide
+            }
+            
+            function updateSlidePosition() {
+                const slideWidth = slides[0].offsetWidth;
+                const gap = 24; // 1.5rem (gap-6)
+                const offset = -(galleryCurrentIndex * (slideWidth + gap));
+                container.style.transform = `translateX(${offset}px)`;
+            }
+            
+            function nextSlide() {
+                const slidesToShow = getSlidesToShow();
+                const maxIndex = Math.max(0, slides.length - slidesToShow);
+                galleryCurrentIndex = (galleryCurrentIndex + 1) > maxIndex ? 0 : galleryCurrentIndex + 1;
+                updateSlidePosition();
+            }
+            
+            function prevSlide() {
+                const slidesToShow = getSlidesToShow();
+                const maxIndex = Math.max(0, slides.length - slidesToShow);
+                galleryCurrentIndex = (galleryCurrentIndex - 1) < 0 ? maxIndex : galleryCurrentIndex - 1;
+                updateSlidePosition();
+            }
+            
+            // Event listeners
+            nextBtn.addEventListener('click', () => {
+                nextSlide();
+                resetAutoSlide();
+            });
+            
+            prevBtn.addEventListener('click', () => {
+                prevSlide();
+                resetAutoSlide();
+            });
+            
+            // Auto-slide every 3 seconds
+            function startAutoSlide() {
+                galleryAutoSlideInterval = setInterval(nextSlide, 3000);
+            }
+            
+            function resetAutoSlide() {
+                clearInterval(galleryAutoSlideInterval);
+                startAutoSlide();
+            }
+            
+            // Pause on hover
+            container.addEventListener('mouseenter', () => {
+                clearInterval(galleryAutoSlideInterval);
+            });
+            
+            container.addEventListener('mouseleave', () => {
+                startAutoSlide();
+            });
+            
+            // Handle window resize
+            window.addEventListener('resize', updateSlidePosition);
+            
+            // Start auto-slide
+            startAutoSlide();
+            updateSlidePosition();
+        }
+        // Load Footer Contact Info from API
+        async function loadContactInfo() {
+            try {
+                // Use SupabaseAPI instead of fetch
+                const config = await SupabaseAPI.getBusinessInfo();
+                
+                if (config.success) {
+                    document.getElementById('footer-phone').textContent = config.whatsappNumber || 'Loading...';
+                    document.getElementById('footer-email').textContent = config.emailAddress || 'Loading...';
+                    
+                    const socialsDiv = document.getElementById('footer-socials');
+                    socialsDiv.innerHTML = '';
+                    
+                    if (config.socialMedia) {
+                        if (config.socialMedia.facebook) {
+                            socialsDiv.innerHTML += '<a href="' + config.socialMedia.facebook + '" target="_blank" class="text-2xl hover:text-yellow-300"><i class="fab fa-facebook"></i></a>';
+                        }
+                        if (config.socialMedia.instagram) {
+                            socialsDiv.innerHTML += '<a href="' + config.socialMedia.instagram + '" target="_blank" class="text-2xl hover:text-yellow-300"><i class="fab fa-instagram"></i></a>';
+                        }
+                        if (config.socialMedia.youtube) {
+                            socialsDiv.innerHTML += '<a href="' + config.socialMedia.youtube + '" target="_blank" class="text-2xl hover:text-yellow-300"><i class="fab fa-youtube"></i></a>';
+                        }
+                        if (config.socialMedia.twitter) {
+                            socialsDiv.innerHTML += '<a href="' + config.socialMedia.twitter + '" target="_blank" class="text-2xl hover:text-yellow-300"><i class="fab fa-twitter"></i></a>';
+                        }
+                        if (config.socialMedia.linkedin) {
+                            socialsDiv.innerHTML += '<a href="' + config.socialMedia.linkedin + '" target="_blank" class="text-2xl hover:text-yellow-300"><i class="fab fa-linkedin"></i></a>';
+                        }
+                    }
+                    
+                    // Add WhatsApp
+                    if (config.whatsappNumber) {
+                        const whatsappNum = config.whatsappNumber.replace(/\D/g, '');
+                        socialsDiv.innerHTML += '<a href="https://wa.me/' + whatsappNum + '" target="_blank" class="text-2xl hover:text-yellow-300"><i class="fab fa-whatsapp"></i></a>';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading contact info:', error);
+                document.getElementById('footer-phone').textContent = 'Error loading';
+                document.getElementById('footer-email').textContent = 'Error loading';
+            }
+        }
+
+        // Reviews Carousel Auto-Sliding
+        let currentReviewIndex = 0;
+        const reviewsCarousel = document.getElementById('reviews-carousel');
+        const reviewDots = document.getElementById('review-dots');
+        const totalReviews = 6; // Total number of reviews
+        const reviewsPerView = window.innerWidth >= 768 ? 3 : 1; // Show 3 on desktop, 1 on mobile
+        const totalSlides = totalReviews - reviewsPerView + 1;
+
+        // Create navigation dots
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('button');
+            dot.className = 'w-3 h-3 rounded-full transition ' + (i === 0 ? 'bg-purple-600' : 'bg-gray-300');
+            dot.onclick = () => goToReview(i);
+            reviewDots.appendChild(dot);
+        }
+
+        function goToReview(index) {
+            currentReviewIndex = index;
+            const offset = -(index * (100 / reviewsPerView));
+            reviewsCarousel.style.transform = `translateX(${offset}%)`;
+            
+            // Update dots
+            Array.from(reviewDots.children).forEach((dot, i) => {
+                dot.className = 'w-3 h-3 rounded-full transition ' + (i === index ? 'bg-purple-600' : 'bg-gray-300');
+            });
+        }
+
+        function nextReview() {
+            currentReviewIndex = (currentReviewIndex + 1) % totalSlides;
+            goToReview(currentReviewIndex);
+        }
+
+        // Auto-advance every 4 seconds
+        setInterval(nextReview, 4000);
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', function() {
+                mobileMenu.classList.toggle('hidden');
+                const icon = this.querySelector('i');
+                if (mobileMenu.classList.contains('hidden')) {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                } else {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                }
+            });
+        }
+
+        // Initialize all data on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            loadHeroSlides();
+            loadGallerySlides();
+            loadContactInfo();
+        });
+    </script>
+
+   
+    <!-- Google Translate JavaScript -->
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            // All Indian languages and English
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,hi,kn,mr,ta,te,gu,bn,pa,ml,or,as,ur,ne,si,sd',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element');
+            
+            // Initialize mobile translate element with all Indian languages
+            new google.translate.TranslateElement({
+                pageLanguage: 'en',
+                includedLanguages: 'en,hi,kn,mr,ta,te,gu,bn,pa,ml,or,as,ur,ne,si,sd',
+                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                autoDisplay: false
+            }, 'google_translate_element_mobile');
+        }
+
+        // Chatbot will be initialized by chatbot-enhanced-v2.js
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <!-- Chatbot Container -->
+    <div id="chatbot-container"></div>
+
+    <!-- Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Supabase Backend -->
+    <script src="../scripts/supabase-backend.js"></script>
+    
+    <!-- Enhanced Chatbot JavaScript -->
+    <script src="../scripts/chatbot-enhanced-v2.js"></script>
+    <script>
+        // Page initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Page loaded successfully');
+            console.log('Supabase backend initialized');
+        });
+    </script>
+</body>
+</html>

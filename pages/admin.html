@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Cosmic Astrology</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.15.4/css/all.css">
+</head>
+<body class="bg-gray-100">
+
+    <!-- ========== LOGIN SCREEN ========== -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-purple-600 to-pink-600">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-96">
+            <div class="text-center mb-6">
+                <i class="fas fa-moon text-6xl text-purple-600 mb-4"></i>
+                <h1 class="text-3xl font-bold text-gray-800">Admin Login</h1>
+                <p class="text-gray-600 mt-2">Cosmic Astrology Dashboard</p>
+            </div>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label for="admin-password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input type="password" id="admin-password" class="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none" placeholder="Enter admin password" required>
+                </div>
+                <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded-lg font-semibold hover:shadow-lg transform hover:-translate-y-0.5 transition">
+                    <i class="fas fa-sign-in-alt mr-2"></i>Login
+                </button>
+                <p id="login-error" class="text-red-500 text-sm text-center hidden">Incorrect password!</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========== ADMIN DASHBOARD ========== -->
+    <div id="admin-dashboard" class="hidden">
+        <!-- Navbar -->
+        <nav class="bg-gradient-to-r from-purple-700 to-pink-600 text-white shadow-lg sticky top-0 z-50">
+            <div class="container mx-auto px-6 py-4">
+                <div class="flex justify-between items-center">
+                    <h1 class="text-2xl font-bold">Admin Dashboard</h1>
+                    <button onclick="logout()" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-6 py-2 rounded-lg transition font-semibold">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container mx-auto px-6 py-8">
+            <!-- Tab Navigation -->
+            <div class="bg-white rounded-2xl shadow-lg p-2 mb-6">
+                <div class="flex flex-wrap gap-2">
+                    <button class="tab-btn active px-6 py-3 rounded-xl font-semibold text-sm" data-tab="stats">
+                        <i class="fas fa-chart-bar mr-2"></i>Stats
+                    </button>
+                    <button class="tab-btn px-6 py-3 rounded-xl font-semibold text-sm text-gray-600 hover:bg-gray-100" data-tab="hero">
+                        <i class="fas fa-images mr-2"></i>Hero Slides
+                    </button>
+                    <button class="tab-btn px-6 py-3 rounded-xl font-semibold text-sm text-gray-600 hover:bg-gray-100" data-tab="gallery">
+                        <i class="fas fa-photo-video mr-2"></i>Gallery
+                    </button>
+                    <button class="tab-btn px-6 py-3 rounded-xl font-semibold text-sm text-gray-600 hover:bg-gray-100" data-tab="messages">
+                        <i class="fas fa-envelope mr-2"></i>Messages
+                    </button>
+                    <button class="tab-btn px-6 py-3 rounded-xl font-semibold text-sm text-gray-600 hover:bg-gray-100" data-tab="bookings">
+                        <i class="fas fa-calendar-check mr-2"></i>Bookings
+                    </button>
+                    <button class="tab-btn px-6 py-3 rounded-xl font-semibold text-sm text-gray-600 hover:bg-gray-100" data-tab="business">
+                        <i class="fas fa-building mr-2"></i>Business Info
+                    </button>
+                    <button class="tab-btn px-6 py-3 rounded-xl font-semibold text-sm text-gray-600 hover:bg-gray-100" data-tab="testimonials">
+                        <i class="fas fa-star mr-2"></i>Testimonials
+                    </button>
+                    <button class="tab-btn px-6 py-3 rounded-xl font-semibold text-sm text-gray-600 hover:bg-gray-100" data-tab="chatbot">
+                        <i class="fas fa-robot mr-2"></i>Chatbot Config
+                    </button>
+                    <button class="tab-btn px-6 py-3 rounded-xl font-semibold text-sm text-gray-600 hover:bg-gray-100" data-tab="settings">
+                        <i class="fas fa-cog mr-2"></i>Settings
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Content -->
+            <div id="stats-section" class="tab-content">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- Hero Slides Card -->
+                    <div class="card bg-white rounded-2xl p-6 shadow-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-14 h-14 gradient-purple rounded-xl flex items-center justify-center">
+                                <i class="fas fa-images text-white text-2xl"></i>
+                            </div>
+                            <span class="text-xs font-semibold text-purple-600 bg-purple-50 px-3 py-1 rounded-full">ACTIVE</span>
+                        </div>
+                        <p class="text-gray-500 text-sm font-medium mb-1">Hero Slides</p>
+                        <p class="stat-number text-purple-600" id="stat-hero">0</p>
+                    </div>
+                    <!-- Gallery Card -->
+                    <div class="card bg-white rounded-2xl p-6 shadow-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-14 h-14 gradient-blue rounded-xl flex items-center justify-center">
+                                <i class="fas fa-photo-video text-white text-2xl"></i>
+                            </div>
+                            <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">MEDIA</span>
+                        </div>
+                        <p class="text-gray-500 text-sm font-medium mb-1">Gallery Items</p>
+                        <p class="stat-number text-blue-600" id="stat-gallery">0</p>
+                    </div>
+                    <!-- Contacts Card -->
+                    <div class="card bg-white rounded-2xl p-6 shadow-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-14 h-14 gradient-green rounded-xl flex items-center justify-center">
+                                <i class="fas fa-envelope text-white text-2xl"></i>
+                            </div>
+                            <span class="text-xs font-semibold text-green-600 bg-green-50 px-3 py-1 rounded-full">INBOX</span>
+                        </div>
+                        <p class="text-gray-500 text-sm font-medium mb-1">Messages</p>
+                        <p class="stat-number text-green-600" id="stat-contacts">0</p>
+                    </div>
+                    <!-- Bookings Card -->
+                    <div class="card bg-white rounded-2xl p-6 shadow-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-14 h-14 gradient-orange rounded-xl flex items-center justify-center">
+                                <i class="fas fa-calendar-check text-white text-2xl"></i>
+                            </div>
+                            <span class="text-xs font-semibold text-orange-600 bg-orange-50 px-3 py-1 rounded-full">PENDING</span>
+                        </div>
+                        <p class="text-gray-500 text-sm font-medium mb-1">Bookings</p>
+                        <p class="stat-number text-orange-600" id="stat-bookings">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="hero-section" class="tab-content hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">
+                            <i class="fas fa-images text-purple-600 mr-2"></i>Hero Slides Management
+                        </h2>
+                        <button id="add-hero-slide-btn" class="admin-btn admin-btn-primary">
+                            <i class="fas fa-plus mr-2"></i>Add New Slide
+                        </button>
+                    </div>
+                    
+                    <div id="hero-slide-form-container" class="hidden admin-form">
+                        <h3 class="text-lg font-bold mb-4">
+                            <i class="fas fa-edit text-purple-600 mr-2"></i>Slide Details
+                        </h3>
+                        <form id="hero-slide-form" class="space-y-4">
+                            <input type="hidden" id="hero-slide-id">
+                            <div class="form-group">
+                                <label for="hero-slide-title" class="form-label">
+                                    <i class="fas fa-heading text-gray-500 mr-2"></i>Slide Title
+                                </label>
+                                <input type="text" id="hero-slide-title" class="admin-input" placeholder="Enter slide title..." required>
+                            </div>
+                            <div class="form-group">
+                                <label for="hero-slide-description" class="form-label">
+                                    <i class="fas fa-align-left text-gray-500 mr-2"></i>Description
+                                </label>
+                                <textarea id="hero-slide-description" rows="3" class="admin-input" placeholder="Enter slide description..." required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="hero-slide-image" class="form-label">
+                                    <i class="fas fa-image text-gray-500 mr-2"></i>Slide Image
+                                </label>
+                                <input type="file" id="hero-slide-image" accept="image/*" class="admin-input">
+                                <p class="text-sm text-gray-500 mt-1">Recommended size: 1920x1080px</p>
+                            </div>
+                            <div class="flex gap-4">
+                                <button type="submit" class="admin-btn admin-btn-success">
+                                    <i class="fas fa-save mr-2"></i>Save Slide
+                                </button>
+                                <button type="button" id="cancel-hero-slide-edit" class="admin-btn admin-btn-secondary">
+                                    <i class="fas fa-times mr-2"></i>Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="hero-slides-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Hero slides will be loaded here -->
+                    </div>
+                </div>
+            </div>
+            <div id="gallery-section" class="tab-content hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">
+                            <i class="fas fa-photo-video text-blue-600 mr-2"></i>Gallery Management
+                        </h2>
+                        <button id="add-gallery-image-btn" class="admin-btn admin-btn-primary">
+                            <i class="fas fa-plus mr-2"></i>Add New Image
+                        </button>
+                    </div>
+                    
+                    <div id="gallery-image-form-container" class="hidden admin-form">
+                        <h3 class="text-lg font-bold mb-4">
+                            <i class="fas fa-image text-blue-600 mr-2"></i>Image Details
+                        </h3>
+                        <form id="gallery-image-form" class="space-y-4">
+                            <input type="hidden" id="gallery-image-id">
+                            <div class="form-group">
+                                <label for="gallery-image-title" class="form-label">
+                                    <i class="fas fa-tag text-gray-500 mr-2"></i>Image Title
+                                </label>
+                                <input type="text" id="gallery-image-title" class="admin-input" placeholder="Enter image title..." required>
+                            </div>
+                            <div class="form-group">
+                                <label for="gallery-image-description" class="form-label">
+                                    <i class="fas fa-align-left text-gray-500 mr-2"></i>Description
+                                </label>
+                                <textarea id="gallery-image-description" class="admin-input" rows="3" placeholder="Enter image description..." required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="gallery-image-file" class="form-label">
+                                    <i class="fas fa-upload text-gray-500 mr-2"></i>Image File
+                                </label>
+                                <input type="file" id="gallery-image-file" accept="image/*" class="admin-input">
+                                <p class="text-sm text-gray-500 mt-1">Supported formats: JPG, PNG, WebP</p>
+                            </div>
+                            <div class="flex gap-4">
+                                <button type="submit" class="admin-btn admin-btn-success">
+                                    <i class="fas fa-save mr-2"></i>Save Image
+                                </button>
+                                <button type="button" id="cancel-gallery-image-edit" class="admin-btn admin-btn-secondary">
+                                    <i class="fas fa-times mr-2"></i>Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div id="gallery-images-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Gallery images will be loaded here -->
+                    </div>
+                </div>
+            </div>
+            <div id="messages-section" class="tab-content hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">
+                            <i class="fas fa-envelope text-green-600 mr-2"></i>Contact Messages
+                        </h2>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm text-gray-500">Total Messages:</span>
+                            <span class="font-bold text-green-600" id="total-messages">0</span>
+                        </div>
+                    </div>
+                    <div id="messages-list" class="space-y-4">
+                        <!-- Messages will be loaded here -->
+                    </div>
+                </div>
+            </div>
+            <div id="bookings-section" class="tab-content hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">
+                            <i class="fas fa-calendar-check text-orange-600 mr-2"></i>Booking Requests
+                        </h2>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sm text-gray-500">Pending Bookings:</span>
+                            <span class="font-bold text-orange-600" id="total-bookings">0</span>
+                        </div>
+                    </div>
+                    <div id="bookings-list" class="space-y-4">
+                        <!-- Bookings will be loaded here -->
+                    </div>
+                </div>
+            </div>
+            <div id="business-section" class="tab-content hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-800">
+                        <i class="fas fa-building text-indigo-600 mr-2"></i>Business Information
+                    </h2>
+                    <form id="business-info-form" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="form-group">
+                                <label for="business-address" class="form-label">
+                                    <i class="fas fa-map-marker-alt text-gray-500 mr-2"></i>Business Address
+                                </label>
+                                <textarea id="business-address" class="admin-input" rows="3" placeholder="Enter complete business address..." required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="business-email" class="form-label">
+                                    <i class="fas fa-envelope text-gray-500 mr-2"></i>Contact Email
+                                </label>
+                                <input type="email" id="business-email" class="admin-input" placeholder="contact@example.com" required>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="form-group">
+                                <label for="business-phone" class="form-label">
+                                    <i class="fas fa-phone text-gray-500 mr-2"></i>Phone Number
+                                </label>
+                                <input type="tel" id="business-phone" class="admin-input" placeholder="+1 (555) 123-4567" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="business-website" class="form-label">
+                                    <i class="fas fa-globe text-gray-500 mr-2"></i>Website URL
+                                </label>
+                                <input type="url" id="business-website" class="admin-input" placeholder="https://www.example.com">
+                            </div>
+                        </div>
+                        
+                        <!-- Business Hours Section -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="form-group">
+                                <label for="business-hours-weekday" class="form-label">
+                                    <i class="fas fa-clock text-gray-500 mr-2"></i>Weekday Hours (Mon-Sat)
+                                </label>
+                                <input type="text" id="business-hours-weekday" class="admin-input" placeholder="9:00 AM - 8:00 PM" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="business-hours-sunday" class="form-label">
+                                    <i class="fas fa-calendar-day text-gray-500 mr-2"></i>Sunday Hours
+                                </label>
+                                <input type="text" id="business-hours-sunday" class="admin-input" placeholder="10:00 AM - 6:00 PM" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Social Media Section -->
+                        <div class="mt-8 pt-6 border-t border-gray-200">
+                            <h3 class="text-lg font-bold mb-4 text-gray-800">
+                                <i class="fas fa-share-alt text-blue-600 mr-2"></i>Social Media Links
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="form-group">
+                                    <label for="facebook-url" class="form-label">
+                                        <i class="fab fa-facebook text-blue-600 mr-2"></i>Facebook
+                                    </label>
+                                    <input type="url" id="facebook-url" class="admin-input" placeholder="https://facebook.com/yourpage">
+                                </div>
+                                <div class="form-group">
+                                    <label for="instagram-url" class="form-label">
+                                        <i class="fab fa-instagram text-pink-600 mr-2"></i>Instagram
+                                    </label>
+                                    <input type="url" id="instagram-url" class="admin-input" placeholder="https://instagram.com/yourpage">
+                                </div>
+                                <div class="form-group">
+                                    <label for="youtube-url" class="form-label">
+                                        <i class="fab fa-youtube text-red-600 mr-2"></i>YouTube
+                                    </label>
+                                    <input type="url" id="youtube-url" class="admin-input" placeholder="https://youtube.com/@yourchannel">
+                                </div>
+                                <div class="form-group">
+                                    <label for="twitter-url" class="form-label">
+                                        <i class="fab fa-twitter text-sky-500 mr-2"></i>Twitter
+                                    </label>
+                                    <input type="url" id="twitter-url" class="admin-input" placeholder="https://twitter.com/yourpage">
+                                </div>
+                                <div class="form-group">
+                                    <label for="linkedin-url" class="form-label">
+                                        <i class="fab fa-linkedin text-blue-700 mr-2"></i>LinkedIn
+                                    </label>
+                                    <input type="url" id="linkedin-url" class="admin-input" placeholder="https://linkedin.com/company/yourcompany">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-6">
+                            <button type="button" id="edit-business-btn" class="admin-btn admin-btn-primary px-8">
+                                <i class="fas fa-edit mr-2"></i>Edit Business Information
+                            </button>
+                            <button type="submit" id="save-business-btn" class="admin-btn admin-btn-success px-8 hidden">
+                                <i class="fas fa-save mr-2"></i>Save Business Information
+                            </button>
+                            <button type="button" id="cancel-business-btn" class="admin-btn admin-btn-secondary px-8 hidden">
+                                <i class="fas fa-times mr-2"></i>Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Testimonials Section -->
+            <div id="testimonials-section" class="tab-content hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">
+                            <i class="fas fa-star text-yellow-500 mr-2"></i>What Our Clients Say
+                        </h2>
+                        <button onclick="showAddTestimonialModal()" class="admin-btn admin-btn-primary">
+                            <i class="fas fa-plus mr-2"></i>Add Testimonial
+                        </button>
+                    </div>
+                    
+                    <div id="testimonials-list" class="space-y-4">
+                        <!-- Testimonials will be loaded here -->
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-spinner fa-spin text-4xl mb-4"></i>
+                            <p>Loading testimonials...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="chatbot-section" class="tab-content hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-gray-800">
+                            <i class="fas fa-robot text-purple-600 mr-2"></i>Chatbot Configuration
+                        </h2>
+                        <button type="button" id="edit-chatbot-btn" onclick="toggleChatbotEdit()" class="admin-btn admin-btn-secondary">
+                            <i class="fas fa-edit mr-2"></i>Edit
+                        </button>
+                    </div>
+                    
+                    <form id="chatbot-config-form" class="space-y-6">
+                        <!-- Google Maps URL -->
+                        <div class="admin-form p-4">
+                            <div class="form-group">
+                                <label for="chatbot-google-maps" class="form-label">
+                                    <i class="fas fa-map-marker-alt text-red-500 mr-2"></i>Google Maps Location URL
+                                </label>
+                                <input type="url" id="chatbot-google-maps" class="admin-input" placeholder="https://maps.app.goo.gl/...">
+                                <p class="text-sm text-gray-500 mt-1">Share link from Google Maps</p>
+                            </div>
+                        </div>
+
+                        <!-- Google Review URL -->
+                        <div class="admin-form p-4">
+                            <div class="form-group">
+                                <label for="chatbot-google-review" class="form-label">
+                                    <i class="fas fa-star text-yellow-500 mr-2"></i>Google Review URL
+                                </label>
+                                <input type="url" id="chatbot-google-review" class="admin-input" placeholder="https://maps.app.goo.gl/...">
+                                <p class="text-sm text-gray-500 mt-1">Link where customers can leave reviews</p>
+                            </div>
+                        </div>
+
+                        <!-- Services List -->
+                        <div class="admin-form p-4">
+                            <label class="form-label">
+                                <i class="fas fa-list text-blue-500 mr-2"></i>Services Offered (One per line)
+                            </label>
+                            <textarea id="chatbot-services" class="admin-input" rows="8" placeholder="Kundali Reading&#10;Tarot Reading&#10;Career Guidance&#10;..."></textarea>
+                            <p class="text-sm text-gray-500 mt-1">Each line is one service</p>
+                        </div>
+
+                        <!-- Social Media URLs -->
+                        <div class="admin-form p-4">
+                            <h3 class="text-lg font-bold mb-4 text-gray-700">
+                                <i class="fas fa-share-alt text-green-500 mr-2"></i>Social Media Links
+                            </h3>
+                            <div class="space-y-3">
+                                <div class="form-group">
+                                    <label for="chatbot-facebook" class="form-label">Facebook</label>
+                                    <input type="url" id="chatbot-facebook" class="admin-input" placeholder="https://facebook.com/...">
+                                </div>
+                                <div class="form-group">
+                                    <label for="chatbot-instagram" class="form-label">Instagram</label>
+                                    <input type="url" id="chatbot-instagram" class="admin-input" placeholder="https://instagram.com/...">
+                                </div>
+                                <div class="form-group">
+                                    <label for="chatbot-twitter" class="form-label">Twitter</label>
+                                    <input type="url" id="chatbot-twitter" class="admin-input" placeholder="https://twitter.com/...">
+                                </div>
+                                <div class="form-group">
+                                    <label for="chatbot-youtube" class="form-label">YouTube</label>
+                                    <input type="url" id="chatbot-youtube" class="admin-input" placeholder="https://youtube.com/...">
+                                </div>
+                                <div class="form-group">
+                                    <label for="chatbot-linkedin" class="form-label">LinkedIn</label>
+                                    <input type="url" id="chatbot-linkedin" class="admin-input" placeholder="https://linkedin.com/...">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Working Hours -->
+                        <div class="admin-form p-4">
+                            <h3 class="text-lg font-bold mb-4 text-gray-700">
+                                <i class="fas fa-clock text-orange-500 mr-2"></i>Working Hours
+                            </h3>
+                            <div class="space-y-3">
+                                <div class="form-group">
+                                    <label for="chatbot-hours-weekday" class="form-label">Weekday Hours</label>
+                                    <input type="text" id="chatbot-hours-weekday" class="admin-input" placeholder="9:00 AM - 8:00 PM">
+                                </div>
+                                <div class="form-group">
+                                    <label for="chatbot-hours-sunday" class="form-label">Sunday Hours</label>
+                                    <input type="text" id="chatbot-hours-sunday" class="admin-input" placeholder="9:00 AM - 2:00 PM">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="chatbot-form-actions" class="flex gap-4" style="display: none;">
+                            <button type="submit" class="admin-btn admin-btn-success flex-1">
+                                <i class="fas fa-save mr-2"></i>Save Changes
+                            </button>
+                            <button type="button" onclick="cancelChatbotEdit()" class="admin-btn admin-btn-danger">
+                                <i class="fas fa-times mr-2"></i>Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div id="settings-section" class="tab-content hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Password Change Section -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6">
+                        <h2 class="text-xl font-bold mb-6 text-gray-800">
+                            <i class="fas fa-lock text-red-600 mr-2"></i>Change Password
+                        </h2>
+                        <form id="change-password-form" class="space-y-4">
+                            <div class="form-group">
+                                <label for="current-password" class="form-label">
+                                    <i class="fas fa-key text-gray-500 mr-2"></i>Current Password
+                                </label>
+                                <input type="password" id="current-password" class="admin-input" placeholder="Enter current password..." required>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-password" class="form-label">
+                                    <i class="fas fa-lock text-gray-500 mr-2"></i>New Password
+                                </label>
+                                <input type="password" id="new-password" class="admin-input" placeholder="Enter new password..." required>
+                                <p class="text-sm text-gray-500 mt-1">Password must be at least 6 characters long</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm-password" class="form-label">
+                                    <i class="fas fa-check-circle text-gray-500 mr-2"></i>Confirm New Password
+                                </label>
+                                <input type="password" id="confirm-password" class="admin-input" placeholder="Confirm new password..." required>
+                            </div>
+                            <button type="submit" class="admin-btn admin-btn-success w-full">
+                                <i class="fas fa-shield-alt mr-2"></i>Update Password
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- System Information Section -->
+                    <div class="bg-white rounded-2xl shadow-lg p-6">
+                        <h2 class="text-xl font-bold mb-6 text-gray-800">
+                            <i class="fas fa-info-circle text-blue-600 mr-2"></i>System Information
+                        </h2>
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <span class="font-medium text-gray-600">Admin Version</span>
+                                <span class="font-bold text-gray-800">v2.1.0</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <span class="font-medium text-gray-600">Last Login</span>
+                                <span class="font-bold text-gray-800" id="last-login-time">Just now</span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <span class="font-medium text-gray-600">System Status</span>
+                                <span class="font-bold text-green-600">
+                                    <i class="fas fa-circle text-xs mr-1"></i>Active
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <span class="font-medium text-gray-600">Database</span>
+                                <span class="font-bold text-green-600">
+                                    <i class="fas fa-database mr-1"></i>Connected
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mt-6 text-center">
+                            <button onclick="logout()" class="admin-btn admin-btn-danger px-8">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Logout Securely
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Testimonial Modal -->
+    <div id="testimonial-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="bg-gradient-to-r from-yellow-500 to-orange-500 text-white p-6 rounded-t-2xl">
+                <h3 class="text-2xl font-bold" id="testimonial-modal-title">
+                    <i class="fas fa-star mr-2"></i>Add Testimonial
+                </h3>
+            </div>
+            <form id="testimonial-form" class="p-6 space-y-4">
+                <input type="hidden" id="testimonial-id">
+                
+                <div class="form-group">
+                    <label for="testimonial-client-name" class="form-label">
+                        <i class="fas fa-user text-gray-500 mr-2"></i>Client Name
+                    </label>
+                    <input type="text" id="testimonial-client-name" class="admin-input" placeholder="John Doe" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="testimonial-rating" class="form-label">
+                        <i class="fas fa-star text-yellow-500 mr-2"></i>Rating (1-5)
+                    </label>
+                    <select id="testimonial-rating" class="admin-input" required>
+                        <option value="">Select Rating</option>
+                        <option value="5">⭐⭐⭐⭐⭐ (5 Stars)</option>
+                        <option value="4">⭐⭐⭐⭐ (4 Stars)</option>
+                        <option value="3">⭐⭐⭐ (3 Stars)</option>
+                        <option value="2">⭐⭐ (2 Stars)</option>
+                        <option value="1">⭐ (1 Star)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="testimonial-review" class="form-label">
+                        <i class="fas fa-comment text-gray-500 mr-2"></i>Review Text
+                    </label>
+                    <textarea id="testimonial-review" class="admin-input" rows="4" placeholder="Enter the client's review..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="testimonial-google-url" class="form-label">
+                        <i class="fab fa-google text-red-500 mr-2"></i>Google Review URL (Optional)
+                    </label>
+                    <input type="url" id="testimonial-google-url" class="admin-input" placeholder="https://maps.app.goo.gl/...">
+                    <p class="text-sm text-gray-500 mt-1">Link to the original Google review</p>
+                </div>
+                
+                <div class="form-group">
+                    <label for="testimonial-image-url" class="form-label">
+                        <i class="fas fa-image text-gray-500 mr-2"></i>Client Image URL (Optional)
+                    </label>
+                    <input type="url" id="testimonial-image-url" class="admin-input" placeholder="https://example.com/image.jpg">
+                    <p class="text-sm text-gray-500 mt-1">Link to client's profile image</p>
+                </div>
+                
+                <div class="flex gap-3 mt-6">
+                    <button type="submit" class="flex-1 admin-btn admin-btn-success">
+                        <i class="fas fa-save mr-2"></i>Save Testimonial
+                    </button>
+                    <button type="button" onclick="closeTestimonialModal()" class="flex-1 admin-btn admin-btn-secondary">
+                        <i class="fas fa-times mr-2"></i>Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Supabase Backend -->
+    <script src="/scripts/supabase-backend.js"></script>
+    
+    <script src="/scripts/admin-comprehensive-fixed.js"></script>
+</body>
+</html>
