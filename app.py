@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify, session, send_from_directory
 from flask_cors import CORS
 from datetime import datetime
 import os
@@ -7,12 +7,20 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 from supabase import create_client, Client
 import openai
+import mimetypes
 
 # Load environment variables
 load_dotenv()
+
+# Ensure proper MIME types for CSS and JS files
+mimetypes.add_type('text/css', '.css')
+mimetypes.add_type('application/javascript', '.js')
+mimetypes.add_type('image/avif', '.avif')
+mimetypes.add_type('image/webp', '.webp')
 
 app = Flask(__name__)
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'your-secret-key-change-this-in-production')
@@ -43,6 +51,11 @@ def contact():
 @app.route('/privacy.html')
 def privacy():
     return render_template('privacy.html')
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 # ==================== API ENDPOINTS ====================
 
@@ -893,11 +906,15 @@ def send_booking_email(booking_data):
             server.login(email_address, email_password)
             server.send_message(msg)
         
-        print(f"Booking email sent successfully for {booking_data.get('name')}")
+        print(f"✅ Booking email sent successfully for {booking_data.get('name')}")
+        print(f"📧 Email sent to: {admin_email}")
         return True
         
     except Exception as e:
-        print(f"Error sending booking email: {str(e)}")
+        print(f"❌ Error sending booking email: {str(e)}")
+        print(f"📧 Email config - ADDRESS: {email_address}, HAS_PASSWORD: {bool(email_password)}")
+        import traceback
+        traceback.print_exc()
         return False
 
 def send_contact_email(contact_data):
@@ -945,11 +962,15 @@ def send_contact_email(contact_data):
             server.login(email_address, email_password)
             server.send_message(msg)
         
-        print(f"Contact email sent successfully from {contact_data.get('name')}")
+        print(f"✅ Contact email sent successfully from {contact_data.get('name')}")
+        print(f"📧 Email sent to: {admin_email}")
         return True
         
     except Exception as e:
-        print(f"Error sending contact email: {str(e)}")
+        print(f"❌ Error sending contact email: {str(e)}")
+        print(f"📧 Email config - ADDRESS: {email_address}, HAS_PASSWORD: {bool(email_password)}")
+        import traceback
+        traceback.print_exc()
         return False
 
 if __name__ == '__main__':
