@@ -346,12 +346,17 @@ def get_business_info():
 def update_business_info():
     try:
         data = request.json
+        print(f"Updating business_info with data: {data}")
         # Upsert (update or insert)
         response = supabase.table('business_info')\
             .upsert({'id': 1, **data})\
             .execute()
+        print(f"Business info updated: {response.data}")
         return jsonify(response.data[0])
     except Exception as e:
+        print(f"Error updating business_info: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
 # Chatbot Config endpoints
@@ -372,12 +377,17 @@ def get_chatbot_config():
 def update_chatbot_config():
     try:
         data = request.json
+        print(f"Updating chatbot_config with data: {data}")
         # Upsert (update or insert)
         response = supabase.table('chatbot_config')\
             .upsert({'id': 1, **data})\
             .execute()
+        print(f"Chatbot config updated: {response.data}")
         return jsonify(response.data[0])
     except Exception as e:
+        print(f"Error updating chatbot_config: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
 # Admin Login
@@ -741,18 +751,19 @@ A: Absolutely! All consultations and personal information are strictly confident
 <em>💬 Have more questions? Just ask me in English or ಕನ್ನಡ! ✨</em>'''
             },
             'help': {
-                'keywords': ['help', 'hi', 'hello', 'hey', 'start', 'menu', 'options'],
-                'response': f'''👋 <strong>Namaste! I'm your Astrology Assistant</strong><br><br>
-I'm here to help you with:<br><br>
-🌟 <strong>Services</strong> - Explore our offerings<br>
+                'keywords': ['help', 'hi', 'hello', 'hey', 'start', 'menu', 'options', 'namaste', 'namaskar', 'good morning', 'good afternoon', 'good evening', 'greetings'],
+                'response': f'''🙏 <strong>Namaste! Welcome to our Astrology Services</strong><br><br>
+I'm your virtual assistant, here to guide you! 🌟<br><br>
+<strong>How can I help you today?</strong><br><br>
+💫 <strong>Services</strong> - Explore our astrology offerings<br>
 ⏰ <strong>Hours</strong> - Check our availability<br>
-📍 <strong>Location</strong> - Find our office<br>
-📞 <strong>Contact</strong> - Get in touch<br>
+📍 <strong>Location</strong> - Find our office & directions<br>
+📞 <strong>Contact</strong> - Get in touch with us<br>
 📅 <strong>Booking</strong> - Schedule your consultation<br>
-📱 <strong>Social</strong> - Follow us online<br>
-❓ <strong>FAQ</strong> - Common questions<br>
+📱 <strong>Social</strong> - Follow us on social media<br>
+❓ <strong>FAQ</strong> - Astrology questions answered<br>
 ⭐ <strong>Review</strong> - Share your experience<br><br>
-<em>Just type what you need, or ask me anything! 😊</em>'''
+<em>Just type your question in English or ಕನ್ನಡ! 😊</em>'''
             },
             'thank': {
                 'keywords': ['thank', 'thanks', 'appreciate', 'grateful'],
