@@ -360,12 +360,25 @@ def update_business_info():
     try:
         data = request.json
         print(f"Updating business_info with data: {data}")
-        # Upsert (update or insert)
-        response = supabase.table('business_info')\
-            .upsert({'id': 1, **data})\
-            .execute()
-        print(f"Business info updated: {response.data}")
-        return jsonify(response.data[0])
+        
+        # Update each field individually using update instead of upsert
+        updates = {}
+        for key, value in data.items():
+            if value is not None:  # Only update non-null values
+                updates[key] = value
+        
+        if updates:
+            response = supabase.table('business_info')\
+                .update(updates)\
+                .eq('id', 1)\
+                .execute()
+            print(f"Business info updated: {response.data}")
+            
+            # Return the updated data
+            return jsonify(response.data[0] if response.data else updates)
+        else:
+            return jsonify({'error': 'No data to update'}), 400
+            
     except Exception as e:
         print(f"Error updating business_info: {str(e)}")
         import traceback

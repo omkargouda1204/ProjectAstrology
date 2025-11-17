@@ -480,17 +480,31 @@
     </section>
     <!-- FAQ Section -->
     <section id="faq" class="py-16 bg-gradient-to-r from-purple-100 to-pink-100">
-        <div class="container mx-auto px-4 max-w-4xl">
+        <div class="container mx-auto px-4 max-w-6xl">
             <h2 class="text-4xl font-bold text-center mb-4 font-serif text-purple-800">Frequently Asked Questions</h2>
-            <p class="text-center text-gray-600 mb-12">Your cosmic queries answered</p>
-            <div class="space-y-4">
+            <p class="text-center text-gray-600 mb-12">Your cosmic queries answered | ನಿಮ್ಮ ಕಾಸ್ಮಿಕ್ ಪ್ರಶ್ನೆಗಳಿಗೆ ಉತ್ತರ</p>
+            
+            <!-- Language Toggle -->
+            <div class="flex justify-center mb-8">
+                <div class="bg-white rounded-full p-1 shadow-md">
+                    <button onclick="showFAQLang('english')" id="faq-en-btn" class="px-6 py-2 rounded-full font-semibold transition-all bg-purple-600 text-white">
+                        English
+                    </button>
+                    <button onclick="showFAQLang('kannada')" id="faq-kn-btn" class="px-6 py-2 rounded-full font-semibold transition-all text-gray-700 hover:bg-gray-100">
+                        ಕನ್ನಡ
+                    </button>
+                </div>
+            </div>
+            
+            <!-- English FAQs -->
+            <div id="faq-english" class="space-y-4">
                 <div class="bg-white rounded-lg shadow-md">
                     <button class="faq-question w-full text-left p-4 font-bold text-purple-800 flex justify-between items-center">
                         What is astrology and how does it work?
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer hidden p-4 text-gray-700">
-                        Astrology is an ancient science that studies the influence of celestial bodies on human affairs and terrestrial events.
+                        Astrology is an ancient science that studies the influence of celestial bodies on human affairs and terrestrial events. It analyzes planetary positions at your birth time to provide insights into your personality, relationships, career, and life path.
                     </div>
                 </div>
                 <div class="bg-white rounded-lg shadow-md">
@@ -499,7 +513,7 @@
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer hidden p-4 text-gray-700">
-                        Accuracy depends on the astrologer's expertise and the precision of birth data. Our experienced practitioners provide highly accurate readings.
+                        Accuracy depends on the astrologer's expertise and the precision of birth data. Our experienced practitioners provide highly accurate readings based on Vedic astrology principles with years of study and practice.
                     </div>
                 </div>
                 <div class="bg-white rounded-lg shadow-md">
@@ -508,7 +522,7 @@
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer hidden p-4 text-gray-700">
-                        You need your exact date of birth, time of birth, and place of birth for an accurate kundali analysis.
+                        You need your exact date of birth, time of birth (as accurate as possible), and place of birth for an accurate kundali analysis. If birth time is unknown, we can work with date and location for a basic reading.
                     </div>
                 </div>
                 <div class="bg-white rounded-lg shadow-md">
@@ -517,7 +531,47 @@
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="faq-answer hidden p-4 text-gray-700">
-                        Most consultations last 45-60 minutes, allowing time for detailed analysis and questions.
+                        Most consultations last 45-60 minutes, allowing time for detailed analysis, answering your specific questions, and providing remedies or guidance.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Kannada FAQs -->
+            <div id="faq-kannada" class="space-y-4 hidden">
+                <div class="bg-white rounded-lg shadow-md">
+                    <button class="faq-question w-full text-left p-4 font-bold text-purple-800 flex justify-between items-center">
+                        ಜ್ಯೋತಿಷ್ಯ ಎಂದರೇನು ಮತ್ತು ಅದು ಹೇಗೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer hidden p-4 text-gray-700">
+                        ಜ್ಯೋತಿಷ್ಯವು ಮಾನವ ವ್ಯವಹಾರಗಳು ಮತ್ತು ಭೂಮಿಯ ಘಟನೆಗಳ ಮೇಲೆ ಆಕಾಶ ಕಾಯಗಳ ಪ್ರಭಾವವನ್ನು ಅಧ್ಯಯನ ಮಾಡುವ ಪ್ರಾಚೀನ ವಿಜ್ಞಾನವಾಗಿದೆ. ನಿಮ್ಮ ವ್ಯಕ್ತಿತ್ವ, ಸಂಬಂಧಗಳು, ವೃತ್ತಿ ಮತ್ತು ಜೀವನ ಮಾರ್ಗದ ಬಗ್ಗೆ ಒಳನೋಟಗಳನ್ನು ನೀಡಲು ನಿಮ್ಮ ಜನನ ಸಮಯದಲ್ಲಿ ಗ್ರಹಗಳ ಸ್ಥಾನಗಳನ್ನು ವಿಶ್ಲೇಷಿಸುತ್ತದೆ.
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md">
+                    <button class="faq-question w-full text-left p-4 font-bold text-purple-800 flex justify-between items-center">
+                        ಜ್ಯೋತಿಷ್ಯ ಭವಿಷ್ಯ ಎಷ್ಟು ನಿಖರವಾಗಿದೆ?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer hidden p-4 text-gray-700">
+                        ನಿಖರತೆಯು ಜ್ಯೋತಿಷಿಯ ಪರಿಣತಿ ಮತ್ತು ಜನನ ದತ್ತಾಂಶದ ನಿಖರತೆಯ ಮೇಲೆ ಅವಲಂಬಿತವಾಗಿದೆ. ನಮ್ಮ ಅನುಭವಿ ವೃತ್ತಿಪರರು ವೇದ ಜ್ಯೋತಿಷ್ಯ ತತ್ವಗಳ ಆಧಾರದ ಮೇಲೆ ಅತ್ಯಂತ ನಿಖರವಾದ ವಾಚನಗಳನ್ನು ಒದಗಿಸುತ್ತಾರೆ.
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md">
+                    <button class="faq-question w-full text-left p-4 font-bold text-purple-800 flex justify-between items-center">
+                        ಕುಂಡಲಿ ಓದುವಿಕೆಗೆ ನನಗೆ ಯಾವ ಮಾಹಿತಿ ಬೇಕು?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer hidden p-4 text-gray-700">
+                        ನಿಖರವಾದ ಕುಂಡಲಿ ವಿಶ್ಲೇಷಣೆಗಾಗಿ ನಿಮ್ಮ ನಿಖರ ಜನ್ಮ ದಿನಾಂಕ, ಜನನ ಸಮಯ (ಸಾಧ್ಯವಾದಷ್ಟು ನಿಖರ), ಮತ್ತು ಜನನ ಸ್ಥಳ ಬೇಕು. ಜನನ ಸಮಯ ತಿಳಿದಿಲ್ಲದಿದ್ದರೆ, ಮೂಲಭೂತ ಓದುವಿಕೆಗಾಗಿ ನಾವು ದಿನಾಂಕ ಮತ್ತು ಸ್ಥಳದೊಂದಿಗೆ ಕೆಲಸ ಮಾಡಬಹುದು.
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md">
+                    <button class="faq-question w-full text-left p-4 font-bold text-purple-800 flex justify-between items-center">
+                        ಸಮಾಲೋಚನೆ ಸಾಮಾನ್ಯವಾಗಿ ಎಷ್ಟು ಸಮಯ ತೆಗೆದುಕೊಳ್ಳುತ್ತದೆ?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer hidden p-4 text-gray-700">
+                        ಹೆಚ್ಚಿನ ಸಮಾಲೋಚನೆಗಳು 45-60 ನಿಮಿಷಗಳ ಕಾಲ ನಡೆಯುತ್ತವೆ, ವಿವರವಾದ ವಿಶ್ಲೇಷಣೆ, ನಿಮ್ಮ ನಿರ್ದಿಷ್ಟ ಪ್ರಶ್ನೆಗಳಿಗೆ ಉತ್ತರಿಸಲು, ಮತ್ತು ಪರಿಹಾರಗಳು ಅಥವಾ ಮಾರ್ಗದರ್ಶನವನ್ನು ನೀಡಲು ಸಮಯ ನೀಡುತ್ತದೆ.
                     </div>
                 </div>
             </div>
@@ -564,6 +618,33 @@
             document.getElementById('mobile-menu').classList.toggle('hidden');
         });
 
+        // FAQ Language Toggle
+        function showFAQLang(lang) {
+            const enFAQ = document.getElementById('faq-english');
+            const knFAQ = document.getElementById('faq-kannada');
+            const enBtn = document.getElementById('faq-en-btn');
+            const knBtn = document.getElementById('faq-kn-btn');
+            
+            if (lang === 'english') {
+                enFAQ.classList.remove('hidden');
+                knFAQ.classList.add('hidden');
+                enBtn.classList.add('bg-purple-600', 'text-white');
+                enBtn.classList.remove('text-gray-700', 'hover:bg-gray-100');
+                knBtn.classList.remove('bg-purple-600', 'text-white');
+                knBtn.classList.add('text-gray-700', 'hover:bg-gray-100');
+            } else {
+                knFAQ.classList.remove('hidden');
+                enFAQ.classList.add('hidden');
+                knBtn.classList.add('bg-purple-600', 'text-white');
+                knBtn.classList.remove('text-gray-700', 'hover:bg-gray-100');
+                enBtn.classList.remove('bg-purple-600', 'text-white');
+                enBtn.classList.add('text-gray-700', 'hover:bg-gray-100');
+            }
+        }
+        
+        // Make function globally available
+        window.showFAQLang = showFAQLang;
+        
         // FAQ Accordion
         document.querySelectorAll('.faq-question').forEach(button => {
             button.addEventListener('click', function() {
@@ -1188,7 +1269,7 @@
                                 formContainer.style.display = 'none';
                             }
                             
-                            // Show success message
+                            // Show success message with contact options
                             addBotMessage(`✅ <strong>Booking Confirmed!</strong><br><br>
 Thank you <strong>${name}</strong> for booking <strong>${service}</strong>!<br><br>
 📋 <strong>Booking Details:</strong><br>
@@ -1197,12 +1278,24 @@ Thank you <strong>${name}</strong> for booking <strong>${service}</strong>!<br><
 • Service: ${service}<br>
 • DOB: ${dob}<br>
 ${bookingData.message ? '• Question: ' + bookingData.message + '<br>' : ''}
-<br>📱 We'll contact you at <strong>${phone}</strong> within 2 hours<br>
-<em>Booking ID: #${result.id}</em><br><br>
-🙏 <strong>What's next?</strong><br>
-• Check your phone for our call/WhatsApp<br>
-• Prepare your birth details (if needed)<br><br>
-<strong>⭐ Had a great experience before?</strong><br>
+<br><em>Booking ID: #${result.id}</em><br><br>
+📱 <strong>Contact Us Directly:</strong><br>
+<div style="display: flex; gap: 10px; flex-wrap: wrap; margin: 15px 0;">
+    <a href="https://wa.me/918431729319?text=Hi!%20I%20just%20booked%20(ID:%20${result.id})%20for%20${encodeURIComponent(service)}" target="_blank" style="background: #25D366; color: white; padding: 10px 15px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; font-weight: bold; gap: 5px;">
+        <i class="fab fa-whatsapp"></i> WhatsApp
+    </a>
+    <a href="tel:+918431729319" style="background: #0088cc; color: white; padding: 10px 15px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; font-weight: bold; gap: 5px;">
+        <i class="fas fa-phone"></i> Call Now
+    </a>
+    <a href="mailto:omkargouda1204@gmail.com?subject=Booking%20Confirmation%20${result.id}&body=Hi,%20I%20booked%20${encodeURIComponent(service)}%20consultation." style="background: #EA4335; color: white; padding: 10px 15px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; font-weight: bold; gap: 5px;">
+        <i class="fas fa-envelope"></i> Email
+    </a>
+</div>
+<br>🙏 <strong>What's next?</strong><br>
+• We'll contact you within 2 hours<br>
+• Or use buttons above to reach us now!<br>
+• Prepare your birth details<br><br>
+<strong>⭐ Loved our service?</strong><br>
 <a href="https://maps.app.goo.gl/rPo3UXPy65DBbsVz8" target="_blank" style="background: linear-gradient(to right, #7C3AED, #EC4899); color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; display: inline-block; font-weight: bold; margin-top: 10px;">
 ⭐ Leave us a Google Review!
 </a>`);
@@ -1259,9 +1352,28 @@ ${bookingData.message ? '• Question: ' + bookingData.message + '<br>' : ''}
         }
         
         function sendMenuOption(option) {
-            addUserMessage(option.charAt(0).toUpperCase() + option.slice(1));
-            document.getElementById('chatbot-input').value = option;
-            sendMessage();
+            const displayText = option.charAt(0).toUpperCase() + option.slice(1);
+            addUserMessage(displayText);
+            
+            // Send to backend without triggering sendMessage() again
+            fetch('/api/chatbot', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: option })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.response) {
+                    addBotMessage(data.response);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                addBotMessage('Sorry, I encountered an error. Please try again.');
+            });
+            
+            // Clear input
+            document.getElementById('chatbot-input').value = '';
         }
         
         function contactViaWhatsApp() {
