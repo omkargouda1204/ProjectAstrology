@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Cosmic Astrology</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/static/styles/main.css">
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.15.4/css/all.css">
 </head>
 <body class="bg-gray-100">
@@ -114,7 +114,7 @@
                             <span class="text-xs font-semibold text-green-600 bg-green-50 px-3 py-1 rounded-full">INBOX</span>
                         </div>
                         <p class="text-gray-500 text-sm font-medium mb-1">Messages</p>
-                        <p class="stat-number text-green-600" id="stat-contacts">0</p>
+                        <p class="stat-number text-green-600" id="stat-messages">0</p>
                     </div>
                     <!-- Bookings Card -->
                     <div class="card bg-white rounded-2xl p-6 shadow-lg">
@@ -629,9 +629,295 @@
         </div>
     </div>
 
-    <!-- Flask Backend API -->
-    <script src="/scripts/flask-backend.js"></script>
-    
-    <script src="/scripts/admin-comprehensive-fixed.js"></script>
+    <script>
+        // Admin Login
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const password = document.getElementById('admin-password').value;
+            
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('login-screen').classList.add('hidden');
+                    document.getElementById('admin-dashboard').classList.remove('hidden');
+                    loadDashboardData();
+                } else {
+                    document.getElementById('login-error').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        });
+
+        function logout() {
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('admin-dashboard').classList.add('hidden');
+            document.getElementById('admin-password').value = '';
+            document.getElementById('login-error').classList.add('hidden');
+        }
+
+        // Tab Switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabName = btn.dataset.tab;
+                
+                // Update buttons
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    b.classList.remove('active', 'gradient-purple', 'text-white');
+                    b.classList.add('text-gray-600', 'hover:bg-gray-100');
+                });
+                btn.classList.add('active', 'gradient-purple', 'text-white');
+                btn.classList.remove('text-gray-600', 'hover:bg-gray-100');
+                
+                // Update content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                document.getElementById(tabName + '-section').classList.remove('hidden');
+                
+                // Load data for the tab
+                if (tabName === 'hero') loadHeroSlides();
+                if (tabName === 'gallery') loadGallerySlides();
+                if (tabName === 'bookings') loadBookings();
+                if (tabName === 'messages') loadMessages();
+                if (tabName === 'business') loadBusinessInfo();
+            });
+        });
+
+        // Load Dashboard Data
+        async function loadDashboardData() {
+            try {
+                const [hero, gallery, bookings, messages] = await Promise.all([
+                    fetch('/api/hero-slides').then(r => r.json()),
+                    fetch('/api/gallery-slides').then(r => r.json()),
+                    fetch('/api/bookings').then(r => r.json()),
+                    fetch('/api/contact-messages').then(r => r.json())
+                ]);
+                
+                // Handle both array and {success, slides/leads} formats
+                const heroData = Array.isArray(hero) ? hero : (hero.slides || []);
+                const galleryData = Array.isArray(gallery) ? gallery : (gallery.slides || []);
+                const bookingsData = Array.isArray(bookings) ? bookings : (bookings.leads || []);
+                const messagesData = Array.isArray(messages) ? messages : (messages.messages || []);
+                
+                document.getElementById('stat-hero').textContent = heroData.length || 0;
+                document.getElementById('stat-gallery').textContent = galleryData.length || 0;
+                document.getElementById('stat-bookings').textContent = bookingsData.length || 0;
+                document.getElementById('stat-messages').textContent = messagesData.length || 0;
+            } catch (error) {
+                console.error('Error loading dashboard stats:', error);
+            }
+        }
+
+        // Load Hero Slides
+        async function loadHeroSlides() {
+            try {
+                const response = await fetch('/api/hero-slides');
+                const data = await response.json();
+                const slides = Array.isArray(data) ? data : (data.slides || []);
+                
+                const container = document.getElementById('hero-slides-list');
+                container.innerHTML = slides.map(slide => `
+                    <div class="bg-white rounded-xl p-6 shadow-lg">
+                        <img src="${slide.image}" alt="${slide.title}" class="w-full h-48 object-cover rounded-lg mb-4">
+                        <h3 class="font-bold text-lg mb-2">${slide.title}</h3>
+                        <p class="text-gray-600 mb-4">${slide.description || ''}</p>
+                        <div class="flex gap-2">
+                            <button onclick="editHeroSlide(${slide.id})" class="btn btn-primary flex-1">
+                                <i class="fas fa-edit mr-2"></i>Edit
+                            </button>
+                            <button onclick="deleteHeroSlide(${slide.id})" class="btn btn-danger flex-1">
+                                <i class="fas fa-trash mr-2"></i>Delete
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading hero slides:', error);
+            }
+        }
+
+        // Load Gallery Slides
+        async function loadGallerySlides() {
+            try {
+                const response = await fetch('/api/gallery-slides');
+                const data = await response.json();
+                const slides = Array.isArray(data) ? data : (data.slides || []);
+                
+                const container = document.getElementById('gallery-slides-list');
+                container.innerHTML = slides.map(slide => `
+                    <div class="bg-white rounded-xl p-4 shadow-lg">
+                        <img src="${slide.image}" alt="${slide.title}" class="w-full h-48 object-cover rounded-lg mb-3">
+                        <h4 class="font-semibold mb-3">${slide.title}</h4>
+                        <button onclick="deleteGallerySlide(${slide.id})" class="btn btn-danger w-full">
+                            <i class="fas fa-trash mr-2"></i>Delete
+                        </button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading gallery slides:', error);
+            }
+        }
+
+        // Load Bookings
+        async function loadBookings() {
+            try {
+                const response = await fetch('/api/bookings');
+                const data = await response.json();
+                const bookings = Array.isArray(data) ? data : (data.leads || []);
+                
+                const container = document.getElementById('bookings-list');
+                container.innerHTML = bookings.map(booking => `
+                    <div class="bg-white rounded-xl p-6 shadow-lg">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-bold text-lg">${booking.name}</h3>
+                                <p class="text-gray-600">${booking.phone}</p>
+                                <p class="text-gray-600">${booking.email || ''}</p>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-sm font-semibold ${booking.status === 'confirmed' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'}">
+                                ${booking.status}
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2"><strong>Service:</strong> ${booking.service || 'N/A'}</p>
+                        <p class="text-sm text-gray-600 mb-2"><strong>Date:</strong> ${booking.booking_date || 'N/A'}</p>
+                        <p class="text-sm text-gray-600 mb-4"><strong>Message:</strong> ${booking.message || 'None'}</p>
+                        <div class="flex gap-2 mb-3">
+                            <a href="https://wa.me/${booking.phone.replace(/[^0-9]/g, '')}" target="_blank" class="btn btn-success flex-1">
+                                <i class="fab fa-whatsapp mr-1"></i>WhatsApp
+                            </a>
+                            <a href="tel:${booking.phone}" class="btn" style="background: linear-gradient(to right, #7C3AED, #EC4899); color: white; flex: 1;">
+                                <i class="fas fa-phone mr-1"></i>Call
+                            </a>
+                            ${booking.email ? `<a href="mailto:${booking.email}" class="btn" style="background: linear-gradient(to right, #10B981, #3B82F6); color: white; flex: 1;">
+                                <i class="fas fa-envelope mr-1"></i>Email
+                            </a>` : ''}
+                        </div>
+                        <button onclick="deleteBooking(${booking.id})" class="btn btn-danger w-full">
+                            <i class="fas fa-trash mr-2"></i>Delete
+                        </button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+            }
+        }
+
+        // Load Messages
+        async function loadMessages() {
+            try {
+                const response = await fetch('/api/contact-messages');
+                const data = await response.json();
+                const messages = Array.isArray(data) ? data : (data.messages || []);
+                
+                const container = document.getElementById('messages-list');
+                container.innerHTML = messages.map(msg => `
+                    <div class="bg-white rounded-xl p-6 shadow-lg">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-bold text-lg">${msg.name}</h3>
+                                <p class="text-gray-600">${msg.email}</p>
+                                <p class="text-gray-600">${msg.phone || ''}</p>
+                            </div>
+                            <span class="text-xs text-gray-500">${new Date(msg.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2"><strong>Subject:</strong> ${msg.subject || 'N/A'}</p>
+                        <p class="text-sm text-gray-600 mb-4">${msg.message}</p>
+                        <div class="flex gap-2 mb-3">
+                            ${msg.phone ? `<a href="https://wa.me/${msg.phone.replace(/[^0-9]/g, '')}" target="_blank" class="btn btn-success flex-1">
+                                <i class="fab fa-whatsapp mr-1"></i>WhatsApp
+                            </a>
+                            <a href="tel:${msg.phone}" class="btn" style="background: linear-gradient(to right, #7C3AED, #EC4899); color: white; flex: 1;">
+                                <i class="fas fa-phone mr-1"></i>Call
+                            </a>` : ''}
+                            <a href="mailto:${msg.email}" class="btn" style="background: linear-gradient(to right, #10B981, #3B82F6); color: white; flex: 1;">
+                                <i class="fas fa-envelope mr-1"></i>Email
+                            </a>
+                        </div>
+                        <button onclick="deleteMessage(${msg.id})" class="btn btn-danger w-full">
+                            <i class="fas fa-trash mr-2"></i>Delete
+                        </button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading messages:', error);
+            }
+        }
+
+        // Load Business Info
+        async function loadBusinessInfo() {
+            try {
+                const response = await fetch('/api/business-info');
+                const info = await response.json();
+                
+                if (info) {
+                    document.getElementById('business-name').value = info.business_name || '';
+                    document.getElementById('business-phone').value = info.phone || '';
+                    document.getElementById('business-email').value = info.email || '';
+                    document.getElementById('business-address').value = info.address || '';
+                    document.getElementById('business-whatsapp').value = info.whatsapp || '';
+                }
+            } catch (error) {
+                console.error('Error loading business info:', error);
+            }
+        }
+
+        // Delete Functions
+        async function deleteHeroSlide(id) {
+            if (!confirm('Delete this hero slide?')) return;
+            try {
+                await fetch(`/api/hero-slides/${id}`, { method: 'DELETE' });
+                loadHeroSlides();
+                loadDashboardData();
+            } catch (error) {
+                console.error('Error deleting hero slide:', error);
+                alert('Error deleting slide');
+            }
+        }
+
+        async function deleteGallerySlide(id) {
+            if (!confirm('Delete this gallery image?')) return;
+            try {
+                await fetch(`/api/gallery-slides/${id}`, { method: 'DELETE' });
+                loadGallerySlides();
+                loadDashboardData();
+            } catch (error) {
+                console.error('Error deleting gallery slide:', error);
+                alert('Error deleting image');
+            }
+        }
+
+        async function deleteBooking(id) {
+            if (!confirm('Delete this booking?')) return;
+            try {
+                await fetch(`/api/bookings/${id}`, { method: 'DELETE' });
+                loadBookings();
+                loadDashboardData();
+            } catch (error) {
+                console.error('Error deleting booking:', error);
+                alert('Error deleting booking');
+            }
+        }
+
+        async function deleteMessage(id) {
+            if (!confirm('Delete this message?')) return;
+            try {
+                await fetch(`/api/contact-messages/${id}`, { method: 'DELETE' });
+                loadMessages();
+                loadDashboardData();
+            } catch (error) {
+                console.error('Error deleting message:', error);
+                alert('Error deleting message');
+            }
+        }
+    </script>
 </body>
 </html>
