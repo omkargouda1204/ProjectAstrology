@@ -341,6 +341,15 @@ def create_contact_message():
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/contact-messages/<int:message_id>', methods=['DELETE'])
+def delete_contact_message(message_id):
+    try:
+        supabase.table('contact_messages').delete().eq('id', message_id).execute()
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f"Error deleting contact message: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 # Business Info
 @app.route('/api/business-info', methods=['GET'])
 def get_business_info():
