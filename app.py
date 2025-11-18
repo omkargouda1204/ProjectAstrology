@@ -10,7 +10,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 from supabase import create_client, Client
-import openai
 import mimetypes
 
 # Load environment variables
@@ -892,119 +891,188 @@ def upload_file():
 
 # Helper Functions
 def send_booking_email(booking_data):
-    """Send email notification for new booking"""
-    try:
-        email_address = os.getenv('EMAIL_ADDRESS')
-        email_password = os.getenv('EMAIL_PASSWORD')
-        admin_email = os.getenv('ADMIN_EMAIL', 'omkargouda1204@gmail.com')
-        
-        if not email_address or not email_password:
-            print("Email credentials not configured")
-            return False
-        
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = f"New Booking: {booking_data.get('service', 'Service')}"
-        msg['From'] = email_address
-        msg['To'] = admin_email
-        
-        html = f"""
-        <html>
-        <body style="font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;">
-            <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; border: 2px solid #667eea;">
-                <h2 style="color: #667eea; text-align: center;">🔮 New Booking Request</h2>
-                <div style="margin: 20px 0; padding: 20px; background: #f8f9ff; border-radius: 8px;">
-                    <p><strong>Name:</strong> {booking_data.get('name')}</p>
-                    <p><strong>Phone:</strong> {booking_data.get('phone')}</p>
-                    <p><strong>Email:</strong> {booking_data.get('email', 'N/A')}</p>
-                    <p><strong>Date of Birth:</strong> {booking_data.get('dob', 'N/A')}</p>
-                    <p><strong>Service:</strong> {booking_data.get('service', 'N/A')}</p>
-                    <p><strong>Preferred Date:</strong> {booking_data.get('booking_date', 'N/A')}</p>
-                    <p><strong>Preferred Time:</strong> {booking_data.get('booking_time', 'N/A')}</p>
-                    <p><strong>Message:</strong> {booking_data.get('message', 'N/A')}</p>
-                    <p><strong>Booking Time:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+    """Send email notification for new booking with retry logic"""
+    import time
+    import socket
+    
+    max_retries = 3
+    retry_delay = 2
+    
+    for attempt in range(max_retries):
+        try:
+            email_address = os.getenv('EMAIL_ADDRESS')
+            email_password = os.getenv('EMAIL_PASSWORD')
+            admin_email = os.getenv('ADMIN_EMAIL', 'omkargouda1204@gmail.com')
+            
+            if not email_address or not email_password:
+                print("⚠️ Email credentials not configured")
+                print(f"📧 EMAIL_ADDRESS: {'Set' if email_address else 'Missing'}")
+                print(f"📧 EMAIL_PASSWORD: {'Set' if email_password else 'Missing'}")
+                return False
+            
+            msg = MIMEMultipart('alternative')
+            msg['Subject'] = f"🔮 New Booking: {booking_data.get('service', 'Service')}"
+            msg['From'] = email_address
+            msg['To'] = admin_email
+            
+            html = f"""
+            <html>
+            <body style="font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;">
+                <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; border: 2px solid #667eea;">
+                    <h2 style="color: #667eea; text-align: center;">🔮 New Booking Request</h2>
+                    <div style="margin: 20px 0; padding: 20px; background: #f8f9ff; border-radius: 8px;">
+                        <p><strong>Name:</strong> {booking_data.get('name')}</p>
+                        <p><strong>Phone:</strong> {booking_data.get('phone')}</p>
+                        <p><strong>Email:</strong> {booking_data.get('email', 'N/A')}</p>
+                        <p><strong>Date of Birth:</strong> {booking_data.get('dob', 'N/A')}</p>
+                        <p><strong>Service:</strong> {booking_data.get('service', 'N/A')}</p>
+                        <p><strong>Preferred Date:</strong> {booking_data.get('booking_date', 'N/A')}</p>
+                        <p><strong>Preferred Time:</strong> {booking_data.get('booking_time', 'N/A')}</p>
+                        <p><strong>Message:</strong> {booking_data.get('message', 'N/A')}</p>
+                        <p><strong>Booking Time:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+                    </div>
+                    <p style="color: #666; font-size: 12px; text-align: center; margin-top: 20px;">
+                        This booking was submitted through your website
+                    </p>
                 </div>
-                <p style="color: #666; font-size: 12px; text-align: center; margin-top: 20px;">
-                    This booking was submitted through your website
-                </p>
-            </div>
-        </body>
-        </html>
-        """
-        
-        part = MIMEText(html, 'html')
-        msg.attach(part)
-        
-        with smtplib.SMTP(os.getenv('SMTP_SERVER', 'smtp.gmail.com'), int(os.getenv('SMTP_PORT', 587))) as server:
-            server.starttls()
-            server.login(email_address, email_password)
-            server.send_message(msg)
-        
-        print(f"✅ Booking email sent successfully for {booking_data.get('name')}")
-        print(f"📧 Email sent to: {admin_email}")
-        return True
-        
-    except Exception as e:
-        print(f"❌ Error sending booking email: {str(e)}")
-        print(f"📧 Email config - ADDRESS: {email_address}, HAS_PASSWORD: {bool(email_password)}")
-        import traceback
-        traceback.print_exc()
-        return False
+            </body>
+            </html>
+            """
+            
+            part = MIMEText(html, 'html')
+            msg.attach(part)
+            
+            smtp_server = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
+            smtp_port = int(os.getenv('SMTP_PORT', 587))
+            
+            # Set socket timeout to prevent hanging
+            socket.setdefaulttimeout(30)
+            
+            with smtplib.SMTP(smtp_server, smtp_port, timeout=30) as server:
+                server.starttls()
+                server.login(email_address, email_password)
+                server.send_message(msg)
+            
+            print(f"✅ Booking email sent successfully for {booking_data.get('name')}")
+            print(f"📧 Email sent to: {admin_email} (Attempt {attempt + 1})")
+            return True
+            
+        except smtplib.SMTPAuthenticationError as e:
+            print(f"❌ SMTP Authentication Error: {str(e)}")
+            print("🔑 Check EMAIL_ADDRESS and EMAIL_PASSWORD in environment variables")
+            return False
+            
+        except (socket.timeout, socket.error, smtplib.SMTPException, OSError) as e:
+            print(f"⚠️ Email send attempt {attempt + 1}/{max_retries} failed: {str(e)}")
+            if attempt < max_retries - 1:
+                print(f"🔄 Retrying in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+                retry_delay *= 1.5  # Exponential backoff
+                continue
+            else:
+                print(f"❌ All {max_retries} email send attempts failed")
+                import traceback
+                traceback.print_exc()
+                return False
+                
+        except Exception as e:
+            print(f"❌ Unexpected error sending booking email: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return False
+    
+    return False
 
 def send_contact_email(contact_data):
-    """Send email notification for new contact message"""
-    try:
-        email_address = os.getenv('EMAIL_ADDRESS')
-        email_password = os.getenv('EMAIL_PASSWORD')
-        admin_email = os.getenv('ADMIN_EMAIL', 'omkargouda1204@gmail.com')
-        
-        if not email_address or not email_password:
-            print("Email credentials not configured")
-            return False
-        
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = f"New Contact Message from {contact_data.get('name', 'Unknown')}"
-        msg['From'] = email_address
-        msg['To'] = admin_email
-        
-        html = f"""
-        <html>
-        <body style="font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;">
-            <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; border: 2px solid #667eea;">
-                <h2 style="color: #667eea; text-align: center;">📧 New Contact Message</h2>
-                <div style="margin: 20px 0; padding: 20px; background: #f8f9ff; border-radius: 8px;">
-                    <p><strong>Name:</strong> {contact_data.get('name')}</p>
-                    <p><strong>Phone:</strong> {contact_data.get('phone')}</p>
-                    <p><strong>Email:</strong> {contact_data.get('email', 'N/A')}</p>
-                    <p><strong>Message:</strong></p>
-                    <p style="background: white; padding: 15px; border-radius: 5px; white-space: pre-wrap;">{contact_data.get('message', 'N/A')}</p>
-                    <p><strong>Received:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+    """Send email notification for new contact message with retry logic"""
+    import time
+    import socket
+    
+    max_retries = 3
+    retry_delay = 2
+    
+    for attempt in range(max_retries):
+        try:
+            email_address = os.getenv('EMAIL_ADDRESS')
+            email_password = os.getenv('EMAIL_PASSWORD')
+            admin_email = os.getenv('ADMIN_EMAIL', 'omkargouda1204@gmail.com')
+            
+            if not email_address or not email_password:
+                print("⚠️ Email credentials not configured")
+                print(f"📧 EMAIL_ADDRESS: {'Set' if email_address else 'Missing'}")
+                print(f"📧 EMAIL_PASSWORD: {'Set' if email_password else 'Missing'}")
+                return False
+            
+            msg = MIMEMultipart('alternative')
+            msg['Subject'] = f"📧 Contact: {contact_data.get('name', 'Unknown')} - {contact_data.get('subject', 'General Inquiry')}"
+            msg['From'] = email_address
+            msg['To'] = admin_email
+            
+            html = f"""
+            <html>
+            <body style="font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;">
+                <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; border: 2px solid #667eea;">
+                    <h2 style="color: #667eea; text-align: center;">📧 New Contact Message</h2>
+                    <div style="margin: 20px 0; padding: 20px; background: #f8f9ff; border-radius: 8px;">
+                        <p><strong>Name:</strong> {contact_data.get('name')}</p>
+                        <p><strong>Phone:</strong> {contact_data.get('phone')}</p>
+                        <p><strong>Email:</strong> {contact_data.get('email', 'N/A')}</p>
+                        <p><strong>Subject:</strong> {contact_data.get('subject', 'General Inquiry')}</p>
+                        <p><strong>Message:</strong></p>
+                        <p style="background: white; padding: 15px; border-radius: 5px; white-space: pre-wrap;">{contact_data.get('message', 'N/A')}</p>
+                        <p><strong>Received:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+                    </div>
+                    <p style="color: #666; font-size: 12px; text-align: center; margin-top: 20px;">
+                        This message was submitted through your contact form
+                    </p>
                 </div>
-                <p style="color: #666; font-size: 12px; text-align: center; margin-top: 20px;">
-                    This message was submitted through your contact form
-                </p>
-            </div>
-        </body>
-        </html>
-        """
-        
-        part = MIMEText(html, 'html')
-        msg.attach(part)
-        
-        with smtplib.SMTP(os.getenv('SMTP_SERVER', 'smtp.gmail.com'), int(os.getenv('SMTP_PORT', 587))) as server:
-            server.starttls()
-            server.login(email_address, email_password)
-            server.send_message(msg)
-        
-        print(f"✅ Contact email sent successfully from {contact_data.get('name')}")
-        print(f"📧 Email sent to: {admin_email}")
-        return True
-        
-    except Exception as e:
-        print(f"❌ Error sending contact email: {str(e)}")
-        print(f"📧 Email config - ADDRESS: {email_address}, HAS_PASSWORD: {bool(email_password)}")
-        import traceback
-        traceback.print_exc()
-        return False
+            </body>
+            </html>
+            """
+            
+            part = MIMEText(html, 'html')
+            msg.attach(part)
+            
+            smtp_server = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
+            smtp_port = int(os.getenv('SMTP_PORT', 587))
+            
+            # Set socket timeout to prevent hanging
+            socket.setdefaulttimeout(30)
+            
+            with smtplib.SMTP(smtp_server, smtp_port, timeout=30) as server:
+                server.starttls()
+                server.login(email_address, email_password)
+                server.send_message(msg)
+            
+            print(f"✅ Contact email sent successfully from {contact_data.get('name')}")
+            print(f"📧 Email sent to: {admin_email} (Attempt {attempt + 1})")
+            return True
+            
+        except smtplib.SMTPAuthenticationError as e:
+            print(f"❌ SMTP Authentication Error: {str(e)}")
+            print("🔑 Check EMAIL_ADDRESS and EMAIL_PASSWORD in environment variables")
+            return False
+            
+        except (socket.timeout, socket.error, smtplib.SMTPException, OSError) as e:
+            print(f"⚠️ Email send attempt {attempt + 1}/{max_retries} failed: {str(e)}")
+            if attempt < max_retries - 1:
+                print(f"🔄 Retrying in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+                retry_delay *= 1.5  # Exponential backoff
+                continue
+            else:
+                print(f"❌ All {max_retries} email send attempts failed")
+                import traceback
+                traceback.print_exc()
+                return False
+                
+        except Exception as e:
+            print(f"❌ Unexpected error sending contact email: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return False
+    
+    return False
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 5000))
