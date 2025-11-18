@@ -1,14 +1,18 @@
 # Flask Backend Dependencies
-Flask==3.0.0
 Flask-CORS==4.0.0
 Werkzeug==3.0.1
-gunicorn==21.2.0
 gevent==24.2.1
-python-dotenv==1.0.0
 
-# Supabase
-supabase==2.3.4
-postgrest==0.13.2
+supabase==2.3.5
+gotrue==2.4.0
+httpx==0.24.1
+postgrest==0.14.1
+Flask==3.0.2
+gunicorn==21.2.0
+python-dotenv==1.0.1
+requests==2.31.0
+
+
 
 # OpenAI for Chatbot
 openai==1.12.0
