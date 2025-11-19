@@ -6,8 +6,6 @@
     <title>Contact Us | Cosmic Astrology</title>
     
     <!-- Tailwind CSS CDN -->
-     <link rel="stylesheet" href="/static/styles/main.css">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -268,9 +266,9 @@
 
             <div class="grid md:grid-cols-2 gap-8">
                 <!-- Contact Form -->
-                <div class="bg-white p-8 rounded-2xl shadow-lg">
-                    <h2 class="font-heading text-2xl font-bold mb-6">Send Us a Message</h2>
-                    <form id="contact-form" class="space-y-4">
+                <div class="bg-white p-2 rounded-2xl shadow-lg">
+                    <h2 class="font-heading text-2xl font-bold mb-5">Send Us a Message</h2>
+                    <form id="contact-form" class="space-y-3">
                         <div>
                             <label class="block text-gray-700 font-semibold mb-2">Name *</label>
                             <input type="text" id="name" required 
@@ -282,7 +280,7 @@
                             <label class="block text-gray-700 font-semibold mb-2">Phone Number *</label>
                             <input type="tel" id="phone" required 
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" 
-                                placeholder="Enter your 10-digit mobile number">
+                                placeholder="10-digit mobile number">
                         </div>
                         
                         <div>
@@ -308,13 +306,13 @@
                         
                         <div>
                             <label class="block text-gray-700 font-semibold mb-2">Your Message *</label>
-                            <textarea id="message" required rows="3" 
+                            <textarea id="message" required rows="4" 
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none" 
-                                placeholder="Tell us how we can help you..." style="min-height: 80px; max-height: 120px;"></textarea>
+                                placeholder="Tell us how we can help you..." style="min-height: 100px; max-height: 150px;"></textarea>
                         </div>
                         
                         <button type="submit" 
-                            class="w-full bg-gradient-to-r from-primary to-accent text-white px-8 py-4 rounded-lg font-semibold hover:shadow-lg transition transform hover:scale-105">
+                            class="w-full bg-gradient-to-r from-primary to-accent text-white px-8 py-4 rounded-lg font-semibold hover:shadow-lg transition transform hover:scale-105 text-lg">
                             <i class="fas fa-paper-plane mr-2"></i> Send Message
                         </button>
                     </form>

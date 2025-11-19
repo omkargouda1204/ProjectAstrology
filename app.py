@@ -4,6 +4,8 @@ from datetime import datetime
 import os
 import json
 import smtplib
+import socket
+import time
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -75,14 +77,29 @@ def get_hero_slides():
                 .select('*')\
                 .execute()
         
-        # Fix image paths: convert ../assets/images/ to /static/assets/images/
+        # Ensure images use proper Supabase Storage URLs
         slides = response.data if response.data else []
         for slide in slides:
-            if slide.get('image') and slide['image'].startswith('../assets/'):
-                slide['image'] = slide['image'].replace('../assets/', '/static/assets/')
+            if slide.get('image'):
+                original_path = slide['image']
+                # If it's a relative path or local path, convert to Supabase URL
+                if not slide['image'].startswith('http'):
+                    # Remove any local path prefixes and get just the filename
+                    image_name = slide['image'].replace('../assets/images/', '').replace('/static/uploads/', '').replace('/static/assets/images/', '').replace('static/uploads/', '').replace('static/assets/images/', '')
+                    # Build Supabase Storage URL - using correct format
+                    slide['image'] = f'https://lpcviiavefxepvtcedxs.storage.supabase.co/storage/v1/object/public/astrology/hero-slides/{image_name}'
+                    print(f'Converted hero slide image: {original_path} -> {slide["image"]}')
+            
+            # Ensure video_url field exists (for frontend compatibility)
+            if 'video_url' not in slide:
+                slide['video_url'] = None
         
         print(f'Hero slides count: {len(slides)}')
-        return jsonify(slides)
+        response_obj = jsonify(slides)
+        # Add cache control headers for better performance
+        response_obj.headers['Cache-Control'] = 'public, max-age=300, stale-while-revalidate=60'
+        response_obj.headers['X-Content-Type-Options'] = 'nosniff'
+        return response_obj
     except Exception as e:
         print(f'Hero slides error: {str(e)}')
         import traceback
@@ -93,9 +110,14 @@ def get_hero_slides():
 def create_hero_slide():
     try:
         data = request.json
+        print(f"Creating hero slide with data: {data}")
         response = supabase.table('hero_slides').insert(data).execute()
+        print(f"Hero slide created: {response.data}")
         return jsonify(response.data[0]), 201
     except Exception as e:
+        print(f"Error creating hero slide: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/hero-slides/<int:slide_id>', methods=['GET'])
@@ -115,12 +137,38 @@ def get_hero_slide(slide_id):
 def update_hero_slide(slide_id):
     try:
         data = request.json
+        print(f"Updating hero slide {slide_id} with data: {data}")
+        
+        # Get old slide data to delete old image if new one is uploaded
+        try:
+            old_slide = supabase.table('hero_slides').select('*').eq('id', slide_id).execute()
+            if old_slide.data and len(old_slide.data) > 0:
+                old_image = old_slide.data[0].get('image', '')
+                new_image = data.get('image', '')
+                
+                # If new image is uploaded and different from old, try to delete old
+                if new_image and old_image and old_image != new_image:
+                    if 'supabase.co/storage' in old_image:
+                        try:
+                            # Extract path from URL
+                            path_part = old_image.split('/astrology/')[-1]
+                            supabase.storage.from_('astrology').remove([path_part])
+                            print(f"Deleted old image: {path_part}")
+                        except Exception as del_error:
+                            print(f"Could not delete old image: {del_error}")
+        except Exception as check_error:
+            print(f"Could not check old slide: {check_error}")
+        
         response = supabase.table('hero_slides')\
             .update(data)\
             .eq('id', slide_id)\
             .execute()
+        print(f"Hero slide updated: {response.data}")
         return jsonify(response.data[0])
     except Exception as e:
+        print(f"Error updating hero slide: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/hero-slides/<int:slide_id>', methods=['DELETE'])
@@ -148,14 +196,25 @@ def get_gallery_slides():
                 .select('*')\
                 .execute()
         
-        # Fix image paths: convert ../assets/images/ to /static/assets/images/
+        # Ensure images use proper Supabase Storage URLs
         slides = response.data if response.data else []
         for slide in slides:
-            if slide.get('image') and slide['image'].startswith('../assets/'):
-                slide['image'] = slide['image'].replace('../assets/', '/static/assets/')
+            if slide.get('image'):
+                original_path = slide['image']
+                # If it's a relative path or local path, convert to Supabase URL
+                if not slide['image'].startswith('http'):
+                    # Remove any local path prefixes and get just the filename
+                    image_name = slide['image'].replace('../assets/images/', '').replace('/static/uploads/', '').replace('/static/assets/images/', '').replace('static/uploads/', '').replace('static/assets/images/', '')
+                    # Build Supabase Storage URL - using correct format
+                    slide['image'] = f'https://lpcviiavefxepvtcedxs.storage.supabase.co/storage/v1/object/public/astrology/gallery/{image_name}'
+                    print(f'Converted gallery slide image: {original_path} -> {slide["image"]}')
         
         print(f'Gallery slides count: {len(slides)}')
-        return jsonify(slides)
+        response_obj = jsonify(slides)
+        # Add cache control headers for better performance  
+        response_obj.headers['Cache-Control'] = 'public, max-age=300, stale-while-revalidate=60'
+        response_obj.headers['X-Content-Type-Options'] = 'nosniff'
+        return response_obj
     except Exception as e:
         print(f'Gallery slides error: {str(e)}')
         import traceback
@@ -255,6 +314,14 @@ def create_booking():
         if phone_digits[0] not in ['6', '7', '8', '9']:
             return jsonify({'error': 'Invalid Indian phone number'}), 400
         
+        # Validate email (optional)
+        email = data.get('email', '').strip()
+        if email:
+            import re
+            email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+            if not re.match(email_regex, email):
+                return jsonify({'error': 'Invalid email format'}), 400
+        
         # Validate DOB (not in future, not more than 120 years old, minimum 5 years old)
         if data.get('dob'):
             try:
@@ -276,6 +343,8 @@ def create_booking():
         # Update data with validated values
         data['name'] = name
         data['phone'] = phone_digits
+        if email:
+            data['email'] = email
         
         # Insert booking
         response = supabase.table('bookings').insert(data).execute()
@@ -393,6 +462,10 @@ def update_business_info():
                 .execute()
             print(f"Business info updated: {response.data}")
             
+            # Clear cache so changes reflect immediately
+            chatbot_cache['data'] = None
+            chatbot_cache['timestamp'] = 0
+            
             # Return the updated data
             return jsonify(response.data[0] if response.data else updates)
         else:
@@ -400,6 +473,49 @@ def update_business_info():
             
     except Exception as e:
         print(f"Error updating business_info: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+# About Section endpoints
+@app.route('/api/about-section', methods=['GET'])
+def get_about_section():
+    try:
+        response = supabase.table('about_section')\
+            .select('*')\
+            .eq('id', 1)\
+            .execute()
+        if response.data:
+            # Convert image path to Supabase URL if needed
+            about_data = response.data[0]
+            if about_data.get('image') and not about_data['image'].startswith('http'):
+                image_name = about_data['image'].replace('../assets/images/', '').replace('/static/uploads/', '').replace('/static/assets/images/', '')
+                about_data['image'] = supabase.storage.from_('astrology').get_public_url(f'about/{image_name}')
+            return jsonify(about_data)
+        return jsonify({})
+    except Exception as e:
+        print(f"Error getting about section: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/about-section', methods=['POST', 'PUT'])
+def update_about_section():
+    try:
+        data = request.json
+        print(f"Updating about_section with data: {data}")
+        
+        # Upsert (update or insert)
+        response = supabase.table('about_section')\
+            .upsert({'id': 1, **data})\
+            .execute()
+        print(f"About section updated: {response.data}")
+        
+        # Clear chatbot cache in case about info is used there
+        chatbot_cache['data'] = None
+        chatbot_cache['timestamp'] = 0
+        
+        return jsonify(response.data[0] if response.data else data)
+    except Exception as e:
+        print(f"Error updating about_section: {str(e)}")
         import traceback
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
@@ -428,6 +544,11 @@ def update_chatbot_config():
             .upsert({'id': 1, **data})\
             .execute()
         print(f"Chatbot config updated: {response.data}")
+        
+        # Clear cache so changes reflect immediately
+        chatbot_cache['data'] = None
+        chatbot_cache['timestamp'] = 0
+        
         return jsonify(response.data[0])
     except Exception as e:
         print(f"Error updating chatbot_config: {str(e)}")
@@ -456,6 +577,37 @@ def admin_logout():
     session.pop('admin_logged_in', None)
     return jsonify({'success': True})
 
+# Cache for chatbot config (cache for 30 seconds)
+chatbot_cache = {'data': None, 'timestamp': 0}
+CACHE_DURATION = 30  # seconds
+
+def get_chatbot_config():
+    """Get chatbot config with caching to improve performance"""
+    current_time = time.time()
+    
+    # Check if cache is valid
+    if chatbot_cache['data'] and (current_time - chatbot_cache['timestamp']) < CACHE_DURATION:
+        return chatbot_cache['data']
+    
+    # Fetch fresh data
+    try:
+        business_info_response = supabase.table('business_info').select('*').eq('id', 1).execute()
+        business_info = business_info_response.data[0] if business_info_response.data else {}
+    except:
+        business_info = {}
+    
+    try:
+        chatbot_config_response = supabase.table('chatbot_config').select('*').eq('id', 1).execute()
+        chatbot_config = chatbot_config_response.data[0] if chatbot_config_response.data else {}
+    except:
+        chatbot_config = {}
+    
+    # Update cache
+    chatbot_cache['data'] = {'business_info': business_info, 'chatbot_config': chatbot_config}
+    chatbot_cache['timestamp'] = current_time
+    
+    return chatbot_cache['data']
+
 # Chatbot Endpoint
 @app.route('/api/chatbot', methods=['POST'])
 def chatbot():
@@ -464,19 +616,10 @@ def chatbot():
         user_message = data.get('message', '').lower()
         booking_data = data.get('booking')  # For booking submissions
         
-        # Get business info from database (dynamically updated by admin)
-        try:
-            business_info_response = supabase.table('business_info').select('*').eq('id', 1).execute()
-            business_info = business_info_response.data[0] if business_info_response.data else {}
-        except:
-            business_info = {}
-        
-        # Get chatbot config from database
-        try:
-            chatbot_config_response = supabase.table('chatbot_config').select('*').eq('id', 1).execute()
-            chatbot_config = chatbot_config_response.data[0] if chatbot_config_response.data else {}
-        except:
-            chatbot_config = {}
+        # Get cached config data
+        config_data = get_chatbot_config()
+        business_info = config_data['business_info']
+        chatbot_config = config_data['chatbot_config']
         
         # Get business details (database first, fallback to env)
         whatsapp = business_info.get('whatsapp') or business_info.get('phone') or os.getenv('WHATSAPP_NUMBER', '+918431729319')
@@ -561,20 +704,31 @@ Thank you <strong>{name}</strong> for booking <strong>{service}</strong>!<br><br
         # Enhanced conversational responses
         responses = {
             'services': {
-                'keywords': ['service', 'services', 'offer', 'what do you', 'provide', 'help with'],
-                'response': f'''🌟 <strong>Our Astrology Services:</strong><br><br>
-We offer comprehensive astrology consultations:<br><br>
-• 📜 <strong>Kundali Analysis</strong> - Complete birth chart reading<br>
-• 🎴 <strong>Tarot Card Reading</strong> - Mystical insights<br>
-• 💼 <strong>Career Guidance</strong> - Professional path clarity<br>
-• 💑 <strong>Love & Relationships</strong> - Compatibility analysis<br>
-• 💰 <strong>Financial Consultation</strong> - Wealth prospects<br>
-• 🏠 <strong>Vastu Consultation</strong> - Space harmonization<br>
-• 💎 <strong>Gemstone Recommendation</strong> - Crystal healing<br>
-• 📅 <strong>Muhurat Selection</strong> - Auspicious timing<br><br>
-<a href="https://wa.me/{whatsapp_clean}" target="_blank" style="background: linear-gradient(to right, #7C3AED, #EC4899); color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; display: inline-block; font-weight: bold;">
-📞 Book via WhatsApp
-</a>'''
+                'keywords': ['service', 'services', 'offer', 'what do you', 'provide', 'help with', 'ಸೇವೆ', 'ಸೇವೆಗಳು'],
+                'response': f'''🔮 <strong>Astrology Services | ಜ್ಯೋತಿಷ್ಯ ಸೇವೆಗಳು</strong><br><br>
+<strong>Choose your service:</strong><br><br>
+1️⃣ <strong>Kundali Reading</strong> | ಕುಂಡಲಿ ಓದುವುದು<br>
+   <em>Complete birth chart analysis</em><br><br>
+2️⃣ <strong>Love & Marriage</strong> | ಪ್ರೀತಿ ಮತ್ತು ವಿವಾಹ<br>
+   <em>Compatibility & relationship guidance</em><br><br>
+3️⃣ <strong>Career Guidance</strong> | ವೃತ್ತಿ ಮಾರ್ಗದರ್ಶನ<br>
+   <em>Professional path clarity</em><br><br>
+4️⃣ <strong>Financial Consultation</strong> | ಹಣಕಾಸು ಸಲಹೆ<br>
+   <em>Wealth & prosperity insights</em><br><br>
+5️⃣ <strong>Health Astrology</strong> | ಆರೋಗ್ಯ ಜ್ಯೋತಿಷ್ಯ<br>
+   <em>Health predictions & remedies</em><br><br>
+6️⃣ <strong>Vastu Consultation</strong> | ವಾಸ್ತು ಸಲಹೆ<br>
+   <em>Space harmonization</em><br><br>
+7️⃣ <strong>Gemstone Recommendation</strong> | ರತ್ನ ಶಿಫಾರಸು<br>
+   <em>Crystal healing guidance</em><br><br>
+<div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
+    <a href="https://wa.me/{whatsapp_clean}?text=Hi!%20I%20want%20to%20book%20a%20consultation" target="_blank" style="background: #25D366; color: white; padding: 10px 16px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; font-weight: bold; gap: 5px;">
+        <i class="fab fa-whatsapp"></i> WhatsApp Booking
+    </a>
+    <button onclick="sendMenuOption('book')" style="background: linear-gradient(to right, #7C3AED, #EC4899); color: white; padding: 10px 16px; border-radius: 20px; border: none; cursor: pointer; font-weight: bold;">
+        📋 Booking Form
+    </button>
+</div>'''
             },
             'hours': {
                 'keywords': ['hours', 'timing', 'time', 'when open', 'schedule', 'available', 'working'],
@@ -605,13 +759,8 @@ We offer comprehensive astrology consultations:<br><br>
 <em>We respond fastest on WhatsApp! 💚</em>'''
             },
             'booking': {
-                'keywords': ['book', 'appointment', 'schedule', 'reserve', 'consultation', 'session'],
-                'response': f'''📅 <strong>Book Your Consultation:</strong><br><br>
-<strong>Choose your preferred method:</strong><br><br>
-1️⃣ <a href="https://wa.me/{whatsapp_clean}" target="_blank" style="color: #7C3AED; font-weight: bold;"><strong>WhatsApp Booking</strong></a> <span style="color: #10B981;">(Instant Response ⚡)</span><br>
-2️⃣ <strong>Fill our booking form</strong> on the website<br>
-3️⃣ <strong>Call us</strong> at {whatsapp}<br><br>
-<em>📝 Please have ready: Name, DOB, and preferred service</em>'''
+                'keywords': ['book', 'appointment', 'schedule', 'reserve', 'consultation', 'session', 'ಬುಕ್', 'ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್'],
+                'response': 'SHOW_BOOKING_FORM'
             },
             'review': {
                 'keywords': ['review', 'feedback', 'rating', 'testimonial', 'google review', 'experience'],
@@ -796,31 +945,53 @@ A: Absolutely! All consultations and personal information are strictly confident
 <em>💬 Have more questions? Just ask me in English or ಕನ್ನಡ! ✨</em>'''
             },
             'help': {
-                'keywords': ['help', 'hi', 'hello', 'hey', 'start', 'menu', 'options', 'namaste', 'namaskar', 'good morning', 'good afternoon', 'good evening', 'greetings'],
-                'response': f'''🙏 <strong>Namaste! Welcome to our Astrology Services</strong><br><br>
-I'm your virtual assistant, here to guide you! 🌟<br><br>
-<strong>How can I help you today?</strong><br><br>
-💫 <strong>Services</strong> - Explore our astrology offerings<br>
-⏰ <strong>Hours</strong> - Check our availability<br>
-📍 <strong>Location</strong> - Find our office & directions<br>
-📞 <strong>Contact</strong> - Get in touch with us<br>
-📅 <strong>Booking</strong> - Schedule your consultation<br>
-📱 <strong>Social</strong> - Follow us on social media<br>
-❓ <strong>FAQ</strong> - Astrology questions answered<br>
-⭐ <strong>Review</strong> - Share your experience<br><br>
-<em>Just type your question in English or ಕನ್ನಡ! 😊</em>'''
+                'keywords': ['help', 'hi', 'hello', 'hey', 'start', 'menu', 'options', 'namaste', 'namaskar', 'good morning', 'good afternoon', 'good evening', 'greetings', 'ನಮಸ್ಕಾರ', 'ಹಲೋ'],
+                'response': f'''👋 <strong>Namaste! Welcome to Cosmic Astrology | ನಮಸ್ಕಾರ!</strong><br><br>
+<strong>I'm here to help with:</strong><br><br>
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 10px; margin: 10px 0;">
+📋 <strong>Services & Pricing</strong> | ಸೇವೆಗಳು ಮತ್ತು ಬೆಲೆ<br>
+⏰ <strong>Business Hours</strong> | ವ್ಯಾಪಾರ ಸಮಯ<br>
+📍 <strong>Location</strong> | ಸ್ಥಳ<br>
+📞 <strong>Contact Details</strong> | ಸಂಪರ್ಕ ವಿವರಗಳು<br>
+📅 <strong>Booking Appointments</strong> | ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್ ಬುಕ್ ಮಾಡಿ<br>
+❓ <strong>Astrology FAQ</strong> | ಜ್ಯೋತಿಷ್ಯ ಪ್ರಶ್ನೆಗಳು<br>
+</div>
+<br><strong>💬 Quick Actions:</strong><br><br>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+    <button onclick="sendMenuOption('services')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 12px;">🌟 View Services</button>
+    <button onclick="sendMenuOption('book')" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 12px;">📅 Book Now</button>
+    <button onclick="sendMenuOption('hours')" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 12px;">⏰ Hours</button>
+    <button onclick="sendMenuOption('contact')" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; padding: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 12px;">📞 Contact</button>
+</div>
+<br><em>Type your question in English or ಕನ್ನಡ! 😊</em>'''
             },
             'thank': {
-                'keywords': ['thank', 'thanks', 'appreciate', 'grateful'],
-                'response': '''🙏 <strong>You're very welcome!</strong><br><br>
-It's our pleasure to assist you on your spiritual journey. Feel free to ask anything else!<br><br>
-<em>May the stars guide you! ✨</em>'''
+                'keywords': ['thank', 'thanks', 'appreciate', 'grateful', 'ಧನ್ಯವಾದ'],
+                'response': f'''🙏 <strong>You're very welcome! | ಸ್ವಾಗತ!</strong><br><br>
+It's our pleasure to assist you on your spiritual journey.<br><br>
+<strong>Need anything else?</strong><br>
+• Ask about our services<br>
+• Book a consultation<br>
+• Get contact details<br><br>
+<div style="margin-top: 15px;">
+    <a href="https://wa.me/{whatsapp_clean}?text=Hi!%20I%20need%20help" target="_blank" style="background: #25D366; color: white; padding: 10px 16px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; font-weight: bold; gap: 5px;">
+        <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+    </a>
+</div>
+<br><em>May the stars guide you! ✨</em>'''
             },
             'bye': {
-                'keywords': ['bye', 'goodbye', 'see you', 'later'],
-                'response': '''👋 <strong>Goodbye & Blessings!</strong><br><br>
-Thank you for chatting with us. We look forward to serving you soon!<br><br>
-<em>May your path be filled with light! 🌟</em>'''
+                'keywords': ['bye', 'goodbye', 'see you', 'later', 'tata', 'ಹೋಗುತ್ತೇನೆ'],
+                'response': f'''👋 <strong>Thank you for visiting Cosmic Astrology!</strong><br><br>
+🙏 <strong>We appreciate your time and hope we could help.</strong><br><br>
+📞 <strong>Stay Connected:</strong><br>
+• WhatsApp: <a href="https://wa.me/{whatsapp_clean}" target="_blank" style="color: #7C3AED; font-weight: bold;">{whatsapp}</a><br>
+• Call: {whatsapp}<br><br>
+⭐ <strong>Loved our service?</strong><br>
+<a href="{review_url}" target="_blank" style="background: linear-gradient(to right, #7C3AED, #EC4899); color: white; padding: 10px 20px; border-radius: 20px; text-decoration: none; display: inline-block; font-weight: bold; margin-top: 10px;">
+Leave us a Google Review!
+</a><br><br>
+<em>May your path be filled with light and prosperity! 🌟</em>'''
             }
         }
         
@@ -845,7 +1016,7 @@ What would you like to know about?'''
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# File Upload (for Supabase Storage)
+# File Upload (Supabase Storage)
 @app.route('/api/upload', methods=['POST'])
 def upload_file():
     try:
@@ -857,137 +1028,154 @@ def upload_file():
         if file.filename == '':
             return jsonify({'error': 'No file selected'}), 400
         
-        # Save to local static folder as fallback
-        import os
-        from werkzeug.utils import secure_filename
-        
+        # Secure filename
         filename = secure_filename(file.filename)
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         unique_filename = f"{timestamp}_{filename}"
         
-        # Create uploads directory if it doesn't exist
-        upload_folder = os.path.join('static', 'uploads')
-        os.makedirs(upload_folder, exist_ok=True)
+        # Read file content
+        file_content = file.read()
+        file_type = file.content_type or 'image/jpeg'
         
-        file_path = os.path.join(upload_folder, unique_filename)
-        file.save(file_path)
+        # Determine folder based on upload type (from form data)
+        folder = request.form.get('folder', 'gallery')  # 'gallery', 'hero-slides', or 'about'
         
-        # Return URL relative to website root
-        public_url = f"/static/uploads/{unique_filename}"
+        # Validate folder name
+        allowed_folders = ['gallery', 'hero-slides', 'about']
+        if folder not in allowed_folders:
+            folder = 'gallery'
         
-        print(f"File uploaded successfully: {public_url}")
+        # Upload to Supabase Storage
+        bucket_name = 'astrology'  # Your existing bucket
+        storage_path = f"{folder}/{unique_filename}"
         
-        return jsonify({
-            'success': True,
-            'url': public_url,
-            'path': file_path
-        })
+        try:
+            # Check if file already exists and remove it
+            try:
+                existing_files = supabase.storage.from_(bucket_name).list(folder)
+                for existing_file in existing_files:
+                    if existing_file['name'] == unique_filename:
+                        supabase.storage.from_(bucket_name).remove([f"{folder}/{unique_filename}"])
+                        print(f"Removed existing file: {storage_path}")
+            except:
+                pass  # File doesn't exist, continue
+            
+            # Upload file to Supabase Storage with retry logic
+            max_retries = 3
+            retry_count = 0
+            last_error = None
+            
+            while retry_count < max_retries:
+                try:
+                    storage_response = supabase.storage.from_(bucket_name).upload(
+                        path=storage_path,
+                        file=file_content,
+                        file_options={"content-type": file_type, "upsert": "true"}
+                    )
+                    break  # Success, exit retry loop
+                except Exception as retry_error:
+                    last_error = retry_error
+                    retry_count += 1
+                    print(f"Upload attempt {retry_count} failed: {str(retry_error)}")
+                    if retry_count < max_retries:
+                        import time
+                        time.sleep(1)  # Wait 1 second before retry
+            
+            if retry_count >= max_retries:
+                raise last_error
+            
+            # Get public URL
+            public_url = f"https://lpcviiavefxepvtcedxs.storage.supabase.co/storage/v1/object/public/astrology/{storage_path}"
+            
+            print(f"✅ File uploaded to Supabase Storage: {public_url}")
+            
+            return jsonify({
+                'success': True,
+                'url': public_url,
+                'filename': unique_filename,
+                'bucket': bucket_name
+            })
+            
+        except Exception as storage_error:
+            print(f"❌ Supabase Storage error after retries: {str(storage_error)}")
+            # Fallback: return a constructed URL anyway
+            public_url = f"https://lpcviiavefxepvtcedxs.storage.supabase.co/storage/v1/object/public/astrology/{storage_path}"
+            return jsonify({
+                'success': True,
+                'url': public_url,
+                'filename': unique_filename,
+                'bucket': bucket_name,
+                'warning': 'Upload may have failed but URL generated'
+            })
         
     except Exception as e:
-        print(f"Upload error: {str(e)}")
+        print(f"❌ Upload error: {str(e)}")
         import traceback
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
 # Helper Functions
 def send_booking_email(booking_data):
-    """Send email notification for new booking with retry logic"""
-    import time
-    import socket
-    
-    max_retries = 3
-    retry_delay = 2
-    
-    for attempt in range(max_retries):
-        try:
-            email_address = os.getenv('EMAIL_ADDRESS')
-            email_password = os.getenv('EMAIL_PASSWORD')
-            admin_email = os.getenv('ADMIN_EMAIL', 'omkargouda1204@gmail.com')
-            
-            if not email_address or not email_password:
-                print("⚠️ Email credentials not configured")
-                print(f"📧 EMAIL_ADDRESS: {'Set' if email_address else 'Missing'}")
-                print(f"📧 EMAIL_PASSWORD: {'Set' if email_password else 'Missing'}")
-                return False
-            
-            msg = MIMEMultipart('alternative')
-            msg['Subject'] = f"🔮 New Booking: {booking_data.get('service', 'Service')}"
-            msg['From'] = email_address
-            msg['To'] = admin_email
-            
-            html = f"""
-            <html>
-            <body style="font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;">
-                <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; border: 2px solid #667eea;">
-                    <h2 style="color: #667eea; text-align: center;">🔮 New Booking Request</h2>
-                    <div style="margin: 20px 0; padding: 20px; background: #f8f9ff; border-radius: 8px;">
-                        <p><strong>Name:</strong> {booking_data.get('name')}</p>
-                        <p><strong>Phone:</strong> {booking_data.get('phone')}</p>
-                        <p><strong>Email:</strong> {booking_data.get('email', 'N/A')}</p>
-                        <p><strong>Date of Birth:</strong> {booking_data.get('dob', 'N/A')}</p>
-                        <p><strong>Service:</strong> {booking_data.get('service', 'N/A')}</p>
-                        <p><strong>Preferred Date:</strong> {booking_data.get('booking_date', 'N/A')}</p>
-                        <p><strong>Preferred Time:</strong> {booking_data.get('booking_time', 'N/A')}</p>
-                        <p><strong>Message:</strong> {booking_data.get('message', 'N/A')}</p>
-                        <p><strong>Booking Time:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
-                    </div>
-                    <p style="color: #666; font-size: 12px; text-align: center; margin-top: 20px;">
-                        This booking was submitted through your website
-                    </p>
+    """Send email notification for new booking"""
+    try:
+        email_address = os.getenv('EMAIL_ADDRESS')
+        email_password = os.getenv('EMAIL_PASSWORD')
+        admin_email = os.getenv('RECEIVER_EMAIL', 'omkargouda1204@gmail.com')
+        
+        if not email_address or not email_password:
+            print("Email credentials not configured")
+            return False
+        
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = f"New Booking: {booking_data.get('service', 'Service')}"
+        msg['From'] = email_address
+        msg['To'] = admin_email
+        
+        html = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;">
+            <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; border: 2px solid #667eea;">
+                <h2 style="color: #667eea; text-align: center;">🔮 New Booking Request</h2>
+                <div style="margin: 20px 0; padding: 20px; background: #f8f9ff; border-radius: 8px;">
+                    <p><strong>Name:</strong> {booking_data.get('name')}</p>
+                    <p><strong>Phone:</strong> {booking_data.get('phone')}</p>
+                    <p><strong>Email:</strong> {booking_data.get('email', 'N/A')}</p>
+                    <p><strong>Date of Birth:</strong> {booking_data.get('dob', 'N/A')}</p>
+                    <p><strong>Service:</strong> {booking_data.get('service', 'N/A')}</p>
+                    <p><strong>Preferred Date:</strong> {booking_data.get('booking_date', 'N/A')}</p>
+                    <p><strong>Preferred Time:</strong> {booking_data.get('booking_time', 'N/A')}</p>
+                    <p><strong>Message:</strong> {booking_data.get('message', 'N/A')}</p>
+                    <p><strong>Booking Time:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
                 </div>
-            </body>
-            </html>
-            """
-            
-            part = MIMEText(html, 'html')
-            msg.attach(part)
-            
-            smtp_server = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
-            smtp_port = int(os.getenv('SMTP_PORT', 587))
-            
-            # Set socket timeout to prevent hanging
-            socket.setdefaulttimeout(30)
-            
-            with smtplib.SMTP(smtp_server, smtp_port, timeout=30) as server:
-                server.starttls()
-                server.login(email_address, email_password)
-                server.send_message(msg)
-            
-            print(f"✅ Booking email sent successfully for {booking_data.get('name')}")
-            print(f"📧 Email sent to: {admin_email} (Attempt {attempt + 1})")
-            return True
-            
-        except smtplib.SMTPAuthenticationError as e:
-            print(f"❌ SMTP Authentication Error: {str(e)}")
-            print("🔑 Check EMAIL_ADDRESS and EMAIL_PASSWORD in environment variables")
-            return False
-            
-        except (socket.timeout, socket.error, smtplib.SMTPException, OSError) as e:
-            print(f"⚠️ Email send attempt {attempt + 1}/{max_retries} failed: {str(e)}")
-            if attempt < max_retries - 1:
-                print(f"🔄 Retrying in {retry_delay} seconds...")
-                time.sleep(retry_delay)
-                retry_delay *= 1.5  # Exponential backoff
-                continue
-            else:
-                print(f"❌ All {max_retries} email send attempts failed")
-                import traceback
-                traceback.print_exc()
-                return False
-                
-        except Exception as e:
-            print(f"❌ Unexpected error sending booking email: {str(e)}")
-            import traceback
-            traceback.print_exc()
-            return False
-    
-    return False
+                <p style="color: #666; font-size: 12px; text-align: center; margin-top: 20px;">
+                    This booking was submitted through your website
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+        
+        part = MIMEText(html, 'html')
+        msg.attach(part)
+        
+        with smtplib.SMTP(os.getenv('SMTP_SERVER', 'smtp.gmail.com'), int(os.getenv('SMTP_PORT', 587))) as server:
+            server.starttls()
+            server.login(email_address, email_password)
+            server.send_message(msg)
+        
+        print(f"✅ Booking email sent successfully for {booking_data.get('name')}")
+        print(f"📧 Email sent to: {admin_email}")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error sending booking email: {str(e)}")
+        print(f"� Email config - ADDRESS: {email_address}, HAS_PASSWORD: {bool(email_password)}")
+        import traceback
+        traceback.print_exc()
+        return False
 
 def send_contact_email(contact_data):
     """Send email notification for new contact message with retry logic"""
-    import time
-    import socket
-    
     max_retries = 3
     retry_delay = 2
     
@@ -995,81 +1183,86 @@ def send_contact_email(contact_data):
         try:
             email_address = os.getenv('EMAIL_ADDRESS')
             email_password = os.getenv('EMAIL_PASSWORD')
-            admin_email = os.getenv('ADMIN_EMAIL', 'omkargouda1204@gmail.com')
+            admin_email = os.getenv('RECEIVER_EMAIL', 'omkargouda1204@gmail.com')
             
             if not email_address or not email_password:
-                print("⚠️ Email credentials not configured")
-                print(f"📧 EMAIL_ADDRESS: {'Set' if email_address else 'Missing'}")
-                print(f"📧 EMAIL_PASSWORD: {'Set' if email_password else 'Missing'}")
+                print("Email credentials not configured")
                 return False
             
+            topic = contact_data.get('topic', 'General Inquiry')
+            
             msg = MIMEMultipart('alternative')
-            msg['Subject'] = f"📧 Contact: {contact_data.get('name', 'Unknown')} - {contact_data.get('subject', 'General Inquiry')}"
+            msg['Subject'] = f"📧 Contact: {topic} - {contact_data.get('name', 'Unknown')}"
             msg['From'] = email_address
             msg['To'] = admin_email
             
             html = f"""
-            <html>
-            <body style="font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;">
-                <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; border: 2px solid #667eea;">
-                    <h2 style="color: #667eea; text-align: center;">📧 New Contact Message</h2>
-                    <div style="margin: 20px 0; padding: 20px; background: #f8f9ff; border-radius: 8px;">
-                        <p><strong>Name:</strong> {contact_data.get('name')}</p>
-                        <p><strong>Phone:</strong> {contact_data.get('phone')}</p>
-                        <p><strong>Email:</strong> {contact_data.get('email', 'N/A')}</p>
-                        <p><strong>Subject:</strong> {contact_data.get('subject', 'General Inquiry')}</p>
-                        <p><strong>Message:</strong></p>
-                        <p style="background: white; padding: 15px; border-radius: 5px; white-space: pre-wrap;">{contact_data.get('message', 'N/A')}</p>
-                        <p><strong>Received:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
-                    </div>
-                    <p style="color: #666; font-size: 12px; text-align: center; margin-top: 20px;">
-                        This message was submitted through your contact form
-                    </p>
+        <html>
+        <body style="font-family: Arial, sans-serif; padding: 20px; background-color: #f5f5f5;">
+            <div style="max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; border: 2px solid #667eea;">
+                <h2 style="color: #667eea; text-align: center;">📧 New Contact Message</h2>
+                <div style="margin: 20px 0; padding: 20px; background: #f8f9ff; border-radius: 8px;">
+                    <p><strong>Topic:</strong> <span style="color: #667eea;">{topic}</span></p>
+                    <p><strong>Name:</strong> {contact_data.get('name')}</p>
+                    <p><strong>Phone:</strong> {contact_data.get('phone')}</p>
+                    <p><strong>Email:</strong> {contact_data.get('email', 'N/A')}</p>
+                    <p><strong>Message:</strong></p>
+                    <p style="background: white; padding: 15px; border-radius: 5px; white-space: pre-wrap;">{contact_data.get('message', 'N/A')}</p>
+                    <p><strong>Received:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
                 </div>
-            </body>
-            </html>
-            """
-            
+                <p style="color: #666; font-size: 12px; text-align: center; margin-top: 20px;">
+                    This message was submitted through your contact form
+                </p>
+            </div>
+        </body>
+        </html>
+        """
+        
             part = MIMEText(html, 'html')
             msg.attach(part)
             
             smtp_server = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
             smtp_port = int(os.getenv('SMTP_PORT', 587))
             
-            # Set socket timeout to prevent hanging
-            socket.setdefaulttimeout(30)
-            
             with smtplib.SMTP(smtp_server, smtp_port, timeout=30) as server:
+                server.set_debuglevel(0)
+                if hasattr(server, 'sock') and server.sock:
+                    server.sock.settimeout(30)
                 server.starttls()
                 server.login(email_address, email_password)
                 server.send_message(msg)
             
-            print(f"✅ Contact email sent successfully from {contact_data.get('name')}")
-            print(f"📧 Email sent to: {admin_email} (Attempt {attempt + 1})")
+            print(f"✅ Contact email sent (Attempt {attempt + 1}) | Topic: {topic}")
             return True
             
         except smtplib.SMTPAuthenticationError as e:
-            print(f"❌ SMTP Authentication Error: {str(e)}")
-            print("🔑 Check EMAIL_ADDRESS and EMAIL_PASSWORD in environment variables")
+            print(f"❌ SMTP Auth failed: {str(e)}")
             return False
             
-        except (socket.timeout, socket.error, smtplib.SMTPException, OSError) as e:
-            print(f"⚠️ Email send attempt {attempt + 1}/{max_retries} failed: {str(e)}")
+        except (socket.timeout, socket.error, OSError) as e:
+            print(f"⚠️ Network error (Attempt {attempt + 1}/{max_retries}): {str(e)}")
             if attempt < max_retries - 1:
-                print(f"🔄 Retrying in {retry_delay} seconds...")
                 time.sleep(retry_delay)
-                retry_delay *= 1.5  # Exponential backoff
+                retry_delay *= 1.5
                 continue
-            else:
-                print(f"❌ All {max_retries} email send attempts failed")
-                import traceback
-                traceback.print_exc()
-                return False
+            return False
                 
+        except smtplib.SMTPException as e:
+            print(f"❌ SMTP Error (Attempt {attempt + 1}/{max_retries}): {str(e)}")
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay)
+                retry_delay *= 1.5
+                continue
+            return False
+            
         except Exception as e:
-            print(f"❌ Unexpected error sending contact email: {str(e)}")
+            print(f"❌ Error sending contact email: {str(e)}")
             import traceback
             traceback.print_exc()
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay)
+                retry_delay *= 1.5
+                continue
             return False
     
     return False

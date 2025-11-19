@@ -70,6 +70,9 @@
                     <button class="tab-btn px-6 py-3 rounded-xl font-semibold text-sm text-gray-600 hover:bg-gray-100" data-tab="chatbot">
                         <i class="fas fa-robot mr-2"></i>Chatbot Config
                     </button>
+                    <button class="tab-btn px-6 py-3 rounded-xl font-semibold text-sm text-gray-600 hover:bg-gray-100" data-tab="about">
+                        <i class="fas fa-user-tie mr-2"></i>About Section
+                    </button>
                     <button class="tab-btn px-6 py-3 rounded-xl font-semibold text-sm text-gray-600 hover:bg-gray-100" data-tab="settings">
                         <i class="fas fa-cog mr-2"></i>Settings
                     </button>
@@ -161,7 +164,7 @@
                                     <i class="fas fa-image text-gray-500 mr-2"></i>Slide Image
                                 </label>
                                 <input type="file" id="hero-slide-image" accept="image/*" class="admin-input">
-                                <p class="text-sm text-gray-500 mt-1">Recommended size: 1920x1080px</p>
+                                <p class="text-sm text-gray-500 mt-1">Upload image (recommended: 1920x1080px)</p>
                             </div>
                             <div class="flex gap-4">
                                 <button type="submit" class="admin-btn admin-btn-success">
@@ -460,6 +463,80 @@
                     </form>
                 </div>
             </div>
+
+            <!-- About Section -->
+            <div id="about-section" class="tab-content hidden">
+                <div class="bg-white rounded-2xl shadow-lg p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-800">
+                            <i class="fas fa-user-tie text-purple-600 mr-2"></i>About Section Configuration
+                        </h2>
+                        <button id="edit-about-btn" onclick="enableAboutEdit()" class="admin-btn admin-btn-primary">
+                            <i class="fas fa-edit mr-2"></i>Edit
+                        </button>
+                    </div>
+                    <form id="about-form" class="space-y-4">
+                        <div class="form-group">
+                            <label for="about-title" class="form-label">
+                                <i class="fas fa-heading text-gray-500 mr-2"></i>Title
+                            </label>
+                            <input type="text" id="about-title" class="admin-input" readonly placeholder="e.g., Meet Our Expert Astrologer">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="about-description" class="form-label">
+                                <i class="fas fa-align-left text-gray-500 mr-2"></i>Description
+                            </label>
+                            <textarea id="about-description" class="admin-input" rows="4" readonly placeholder="Enter a detailed description..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="about-experience" class="form-label">
+                                <i class="fas fa-star text-gray-500 mr-2"></i>Experience
+                            </label>
+                            <input type="text" id="about-experience" class="admin-input" readonly placeholder="e.g., 15+ Years">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="about-specialization" class="form-label">
+                                <i class="fas fa-gem text-gray-500 mr-2"></i>Specialization
+                            </label>
+                            <input type="text" id="about-specialization" class="admin-input" readonly placeholder="e.g., Vedic Astrology, Tarot Reading">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="about-credentials" class="form-label">
+                                <i class="fas fa-certificate text-gray-500 mr-2"></i>Credentials
+                            </label>
+                            <input type="text" id="about-credentials" class="admin-input" readonly placeholder="e.g., Certified Astrologer">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <i class="fas fa-image text-gray-500 mr-2"></i>Astrologer Image
+                            </label>
+                            <div class="space-y-3">
+                                <input type="file" id="about-image-file" accept="image/*" class="admin-input" disabled>
+                                <input type="text" id="about-image-url" class="admin-input" readonly placeholder="Image URL will appear here">
+                                <button type="button" id="about-upload-btn" onclick="uploadAboutImage()" class="admin-btn admin-btn-secondary" disabled>
+                                    <i class="fas fa-upload mr-2"></i>Upload Image
+                                </button>
+                                <div id="about-image-preview" class="mt-4"></div>
+                            </div>
+                        </div>
+                        
+                        <div id="about-form-actions" class="flex gap-3" style="display: none;">
+                            <button type="submit" class="flex-1 admin-btn admin-btn-success">
+                                <i class="fas fa-save mr-2"></i>Save Changes
+                            </button>
+                            <button type="button" onclick="cancelAboutEdit()" class="admin-btn admin-btn-danger">
+                                <i class="fas fa-times mr-2"></i>Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <div id="settings-section" class="tab-content hidden">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Password Change Section -->
@@ -660,6 +737,8 @@
                 if (tabName === 'bookings') loadBookings();
                 if (tabName === 'messages') loadMessages();
                 if (tabName === 'business') loadBusinessInfo();
+                if (tabName === 'chatbot') loadChatbotConfig();
+                if (tabName === 'about') loadAboutSection();
             });
         });
 
@@ -698,7 +777,7 @@
                 const container = document.getElementById('hero-slides-list');
                 container.innerHTML = slides.map(slide => `
                     <div class="bg-white rounded-xl p-6 shadow-lg">
-                        <img src="${slide.image}" alt="${slide.title}" class="w-full h-48 object-cover rounded-lg mb-4">
+                        <img src="${slide.image}" alt="${slide.title}" class="w-full h-48 object-cover rounded-lg mb-4" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23667eea%22 width=%22400%22 height=%22300%22/%3E%3Ctext fill=%22white%22 font-size=%2220%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage Not Available%3C/text%3E%3C/svg%3E'" loading="lazy">
                         <h3 class="font-bold text-lg mb-2">${slide.title}</h3>
                         <p class="text-gray-600 mb-4">${slide.description || ''}</p>
                         <div class="flex gap-2">
@@ -730,7 +809,7 @@
                 }
                 container.innerHTML = slides.map(slide => `
                     <div class="bg-white rounded-xl overflow-hidden shadow-lg">
-                        <img src="${slide.image}" alt="${slide.title}" class="w-full h-48 object-cover" onerror="this.src='/static/assets/images/placeholder.svg'">
+                        <img src="${slide.image}" alt="${slide.title}" class="w-full h-48 object-cover" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%2364748b%22 width=%22400%22 height=%22300%22/%3E%3Ctext fill=%22white%22 font-size=%2220%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage Not Available%3C/text%3E%3C/svg%3E'" loading="lazy">
                         <div class="p-4">
                             <h4 class="font-semibold mb-2">${slide.title}</h4>
                             <p class="text-sm text-gray-600 mb-3">${slide.description || ''}</p>
@@ -773,15 +852,15 @@
                         <p class="text-sm text-gray-600 mb-2"><strong>Service:</strong> ${booking.service || 'N/A'}</p>
                         <p class="text-sm text-gray-600 mb-2"><strong>Date:</strong> ${booking.booking_date || 'N/A'}</p>
                         <p class="text-sm text-gray-600 mb-4"><strong>Message:</strong> ${booking.message || 'None'}</p>
-                        <div class="flex gap-2 mb-3">
-                            <a href="https://wa.me/${booking.phone.replace(/[^0-9]/g, '')}" target="_blank" class="btn btn-success flex-1">
-                                <i class="fab fa-whatsapp mr-1"></i>WhatsApp
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mb-3">
+                            <a href="https://wa.me/${booking.phone.replace(/[^0-9]/g, '')}" target="_blank" class="btn btn-success text-center" style="background: #25D366; color: white; padding: 10px; border-radius: 8px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <i class="fab fa-whatsapp"></i><span>WhatsApp</span>
                             </a>
-                            <a href="tel:${booking.phone}" class="btn" style="background: linear-gradient(to right, #7C3AED, #EC4899); color: white; flex: 1;">
-                                <i class="fas fa-phone mr-1"></i>Call
+                            <a href="tel:${booking.phone}" class="btn text-center" style="background: linear-gradient(to right, #7C3AED, #EC4899); color: white; padding: 10px; border-radius: 8px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <i class="fas fa-phone"></i><span>Call</span>
                             </a>
-                            ${booking.email ? `<a href="mailto:${booking.email}" class="btn" style="background: linear-gradient(to right, #10B981, #3B82F6); color: white; flex: 1;">
-                                <i class="fas fa-envelope mr-1"></i>Email
+                            ${booking.email ? `<a href="mailto:${booking.email}" class="btn text-center" style="background: linear-gradient(to right, #10B981, #3B82F6); color: white; padding: 10px; border-radius: 8px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <i class="fas fa-envelope"></i><span>Email</span>
                             </a>` : ''}
                         </div>
                         <button onclick="deleteBooking(${booking.id})" class="btn btn-danger w-full">
@@ -814,15 +893,15 @@
                         </div>
                         <p class="text-sm text-gray-600 mb-2"><strong>Subject:</strong> ${msg.subject || 'N/A'}</p>
                         <p class="text-sm text-gray-600 mb-4">${msg.message}</p>
-                        <div class="flex gap-2 mb-3">
-                            ${msg.phone ? `<a href="https://wa.me/${msg.phone.replace(/[^0-9]/g, '')}" target="_blank" class="btn btn-success flex-1">
-                                <i class="fab fa-whatsapp mr-1"></i>WhatsApp
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mb-3">
+                            ${msg.phone ? `<a href="https://wa.me/${msg.phone.replace(/[^0-9]/g, '')}" target="_blank" class="btn text-center" style="background: #25D366; color: white; padding: 10px; border-radius: 8px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <i class="fab fa-whatsapp"></i><span>WhatsApp</span>
                             </a>
-                            <a href="tel:${msg.phone}" class="btn" style="background: linear-gradient(to right, #7C3AED, #EC4899); color: white; flex: 1;">
-                                <i class="fas fa-phone mr-1"></i>Call
+                            <a href="tel:${msg.phone}" class="btn text-center" style="background: linear-gradient(to right, #7C3AED, #EC4899); color: white; padding: 10px; border-radius: 8px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <i class="fas fa-phone"></i><span>Call</span>
                             </a>` : ''}
-                            <a href="mailto:${msg.email}" class="btn" style="background: linear-gradient(to right, #10B981, #3B82F6); color: white; flex: 1;">
-                                <i class="fas fa-envelope mr-1"></i>Email
+                            <a href="mailto:${msg.email}" class="btn text-center" style="background: linear-gradient(to right, #10B981, #3B82F6); color: white; padding: 10px; border-radius: 8px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <i class="fas fa-envelope"></i><span>Email</span>
                             </a>
                         </div>
                         <button onclick="deleteMessage(${msg.id})" class="btn btn-danger w-full">
@@ -838,7 +917,9 @@
         // Load Business Info
         async function loadBusinessInfo() {
             try {
-                const response = await fetch('/api/business-info');
+                const response = await fetch('/api/business-info', {
+                    cache: 'no-cache'  // Prevent caching to always get fresh data
+                });
                 if (!response.ok) {
                     console.error('Failed to load business info');
                     return;
@@ -936,6 +1017,7 @@
             if (fileInput.files.length > 0) {
                 const formData = new FormData();
                 formData.append('file', fileInput.files[0]);
+                formData.append('folder', 'gallery');  // Specify gallery folder
                 
                 try {
                     const uploadResponse = await fetch('/api/upload', {
@@ -1046,12 +1128,15 @@
             const fileInput = document.getElementById('hero-slide-image');
             
             try {
-                let imageUrl = '';
+                let mediaUrl = '';
                 
-                // Upload image if selected
+                // Upload file if selected
                 if (fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    
                     const formData = new FormData();
-                    formData.append('file', fileInput.files[0]);
+                    formData.append('file', file);
+                    formData.append('folder', 'hero-slides');
                     
                     const uploadResponse = await fetch('/api/upload', {
                         method: 'POST',
@@ -1059,11 +1144,12 @@
                     });
                     
                     if (!uploadResponse.ok) {
-                        throw new Error('Failed to upload image');
+                        const errorData = await uploadResponse.json();
+                        throw new Error(errorData.error || 'Failed to upload file');
                     }
                     
                     const uploadData = await uploadResponse.json();
-                    imageUrl = uploadData.url;
+                    mediaUrl = uploadData.url;
                 }
                 
                 const data = {
@@ -1071,23 +1157,28 @@
                     description: description
                 };
                 
-                // Only include image if a new one was uploaded
-                if (imageUrl) {
-                    data.image = imageUrl;
+                // Add image URL if media was uploaded
+                if (mediaUrl) {
+                    data.image = mediaUrl;
                 }
                 
                 if (id) {
                     // Update existing slide
-                    await fetch(`/api/hero-slides/${id}`, {
+                    const updateResponse = await fetch(`/api/hero-slides/${id}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(data)
                     });
+                    
+                    if (!updateResponse.ok) {
+                        throw new Error('Failed to update slide');
+                    }
+                    
                     alert('Hero slide updated successfully!');
                 } else {
                     // Create new slide
-                    if (!imageUrl) {
-                        alert('Please select an image for the new slide');
+                    if (!mediaUrl) {
+                        alert('Please select an image or video for the new slide');
                         return;
                     }
                     
@@ -1108,7 +1199,11 @@
                 loadHeroSlides();
             } catch (error) {
                 console.error('Error saving hero slide:', error);
-                alert('Error saving hero slide: ' + error.message);
+                let errorMsg = 'Error saving hero slide: ' + error.message;
+                if (error.message.includes('fetch')) {
+                    errorMsg = 'Network error. Please check your internet connection and try again.';
+                }
+                alert(errorMsg);
             }
         });
         
@@ -1302,7 +1397,33 @@
         
         // Load chatbot config (placeholder)
         async function loadChatbotConfig() {
-            // TODO: Load from API if needed
+            try {
+                const response = await fetch('/api/chatbot-config', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                    cache: 'no-cache'  // Prevent caching to always get fresh data
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load chatbot configuration');
+                }
+                
+                const data = await response.json();
+                
+                // Populate form fields with fetched data
+                document.getElementById('chatbot-google-maps').value = data.google_maps_url || '';
+                document.getElementById('chatbot-google-review').value = data.google_review_url || '';
+                document.getElementById('chatbot-services').value = data.services || '';
+                document.getElementById('chatbot-facebook').value = data.facebook || '';
+                document.getElementById('chatbot-instagram').value = data.instagram || '';
+                document.getElementById('chatbot-twitter').value = data.twitter || '';
+                document.getElementById('chatbot-youtube').value = data.youtube || '';
+                document.getElementById('chatbot-linkedin').value = data.linkedin || '';
+                document.getElementById('chatbot-hours-weekday').value = data.hours_weekday || '';
+                document.getElementById('chatbot-hours-sunday').value = data.hours_sunday || '';
+            } catch (error) {
+                console.error('Error loading chatbot config:', error);
+            }
         }
 
         async function deleteGallerySlide(id) {
@@ -1340,6 +1461,154 @@
                 alert('Error deleting message');
             }
         }
+
+        // About Section Functions
+        async function loadAboutSection() {
+            try {
+                const response = await fetch('/api/about-section', {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' },
+                    cache: 'no-cache'
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load about section');
+                }
+                
+                const data = await response.json();
+                
+                if (data && Object.keys(data).length > 0) {
+                    document.getElementById('about-title').value = data.title || '';
+                    document.getElementById('about-description').value = data.description || '';
+                    document.getElementById('about-experience').value = data.experience || '';
+                    document.getElementById('about-specialization').value = data.specialization || '';
+                    document.getElementById('about-credentials').value = data.credentials || '';
+                    document.getElementById('about-image-url').value = data.image || '';
+                    
+                    // Show image preview if URL exists
+                    if (data.image) {
+                        document.getElementById('about-image-preview').innerHTML = `
+                            <img src="${data.image}" alt="Astrologer" class="w-48 h-48 object-cover rounded-lg shadow-lg">
+                        `;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading about section:', error);
+            }
+        }
+
+        function enableAboutEdit() {
+            const inputs = document.querySelectorAll('#about-form input:not([type=file]), #about-form textarea');
+            const editBtn = document.getElementById('edit-about-btn');
+            const actionsDiv = document.getElementById('about-form-actions');
+            const uploadBtn = document.getElementById('about-upload-btn');
+            const fileInput = document.getElementById('about-image-file');
+            
+            inputs.forEach(input => input.removeAttribute('readonly'));
+            fileInput.removeAttribute('disabled');
+            uploadBtn.removeAttribute('disabled');
+            editBtn.style.display = 'none';
+            actionsDiv.style.display = 'flex';
+        }
+
+        function cancelAboutEdit() {
+            const inputs = document.querySelectorAll('#about-form input:not([type=file]), #about-form textarea');
+            const editBtn = document.getElementById('edit-about-btn');
+            const actionsDiv = document.getElementById('about-form-actions');
+            const uploadBtn = document.getElementById('about-upload-btn');
+            const fileInput = document.getElementById('about-image-file');
+            
+            inputs.forEach(input => input.setAttribute('readonly', 'readonly'));
+            fileInput.setAttribute('disabled', 'disabled');
+            uploadBtn.setAttribute('disabled', 'disabled');
+            editBtn.style.display = 'inline-block';
+            actionsDiv.style.display = 'none';
+            
+            loadAboutSection(); // Reload original data
+        }
+
+        async function uploadAboutImage() {
+            const fileInput = document.getElementById('about-image-file');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select an image file');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('folder', 'about');
+            
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.url) {
+                    document.getElementById('about-image-url').value = result.url;
+                    document.getElementById('about-image-preview').innerHTML = `
+                        <img src="${result.url}" alt="Astrologer" class="w-48 h-48 object-cover rounded-lg shadow-lg" onload="console.log('Image loaded successfully')" onerror="console.error('Image load failed'); this.style.display='none';">
+                    `;
+                    alert('Image uploaded successfully!');
+                } else {
+                    alert('Error uploading image: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                alert('Error uploading image');
+            }
+        }
+
+        document.getElementById('about-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const aboutData = {
+                title: document.getElementById('about-title').value || '',
+                description: document.getElementById('about-description').value || '',
+                experience: document.getElementById('about-experience').value || '',
+                specialization: document.getElementById('about-specialization').value || '',
+                credentials: document.getElementById('about-credentials').value || '',
+                image: document.getElementById('about-image-url').value || ''
+            };
+            
+            try {
+                const response = await fetch('/api/about-section', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(aboutData)
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to save about section');
+                }
+                
+                alert('About section saved successfully!');
+                
+                // Set form back to readonly mode
+                const inputs = document.querySelectorAll('#about-form input:not([type=file]), #about-form textarea');
+                const editBtn = document.getElementById('edit-about-btn');
+                const actionsDiv = document.getElementById('about-form-actions');
+                const uploadBtn = document.getElementById('about-upload-btn');
+                const fileInput = document.getElementById('about-image-file');
+                
+                inputs.forEach(input => input.setAttribute('readonly', 'readonly'));
+                fileInput.setAttribute('disabled', 'disabled');
+                uploadBtn.setAttribute('disabled', 'disabled');
+                editBtn.style.display = 'inline-block';
+                actionsDiv.style.display = 'none';
+                
+                // Reload about section to show updated data
+                await loadAboutSection();
+                
+            } catch (error) {
+                console.error('Error saving about section:', error);
+                alert('Error saving about section: ' + error.message);
+            }
+        });
     </script>
 </body>
 </html>

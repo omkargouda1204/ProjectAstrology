@@ -25,8 +25,34 @@
         img { max-width: 100%; height: auto; display: block; }
         .goog-te-banner-frame { display: none !important; }
         body { top: 0 !important; }
-        .hero-slide { opacity: 0; visibility: hidden; transition: opacity 0.8s ease-in-out; }
-        .hero-slide.active { opacity: 1; visibility: visible; z-index: 1; }
+        .hero-slide { 
+            opacity: 0; 
+            visibility: hidden; 
+            transition: opacity 0.8s ease-in-out;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .hero-slide.active { 
+            opacity: 1 !important; 
+            visibility: visible !important; 
+            z-index: 2 !important; 
+        }
+        
+        /* Responsive Hero Slider */
+        @media (max-width: 768px) {
+            #hero-slider { height: 60vh !important; min-height: 400px !important; }
+            .hero-slide h1 { font-size: 2rem !important; }
+            .hero-slide p { font-size: 1rem !important; }
+        }
+        
+        @media (max-width: 480px) {
+            #hero-slider { height: 50vh !important; min-height: 350px !important; }
+            .hero-slide h1 { font-size: 1.5rem !important; }
+            .hero-slide p { font-size: 0.875rem !important; }
+        }
     </style>
     
     <!-- Tailwind CSS CDN -->
@@ -191,7 +217,6 @@
                 });
             });
         });</script>
-    <link rel="stylesheet" href="./styles/main.css">
 </head>
 <body class="font-sans bg-gray-50">
 
@@ -294,17 +319,42 @@
     </nav>
     
     <!-- Hero Slider Section -->
-    <section class="relative overflow-hidden" id="hero-slider" style="height: calc(100vh - 120px); margin-top: 0;">
-        <div class="hero-slides-container relative h-full">
+    <section class="relative overflow-hidden" id="hero-slider" style="height: calc(100vh - 120px); margin-top: 0; min-height: 400px;">
+        <div class="hero-slides-container relative h-full" style="position: relative; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
             <!-- Slides will be loaded from API -->
         </div>
-        <button id="prev-slide" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 rounded-full p-3 z-10">
+        <button id="prev-slide" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 rounded-full p-3" style="z-index: 20;">
             <i class="fas fa-chevron-left text-purple-700 text-xl"></i>
         </button>
-        <button id="next-slide" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 rounded-full p-3 z-10">
+        <button id="next-slide" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 rounded-full p-3" style="z-index: 20;">
             <i class="fas fa-chevron-right text-purple-700 text-xl"></i>
         </button>
     </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-16 bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12 font-serif text-purple-800">About Our Astrologer</h2>
+            <div class="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+                <div class="order-2 md:order-1">
+                    <div class="bg-white p-8 rounded-2xl shadow-xl">
+                        <h3 id="about-title" class="text-2xl font-bold mb-4 text-purple-800">Loading...</h3>
+                        <p id="about-description" class="text-gray-700 leading-relaxed mb-6">Loading...</p>
+                        <div id="about-details" class="space-y-3">
+                            <!-- Details will be loaded from API -->
+                        </div>
+                    </div>
+                </div>
+                <div class="order-1 md:order-2">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-400 to-pink-400 rounded-3xl transform rotate-3"></div>
+                        <img id="about-image" src="" alt="Astrologer" class="relative rounded-3xl shadow-2xl w-full h-auto object-cover" style="max-height: 500px;" loading="lazy">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
     <!-- Services Section -->
     <section id="services" class="py-16 bg-white">
         <div class="container mx-auto px-4">
@@ -684,12 +734,21 @@
 
         async function loadHeroSlides() {
             try {
+                console.log('Fetching hero slides from API...');
                 const response = await fetch('/api/hero-slides');
+                console.log('Hero slides response status:', response.status);
                 const data = await response.json();
+                console.log('Hero slides data received:', data);
                 
                 // Handle API response format
                 if (Array.isArray(data)) {
                     heroSlides = data;
+                    console.log('Loaded', heroSlides.length, 'hero slides');
+                    // Debug: Check first slide's image URL
+                    if (heroSlides.length > 0) {
+                        console.log('First hero slide image URL:', heroSlides[0].image);
+                        console.log('First hero slide video URL:', heroSlides[0].video_url);
+                    }
                 } else {
                     console.error('Invalid hero slides data format:', data);
                     heroSlides = [];
@@ -698,6 +757,9 @@
                 renderHeroSlides();
                 if (heroSlides.length > 0) {
                     startHeroSlider();
+                    console.log('Hero slider started');
+                } else {
+                    console.warn('No hero slides to display');
                 }
             } catch (error) {
                 console.error('Error loading hero slides:', error);
@@ -707,53 +769,116 @@
         }
 
         function renderHeroSlides() {
+            console.log('renderHeroSlides called with', heroSlides ? heroSlides.length : 0, 'slides');
             const container = document.querySelector('.hero-slides-container');
             if (!container) {
                 console.error('Hero slides container not found');
                 return;
             }
             
+            console.log('Container found, clearing content');
             container.innerHTML = '';
             
             if (!Array.isArray(heroSlides) || heroSlides.length === 0) {
+                console.warn('No hero slides to render, showing default content');
                 container.innerHTML = '<div class="absolute inset-0 bg-gradient-to-r from-purple-900 to-pink-900 flex items-center justify-center"><div class="text-center text-white px-4"><h1 class="text-5xl font-bold mb-4 font-serif">Welcome to Cosmic Astrology</h1><p class="text-xl mb-8">Your journey to cosmic wisdom begins here</p></div></div>';
                 return;
             }
             
+            console.log('Starting to render', heroSlides.length, 'slides');
+            
             heroSlides.forEach((slide, index) => {
                 const slideDiv = document.createElement('div');
                 slideDiv.className = 'hero-slide absolute inset-0 transition-opacity duration-1000' + (index === 0 ? ' opacity-100' : ' opacity-0');
+                slideDiv.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;';
+                slideDiv.setAttribute('data-slide-index', index);
                 
-                // Create image with error handling
-                const img = new Image();
-                img.src = slide.image;
-                img.alt = slide.title;
-                img.className = 'w-full h-full object-cover';
-                img.onerror = function() {
-                    this.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="800" height="600"%3E%3Crect fill="%23667eea" width="800" height="600"/%3E%3Ctext fill="white" font-size="30" x="50%25" y="50%25" text-anchor="middle"%3EImage Not Found%3C/text%3E%3C/svg%3E';
-                };
+                // Check if slide has video
+                const isVideo = slide.video_url && slide.video_url.trim() !== '';
+                console.log('Slide', index, '- Video:', isVideo, slide.video_url);
                 
-                slideDiv.innerHTML = `
-                    <div class="relative h-full">
-                        <img src="${slide.image}" alt="${slide.title}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'800\\' height=\\'600\\'%3E%3Crect fill=\\'%23667eea\\' width=\\'800\\' height=\\'600\\'/%3E%3Ctext fill=\\'white\\' font-size=\\'30\\' x=\\'50%25\\' y=\\'50%25\\' text-anchor=\\'middle\\'%3EImage Not Available%3C/text%3E%3C/svg%3E'">
-                        <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                            <div class="text-center text-white px-4 max-w-4xl">
-                                <h1 class="text-3xl md:text-5xl font-bold mb-4 font-serif">${slide.title}</h1>
-                                <p class="text-lg md:text-xl mb-8">${slide.description}</p>
-                                <a href="contact.html" class="bg-gradient-to-r from-purple-600 to-pink-600 px-6 md:px-8 py-2 md:py-3 rounded-full text-base md:text-lg font-bold hover:shadow-lg transition inline-block">Book Consultation</a>
+                if (isVideo) {
+                    // Video slide
+                    slideDiv.innerHTML = `
+                        <div class="relative h-full">
+                            <video class="w-full h-full object-cover" autoplay muted playsinline>
+                                <source src="${slide.video_url}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                            <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                                <div class="text-center text-white px-4 max-w-4xl">
+                                    <h1 class="text-3xl md:text-5xl font-bold mb-4 font-serif drop-shadow-2xl">${slide.title}</h1>
+                                    <p class="text-lg md:text-xl mb-8 drop-shadow-lg">${slide.description}</p>
+                                    <div class="flex flex-wrap gap-4 justify-center">
+                                        <button onclick="document.getElementById('chatbot-toggle').click(); setTimeout(() => sendMenuOption('book'), 500);" class="bg-gradient-to-r from-purple-600 to-pink-600 px-6 md:px-8 py-2 md:py-3 rounded-full text-base md:text-lg font-bold hover:shadow-lg transition inline-block">
+                                            <i class="fas fa-calendar-check mr-2"></i>Book Consultation
+                                        </button>
+                                        <a href="/contact.html" class="bg-gradient-to-r from-green-500 to-teal-600 px-6 md:px-8 py-2 md:py-3 rounded-full text-base md:text-lg font-bold hover:shadow-lg transition inline-block">
+                                            <i class="fas fa-envelope mr-2"></i>Contact Us
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                } else {
+                    // Image slide
+                    slideDiv.innerHTML = `
+                        <div class="relative h-full">
+                            <img src="${slide.image}" alt="${slide.title}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22600%22%3E%3Crect fill=%22%23667eea%22 width=%22800%22 height=%22600%22/%3E%3Ctext fill=%22white%22 font-size=%2230%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage Not Available%3C/text%3E%3C/svg%3E'">
+                            <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                                <div class="text-center text-white px-4 max-w-4xl">
+                                    <h1 class="text-3xl md:text-5xl font-bold mb-4 font-serif">${slide.title}</h1>
+                                    <p class="text-lg md:text-xl mb-8">${slide.description}</p>
+                                    <div class="flex flex-wrap gap-4 justify-center">
+                                        <button onclick="document.getElementById('chatbot-toggle').click(); setTimeout(() => sendMenuOption('book'), 500);" class="bg-gradient-to-r from-purple-600 to-pink-600 px-6 md:px-8 py-2 md:py-3 rounded-full text-base md:text-lg font-bold hover:shadow-lg transition inline-block">
+                                            <i class="fas fa-calendar-check mr-2"></i>Book Consultation
+                                        </button>
+                                        <a href="/contact.html" class="bg-gradient-to-r from-green-500 to-teal-600 px-6 md:px-8 py-2 md:py-3 rounded-full text-base md:text-lg font-bold hover:shadow-lg transition inline-block">
+                                            <i class="fas fa-envelope mr-2"></i>Contact Us
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
                 container.appendChild(slideDiv);
+                console.log('Appended slide', index, '- HTML length:', slideDiv.innerHTML.length);
             });
+            
+            console.log('Total slides in container:', container.children.length);
+            console.log('Container dimensions:', container.offsetWidth, 'x', container.offsetHeight);
         }
 
         function showSlide(index) {
             const slides = document.querySelectorAll('.hero-slide');
             slides.forEach((slide, i) => {
-                slide.classList.toggle('opacity-100', i === index);
-                slide.classList.toggle('opacity-0', i !== index);
+                const isActive = i === index;
+                
+                // Remove/add active class for CSS transitions
+                if (isActive) {
+                    slide.classList.add('active');
+                    slide.classList.remove('opacity-0');
+                    slide.classList.add('opacity-100');
+                    slide.style.zIndex = '2';
+                } else {
+                    slide.classList.remove('active');
+                    slide.classList.remove('opacity-100');
+                    slide.classList.add('opacity-0');
+                    slide.style.zIndex = '1';
+                }
+                
+                // Handle video autoplay
+                const video = slide.querySelector('video');
+                if (video) {
+                    if (isActive) {
+                        video.currentTime = 0;
+                        video.play().catch(e => console.log('Video autoplay prevented:', e));
+                    } else {
+                        video.pause();
+                    }
+                }
             });
         }
 
@@ -767,22 +892,99 @@
             showSlide(currentSlide);
         }
 
+        let sliderInterval = null;
+        
         function startHeroSlider() {
-            setInterval(nextSlide, 5000);
+            // Clear any existing interval
+            if (sliderInterval) {
+                clearInterval(sliderInterval);
+            }
+            
+            // Start with initial interval
+            sliderInterval = setInterval(() => {
+                const currentSlideElement = document.querySelectorAll('.hero-slide')[currentSlide];
+                const video = currentSlideElement?.querySelector('video');
+                
+                // If current slide has a video that's still playing, wait for it to finish
+                if (video && !video.paused && !video.ended) {
+                    console.log('Video still playing, waiting...');
+                    return;
+                }
+                
+                nextSlide();
+            }, 5000);
+            
+            // Add event listener to videos to advance slide when video ends
+            document.querySelectorAll('.hero-slide video').forEach(video => {
+                video.addEventListener('ended', () => {
+                    console.log('Video ended, advancing to next slide');
+                    nextSlide();
+                });
+            });
         }
 
         document.getElementById('next-slide').addEventListener('click', nextSlide);
         document.getElementById('prev-slide').addEventListener('click', prevSlide);
+        
+        // Load About Section from API
+        async function loadAboutSection() {
+            try {
+                const response = await fetch('/api/about-section');
+                const data = await response.json();
+                
+                if (data && Object.keys(data).length > 0) {
+                    document.getElementById('about-title').textContent = data.title || 'Our Expert Astrologer';
+                    document.getElementById('about-description').textContent = data.description || '';
+                    document.getElementById('about-image').src = data.image || '';
+                    
+                    // Render additional details
+                    const detailsContainer = document.getElementById('about-details');
+                    const details = [];
+                    
+                    if (data.experience) {
+                        details.push(`<div class="flex items-start"><i class="fas fa-star text-purple-600 mt-1 mr-3"></i><p><strong>Experience:</strong> ${data.experience}</p></div>`);
+                    }
+                    if (data.specialization) {
+                        details.push(`<div class="flex items-start"><i class="fas fa-gem text-purple-600 mt-1 mr-3"></i><p><strong>Specialization:</strong> ${data.specialization}</p></div>`);
+                    }
+                    if (data.credentials) {
+                        details.push(`<div class="flex items-start"><i class="fas fa-certificate text-purple-600 mt-1 mr-3"></i><p><strong>Credentials:</strong> ${data.credentials}</p></div>`);
+                    }
+                    
+                    detailsContainer.innerHTML = details.join('');
+                } else {
+                    // Default content if no data
+                    document.getElementById('about-title').textContent = 'Our Expert Astrologer';
+                    document.getElementById('about-description').textContent = 'Welcome to our astrology consultation service. Our expert astrologer brings years of experience in Vedic astrology, tarot reading, and spiritual guidance.';
+                    document.getElementById('about-details').innerHTML = `
+                        <div class="flex items-start"><i class="fas fa-star text-purple-600 mt-1 mr-3"></i><p><strong>Experience:</strong> 15+ Years</p></div>
+                        <div class="flex items-start"><i class="fas fa-gem text-purple-600 mt-1 mr-3"></i><p><strong>Specialization:</strong> Vedic Astrology, Tarot, Vastu</p></div>
+                        <div class="flex items-start"><i class="fas fa-certificate text-purple-600 mt-1 mr-3"></i><p><strong>Credentials:</strong> Certified Astrologer</p></div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading about section:', error);
+            }
+        }
+        
         // Load Gallery Slides from API
         async function loadGallerySlides() {
             try {
+                console.log('Fetching gallery slides from API...');
                 const response = await fetch('/api/gallery-slides');
+                console.log('Gallery slides response status:', response.status);
                 const data = await response.json();
+                console.log('Gallery slides data received:', data);
                 
                 // Handle API response format
                 let gallerySlides = [];
                 if (Array.isArray(data)) {
                     gallerySlides = data;
+                    console.log('Loaded', gallerySlides.length, 'gallery slides');
+                    // Debug: Check first slide's image URL
+                    if (gallerySlides.length > 0) {
+                        console.log('First gallery slide image URL:', gallerySlides[0].image);
+                    }
                 } else {
                     console.error('Invalid gallery slides data format:', data);
                 }
@@ -812,7 +1014,7 @@
                              alt="${slide.title}" 
                              class="w-full h-full object-cover"
                              loading="lazy"
-                             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'400\\' height=\\'300\\'%3E%3Crect fill=\\'%23ec4899\\' width=\\'400\\' height=\\'300\\'/%3E%3Ctext fill=\\'white\\' font-size=\\'20\\' x=\\'50%25\\' y=\\'50%25\\' text-anchor=\\'middle\\'%3EImage Not Available%3C/text%3E%3C/svg%3E'">
+                             onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23ec4899%22 width=%22400%22 height=%22300%22/%3E%3Ctext fill=%22white%22 font-size=%2220%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage Not Available%3C/text%3E%3C/svg%3E'">
                     </div>
                     <div class="p-4">
                         <h4 class="font-bold text-purple-800 text-center text-lg">${slide.title}</h4>
@@ -1001,10 +1203,23 @@
 
         // Initialize all data on page load
         window.addEventListener('DOMContentLoaded', function() {
+            console.log('Loading hero slides...');
+            loadHeroSlides();
+            console.log('Loading gallery slides...');
+            loadGallerySlides();
+            console.log('Loading contact info...');
+            loadContactInfo();
+        });
+        
+        // Also try immediate load for faster display
+        if (document.readyState === 'loading') {
+            console.log('Document still loading, waiting for DOMContentLoaded...');
+        } else {
+            console.log('Document already loaded, loading data immediately...');
             loadHeroSlides();
             loadGallerySlides();
             loadContactInfo();
-        });
+        }
     </script>
 
 
@@ -1013,14 +1228,14 @@
         let isChatbotOpen = false;
         
         function createChatbot() {
-            const chatbotHTML = ` <div id="chatbot-widget" class="fixed bottom-6 right-6 z-50">
+            const chatbotHTML = ` <div id="chatbot-widget" class="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50">
                     <!-- Chatbot Button -->
-                    <button id="chatbot-toggle" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 hover:scale-110">
-                        <i class="fas fa-comments text-2xl"></i>
+                    <button id="chatbot-toggle" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 hover:scale-110">
+                        <i class="fas fa-comments text-xl sm:text-2xl"></i>
                     </button>
                     
                     <!-- Chatbot Window -->
-                    <div id="chatbot-window" class="hidden absolute bottom-20 right-0 w-96 h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+                    <div id="chatbot-window" class="hidden fixed sm:absolute bottom-0 left-0 right-0 sm:bottom-20 sm:right-0 sm:left-auto w-full sm:w-96 h-[80vh] sm:h-[500px] bg-white sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden" style="max-height: 600px;">
                         <!-- Header -->
                         <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-4 flex justify-between items-center">
                             <div class="flex items-center gap-3">
@@ -1098,13 +1313,15 @@
             // Event listeners
             let lastActivityTime = Date.now();
             let reviewTimerSet = false;
+            let inactivityTimer = null;
             
             document.getElementById('chatbot-toggle').addEventListener('click', () => {
                 toggleChatbot();
-                // Send greeting when opened
+                // Send simple greeting when opened
                 if (isChatbotOpen && document.getElementById('chatbot-messages').children.length === 0) {
                     setTimeout(() => {
-                        addBotMessage('Hello! 👋 Welcome to Cosmic Astrology. How can I help you today?');
+                        addBotMessage(`👋 <strong>Namaste! Welcome to Cosmic Astrology</strong><br><br>How can I help you today?<br><br><em>Type your question or say "menu" to see options!</em>`);
+                        startInactivityTimer();
                     }, 300);
                 }
             });
@@ -1112,15 +1329,37 @@
             document.getElementById('chatbot-send').addEventListener('click', () => {
                 sendMessage();
                 lastActivityTime = Date.now();
+                resetInactivityTimer();
             });
             document.getElementById('chatbot-input').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     sendMessage();
                     lastActivityTime = Date.now();
+                    resetInactivityTimer();
                 }
             });
             
-            // Review message will be shown after booking completion, not on timer
+            // Start inactivity timer
+            function startInactivityTimer() {
+                resetInactivityTimer();
+            }
+            
+            function resetInactivityTimer() {
+                if (inactivityTimer) clearTimeout(inactivityTimer);
+                if (!reviewTimerSet && isChatbotOpen) {
+                    inactivityTimer = setTimeout(() => {
+                        if (!reviewTimerSet) {
+                            addBotMessage(`😊 <strong>Thank you for chatting with us!</strong><br><br>
+If you've experienced our services, we'd love your feedback!<br><br>
+<a href="https://maps.app.goo.gl/rPo3UXPy65DBbsVz8" target="_blank" style="background: linear-gradient(to right, #7C3AED, #EC4899); color: white; padding: 12px 24px; border-radius: 25px; text-decoration: none; display: inline-block; font-weight: bold; font-size: 16px;">
+⭐⭐⭐⭐⭐ Write a Google Review
+</a><br><br>
+<em>May the stars guide you! 🌟</em>`);
+                            reviewTimerSet = true;
+                        }
+                    }, 30000); // 30 seconds
+                }
+            }
         }
         
         function toggleChatbot() {
@@ -1168,11 +1407,7 @@
                     return;
                 }
                 
-                // Check if user wants to book - show booking form
-                if (message.toLowerCase().includes('book') && !message.toLowerCase().includes('facebook')) {
-                    showBookingForm();
-                    return;
-                }
+                // Booking is now handled by backend response
             }
             
             try {
@@ -1182,26 +1417,38 @@
                     body: JSON.stringify(bookingData ? { booking: bookingData } : { message: message })
                 });
                 const data = await response.json();
-                addBotMessage(data.response || 'Sorry, I couldn\'t understand that.');
+                console.log('Chatbot response:', data);
+                if (data.response === 'SHOW_BOOKING_FORM') {
+                    console.log('Showing booking form');
+                    addBotMessage('📅 <strong>Great! Let me help you book a consultation.</strong><br><br>Please fill in the details below:');
+                    showBookingForm();
+                } else {
+                    console.log('Showing normal response:', data.response);
+                    addBotMessage(data.response || 'Sorry, I couldn\'t understand that.');
+                }
             } catch (error) {
                 addBotMessage('Sorry, I\'m having trouble connecting. Please try again.');
             }
         }
         
         function showBookingForm() {
+            console.log('showBookingForm function called');
+            const today = new Date().toISOString().split('T')[0];
+            console.log('Max date for DOB:', today);
             addBotMessage(`
                 <div class="booking-form-container">
                     <strong>📅 Book Your Consultation</strong><br><br>
                     <form id="chatbot-booking-form" class="space-y-3">
-                        <input type="text" id="booking-name" placeholder="Your Name *" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500">
-                        <input type="tel" id="booking-phone" placeholder="Phone Number (10 digits) *" required pattern="[6-9][0-9]{9}" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500">
+                        <input type="text" id="booking-name" placeholder="Your Name *" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333; font-size: 14px;">
+                        <input type="email" id="booking-email" placeholder="Email (Optional)" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333; font-size: 14px;">
+                        <input type="tel" id="booking-phone" placeholder="Phone Number (10 digits) *" required pattern="[6-9][0-9]{9}" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333; font-size: 14px;">
                         <div>
-                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 4px;">Date of Birth *</label>
-                            <input type="date" id="booking-dob" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333;">
+                            <label style="display: block; font-size: 14px; color: #333; margin-bottom: 4px; font-weight: 500;">Date of Birth *</label>
+                            <input type="date" id="booking-dob" required max="${today}" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333; font-size: 14px;">
                         </div>
                         <div>
-                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 4px;">Select Service *</label>
-                            <select id="booking-service" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333;">
+                            <label style="display: block; font-size: 14px; color: #333; margin-bottom: 4px; font-weight: 500;">Select Service *</label>
+                            <select id="booking-service" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333; font-size: 14px;">
                                 <option value="">Choose a service...</option>
                                 <option value="Kundali Analysis">🔮 Kundali Analysis</option>
                                 <option value="Tarot Reading">🎴 Tarot Reading</option>
@@ -1214,8 +1461,8 @@
                             </select>
                         </div>
                         <div>
-                            <label style="display: block; font-size: 12px; color: #666; margin-bottom: 4px;">Specific Question (Optional)</label>
-                            <textarea id="booking-message" placeholder="Tell us about your concerns or questions..." class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" rows="3" style="color: #333;"></textarea>
+                            <label style="display: block; font-size: 14px; color: #333; margin-bottom: 4px; font-weight: 500;">Message (Optional)</label>
+                            <textarea id="booking-message" placeholder="Tell us about your concerns or questions..." class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" rows="3" style="color: #333; font-size: 14px;"></textarea>
                         </div>
                         <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2 rounded-lg font-bold hover:shadow-lg transition">
                             📤 Submit Booking
@@ -1232,6 +1479,7 @@
                     
                     // Validation
                     const name = document.getElementById('booking-name').value.trim();
+                    const email = document.getElementById('booking-email').value.trim();
                     const phone = document.getElementById('booking-phone').value.trim();
                     const dob = document.getElementById('booking-dob').value;
                     const service = document.getElementById('booking-service').value;
@@ -1239,6 +1487,12 @@
                     // Name validation - at least 2 letters, only letters and spaces
                     if (!/^[A-Za-z\s]{2,}$/.test(name)) {
                         addBotMessage('❌ Please enter a valid name (at least 2 letters, only alphabets)');
+                        return;
+                    }
+                    
+                    // Email validation (if provided)
+                    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                        addBotMessage('❌ Please enter a valid email address');
                         return;
                     }
                     
@@ -1266,10 +1520,12 @@
                     
                     const bookingData = {
                         name: name,
+                        email: email || null,
                         phone: phone,
                         dob: dob,
                         service: service,
-                        message: document.getElementById('booking-message').value.trim()
+                        subject: service,
+                        message: document.getElementById('booking-message').value.trim() || null
                     };
                     
                     // Show loading message
@@ -1286,11 +1542,13 @@
                         const result = await response.json();
                         
                         if (response.ok && result) {
-                            // Hide the booking form
-                            const formContainer = form.closest('.booking-form-container');
-                            if (formContainer) {
-                                formContainer.style.display = 'none';
-                            }
+                            // Remove the entire booking form message from chat
+                            const messages = document.getElementById('chatbot-messages');
+                            const formMessages = messages.querySelectorAll('.booking-form-container');
+                            formMessages.forEach(msg => {
+                                const parentDiv = msg.closest('.flex');
+                                if (parentDiv) parentDiv.remove();
+                            });
                             
                             // Show success message with contact options
                             addBotMessage(`✅ <strong>Booking Confirmed!</strong><br><br>
@@ -1318,10 +1576,10 @@ ${bookingData.message ? '• Question: ' + bookingData.message + '<br>' : ''}
 • We'll contact you within 2 hours<br>
 • Or use buttons above to reach us now!<br>
 • Prepare your birth details<br><br>
-<strong>⭐ Loved our service?</strong><br>
-<a href="https://maps.app.goo.gl/rPo3UXPy65DBbsVz8" target="_blank" style="background: linear-gradient(to right, #7C3AED, #EC4899); color: white; padding: 10px 20px; border-radius: 25px; text-decoration: none; display: inline-block; font-weight: bold; margin-top: 10px;">
-⭐ Leave us a Google Review!
-</a>`);
+💬 <strong>Need anything else?</strong> Just ask!`);
+                            
+                            // Reset review flag
+                            reviewTimerSet = false;
                         } else {
                             addBotMessage(`❌ <strong>Booking failed</strong><br><br>${result.error || 'Please try again or contact us directly.'}<br><br>
 <a href="https://wa.me/918431729319" target="_blank" style="color: #7C3AED; font-weight: bold;">
@@ -1386,7 +1644,11 @@ ${bookingData.message ? '• Question: ' + bookingData.message + '<br>' : ''}
             })
             .then(response => response.json())
             .then(data => {
-                if (data.response) {
+                if (data.response === 'SHOW_BOOKING_FORM') {
+                    console.log('Showing booking form from menu');
+                    addBotMessage('📅 <strong>Great! Let me help you book a consultation.</strong><br><br>Please fill in the details below:');
+                    showBookingForm();
+                } else if (data.response) {
                     addBotMessage(data.response);
                 }
             })
@@ -1415,6 +1677,9 @@ ${bookingData.message ? '• Question: ' + bookingData.message + '<br>' : ''}
         document.addEventListener('DOMContentLoaded', () => {
             console.log('Page loaded successfully');
             console.log('Backend ready');
+            
+            // Load About section
+            loadAboutSection();
             
             // Initialize chatbot
             createChatbot();
