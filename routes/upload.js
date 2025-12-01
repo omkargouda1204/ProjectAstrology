@@ -41,6 +41,17 @@ const upload = multer({
 // FILE UPLOAD ENDPOINT
 // ========================================
 
+// Test endpoint to verify upload route is accessible
+router.get('/upload/test', (req, res) => {
+    res.json({ 
+        success: true, 
+        message: 'Upload endpoint is accessible',
+        acceptedMethods: ['POST'],
+        expectedFields: ['file', 'folder'],
+        maxFileSize: '5MB'
+    });
+});
+
 // Single file upload with background removal (Supabase Storage)
 router.post('/upload', upload.single('file'), async (req, res) => {
     try {

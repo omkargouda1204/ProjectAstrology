@@ -32,8 +32,13 @@ app.use(compression());
 // CORS configuration
 app.use(cors({
     origin: process.env.CORS_ORIGIN || '*',
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Handle OPTIONS requests explicitly
+app.options('*', cors());
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
@@ -104,10 +109,10 @@ app.use((err, req, res, next) => {
 });
 
 // ========================================
-// START SERVER
+// START SERVER WITH ERROR HANDLING
 // ========================================
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`
 ╔═══════════════════════════════════════════════════════╗
 ║                                                       ║
@@ -124,6 +129,38 @@ app.listen(PORT, () => {
 ║                                                       ║
 ╚═══════════════════════════════════════════════════════╝
     `);
+});
+
+// Handle errors
+server.on('error', (error) => {
+    if (error.code === 'EADDRINUSE') {
+        console.error(`❌ Port ${PORT} is already in use!`);
+        console.error('🔧 Trying to use alternative port...');
+        const newPort = PORT + 1;
+        app.listen(newPort, () => {
+            console.log(`✅ Server started on alternative port: ${newPort}`);
+        });
+    } else {
+        console.error('Server error:', error);
+        process.exit(1);
+    }
+});
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+    console.log('\n\nSIGINT received. Shutting down gracefully...');
+    server.close(() => {
+        console.log('✅ Server closed');
+        process.exit(0);
+    });
+});
+
+process.on('SIGTERM', () => {
+    console.log('\n\nSIGTERM received. Shutting down gracefully...');
+    server.close(() => {
+        console.log('✅ Server closed');
+        process.exit(0);
+    });
 });
 
 // Graceful shutdown
