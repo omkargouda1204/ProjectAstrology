@@ -145,18 +145,137 @@
             }
         }
         
-        /* Round logo styles */
+        /* Logo styles - Display directly without round shape */
         .logo-container img, .navbar-logo {
-            border-radius: 50% !important;
-            object-fit: cover !important;
-            border: 3px solid rgba(124, 58, 237, 0.3) !important;
+            border-radius: 0 !important;
+            object-fit: contain !important;
+            border: none !important;
             transition: all 0.3s ease !important;
         }
         
         .logo-container img:hover, .navbar-logo:hover {
-            transform: scale(1.05) rotate(5deg) !important;
-            border-color: rgba(124, 58, 237, 0.6) !important;
-            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3) !important;
+            transform: scale(1.05) !important;
+            box-shadow: none !important;
+        }
+
+        /* ============================================
+           COMPREHENSIVE RESPONSIVE DESIGN STYLES
+           ============================================ */
+
+        /* Extra Small Devices (Mobile - 320px to 480px) */
+        @media (max-width: 480px) {
+            .navbar-logo {
+                max-width: 120px !important;
+                height: auto !important;
+            }
+            
+            .website-name {
+                font-size: 16px !important;
+            }
+            
+            .website-tagline {
+                font-size: 11px !important;
+            }
+            
+            h1 {
+                font-size: 20px !important;
+            }
+            
+            h2 {
+                font-size: 18px !important;
+            }
+            
+            h3 {
+                font-size: 16px !important;
+            }
+            
+            .text-base {
+                font-size: 12px !important;
+            }
+            
+            button {
+                padding: 8px 12px !important;
+                font-size: 12px !important;
+            }
+            
+            .p-4 {
+                padding: 12px !important;
+            }
+            
+            .px-6 {
+                padding-left: 12px !important;
+                padding-right: 12px !important;
+            }
+        }
+
+        /* Small Devices (Mobile - 481px to 768px) */
+        @media (max-width: 768px) {
+            .navbar-logo {
+                max-width: 140px !important;
+                height: auto !important;
+            }
+            
+            .website-name {
+                font-size: 18px !important;
+            }
+            
+            .website-tagline {
+                font-size: 12px !important;
+            }
+            
+            h1 {
+                font-size: 24px !important;
+            }
+            
+            h2 {
+                font-size: 20px !important;
+            }
+            
+            h3 {
+                font-size: 18px !important;
+            }
+            
+            .text-lg {
+                font-size: 14px !important;
+            }
+            
+            button {
+                padding: 10px 14px !important;
+                font-size: 13px !important;
+            }
+            
+            .px-8 {
+                padding-left: 16px !important;
+                padding-right: 16px !important;
+            }
+        }
+
+        /* Medium Devices (Tablet - 769px to 1024px) */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .navbar-logo {
+                max-width: 180px !important;
+                height: auto !important;
+            }
+            
+            h1 {
+                font-size: 28px !important;
+            }
+            
+            h2 {
+                font-size: 22px !important;
+            }
+            
+            h3 {
+                font-size: 19px !important;
+            }
+        }
+
+        /* Large Devices (Desktop - 1025px+) */
+        @media (min-width: 1025px) {
+            .navbar-logo {
+                max-width: 250px !important;
+                height: auto !important;
+            }
         }
         
         /* Fade In Animation */
@@ -2277,9 +2396,6 @@
                                 <style>
                                     .chatbot-menu::-webkit-scrollbar { display: none; }
                                 </style>
-                                <button onclick="sendMenuOption('chat')" class="flex-shrink-0 px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-full text-xs font-semibold hover:shadow-lg transition">
-                                    💬 Chat
-                                </button>
                                 <button onclick="sendMenuOption('services')" class="flex-shrink-0 px-4 py-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-full text-xs font-semibold hover:shadow-lg transition">
                                     🌟 Services
                                 </button>
@@ -2300,9 +2416,6 @@
                                 </button>
                                 <button onclick="sendMenuOption('qa')" class="flex-shrink-0 px-4 py-2 bg-gradient-to-r from-teal-500 to-cyan-600 text-white rounded-full text-xs font-semibold hover:shadow-lg transition">
                                     ❓ FAQ
-                                </button>
-                                <button onclick="sendMenuOption('review')" class="flex-shrink-0 px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-600 text-white rounded-full text-xs font-semibold hover:shadow-lg transition">
-                                    ⭐ Review
                                 </button>
                                 <button onclick="contactViaWhatsApp()" class="flex-shrink-0 px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-full text-xs font-semibold hover:shadow-lg transition">
                                     💬 WhatsApp

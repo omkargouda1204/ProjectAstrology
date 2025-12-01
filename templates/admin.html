@@ -2455,6 +2455,29 @@
             }
         }
         
+        async function editAnnouncement(id) {
+            try {
+                const response = await fetch('/api/announcements');
+                if (response.ok) {
+                    const items = await response.json();
+                    const item = items.find(i => i.id === id);
+                    if (!item) return;
+                    
+                    document.getElementById('announcement-id').value = item.id;
+                    document.getElementById('announcement-text').value = item.text;
+                    document.getElementById('announcement-active').checked = item.active;
+                    document.getElementById('announcement-order').value = item.display_order || 0;
+                    
+                    document.getElementById('announcement-form-container').classList.remove('hidden');
+                    document.getElementById('announcement-form-container').scrollIntoView({ behavior: 'smooth' });
+                    document.getElementById('announcement-text').focus();
+                }
+            } catch (error) {
+                console.error('Error loading announcement:', error);
+                alert('Error loading announcement');
+            }
+        }
+        
         document.getElementById('announcement-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('announcement-id').value;

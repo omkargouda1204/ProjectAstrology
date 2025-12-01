@@ -1129,3 +1129,135 @@ body {
         font-size: 16px !important; /* Prevents zoom on iOS */
     }
 }
+
+/* ============================================
+   TESTIMONIALS & CAROUSEL RESPONSIVE STYLES
+   ============================================ */
+
+/* Reviews carousel responsive adjustments */
+#reviews-carousel {
+    display: flex;
+    flex-wrap: wrap;
+    transition: transform 0.5s ease-in-out;
+}
+
+.review-card {
+    flex: 1 1 100%;
+    min-width: 100%;
+    padding: 1rem;
+}
+
+/* Tablet: Show 2 reviews per slide */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .review-card {
+        flex: 1 1 50%;
+        min-width: 50%;
+    }
+}
+
+/* Desktop: Show 3 reviews per slide */
+@media (min-width: 1025px) {
+    .review-card {
+        flex: 1 1 33.333%;
+        min-width: 33.333%;
+    }
+}
+
+/* Navigation dots responsive sizing */
+#review-dots button {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+@media (max-width: 480px) {
+    #review-dots button {
+        width: 8px;
+        height: 8px;
+        margin: 4px;
+    }
+    
+    .review-card {
+        padding: 0.5rem;
+    }
+    
+    .review-card h4 {
+        font-size: 14px !important;
+    }
+    
+    .review-card p {
+        font-size: 12px !important;
+    }
+    
+    .review-card .text-yellow-500 {
+        font-size: 12px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    #review-dots button {
+        width: 9px;
+        height: 9px;
+        margin: 5px;
+    }
+    
+    .review-card {
+        padding: 0.75rem;
+    }
+}
+
+/* ============================================
+   ADMIN DASHBOARD RESPONSIVE IMPROVEMENTS
+   ============================================ */
+
+/* Mobile admin dashboard optimization */
+@media (max-width: 640px) {
+    .admin-btn-sm {
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+        min-height: auto !important;
+    }
+    
+    .admin-btn {
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+    }
+    
+    .tab-btn {
+        padding: 8px 12px !important;
+        font-size: 11px !important;
+        min-height: auto !important;
+    }
+    
+    .form-label {
+        font-size: 12px !important;
+    }
+    
+    .admin-input,
+    textarea {
+        font-size: 14px !important;
+        padding: 8px !important;
+    }
+}
+
+/* Admin form responsive adjustments */
+.admin-form-container {
+    overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+    .admin-form {
+        width: 100%;
+    }
+    
+    .form-row {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .form-col {
+        flex: 1 1 100%;
+        margin-bottom: 1rem;
+    }
+}
