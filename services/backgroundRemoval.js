@@ -13,13 +13,17 @@ try {
 
 try {
     sharp = require('sharp');
-    // Test Sharp functionality
-    const testSharp = sharp({ create: { width: 1, height: 1, channels: 3, background: 'white' } }).png().toBuffer();
-    sharpAvailable = true;
-    console.log('✅ Sharp loaded successfully for PNG conversion and tested functional');
+    // Test Sharp functionality by creating a simple buffer
+    sharp({ create: { width: 1, height: 1, channels: 3, background: 'white' } }).png().toBuffer()
+        .then(() => {
+            sharpAvailable = true;
+            console.log('✅ Sharp loaded and tested successfully');
+        })
+        .catch(() => {
+            console.log('ℹ️  Sharp module loaded but not fully functional - using Canvas API fallback for background removal');
+        });
 } catch (error) {
-    console.warn('Sharp not available:', error.message);
-    console.warn('Background removal will use original image format (may cause "Unsupported format" errors)');
+    console.log('ℹ️  Sharp not available - using Canvas API fallback for background removal');
 }
 
 const path = require('path');

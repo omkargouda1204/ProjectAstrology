@@ -1,7 +1,5 @@
-# Flask Backend Dependencies
 Flask-CORS==4.0.0
 Werkzeug==3.0.1
-gevent==24.2.1
 supabase==1.2.0
 gotrue==1.0.4
 postgrest==0.10.8
@@ -11,5 +9,4 @@ gunicorn==21.2.0
 python-dotenv==1.0.1
 requests==2.31.0
 
-# OpenAI for Chatbot
 openai==1.12.0
