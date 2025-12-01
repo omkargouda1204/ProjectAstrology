@@ -92,9 +92,9 @@
 
         // Toggle dropdown and mobile menu
         document.addEventListener('DOMContentLoaded', function() {
-            // Desktop dropdown
-            const languageBtn = document.getElementById('language-btn');
-            const languageDropdown = document.getElementById('language-dropdown');
+            // Desktop dropdown - FIXED ID
+            const languageBtn = document.getElementById('lang-dropdown-btn');
+            const languageDropdown = document.getElementById('lang-dropdown');
             
             if (languageBtn) {
                 languageBtn.addEventListener('click', function(e) {
@@ -159,102 +159,95 @@
     </script>
 </head>
 <body class="font-body bg-gray-50">
-    <nav id="main-navbar" class="bg-gradient-to-r from-purple-700 via-pink-600 to-purple-800 text-white shadow-xl sticky top-0 z-50">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
-                
-                <!-- Logo Section -->
-                <div class="flex items-center space-x-3">
-                    <div class="w-12 h-12 bg-white bg-opacity-20 backdrop-blur rounded-full flex items-center justify-center hover:bg-opacity-30 transition-all duration-300">
-                        <i class="fas fa-star text-yellow-300 text-xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-2xl md:text-3xl font-bold font-serif text-white">
-                            Cosmic Astrology
-                        </h1>
-                        <p class="text-xs text-purple-200 font-medium">Your Gateway to Cosmic Wisdom</p>
-                    </div>
+    <!-- Clean Header Section (Yenepoya Style) -->
+    <header class="bg-white border-b-2 border-gray-200 shadow-md">
+        <div class="container mx-auto px-4 py-5 md:py-6">
+            <div class="flex items-center justify-between md:justify-start md:space-x-8">
+                <!-- Logo - Direct Display (No Round Shape, No Fallback) -->
+                <div class="flex-shrink-0 logo-container">
+                    <img id="navbar-logo" src="" alt="Logo" class="h-20 w-auto sm:h-24 md:h-28 lg:h-32 xl:h-36 object-contain transition-transform duration-300 hover:scale-105" style="max-width: 250px; background: transparent;">
                 </div>
                 
-                <!-- Desktop Navigation -->
-                <div class="hidden lg:flex items-center space-x-8">
-                    <a href="/" class="nav-link relative group">
-                        <span class="flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-300">
-                            <i class="fas fa-home text-sm"></i>
-                            <span class="font-medium">Home</span>
-                        </span>
-                    </a>
-                    <a href="#services" class="nav-link relative group">
-                        <span class="flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-300">
-                            <i class="fas fa-magic text-sm"></i>
-                            <span class="font-medium">Services</span>
-                        </span>
-                    </a>
-                    <a href="#gallery" class="nav-link relative group">
-                        <span class="flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-300">
-                            <i class="fas fa-images text-sm"></i>
-                            <span class="font-medium">Gallery</span>
-                        </span>
-                    </a>
-                    <a href="#faq" class="nav-link relative group">
-                        <span class="flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-300">
-                            <i class="fas fa-question-circle text-sm"></i>
-                            <span class="font-medium">FAQ</span>
-                        </span>
-                    </a>
-                    <a href="contact.html" class="nav-link relative group">
-                        <span class="flex items-center space-x-2 hover:text-yellow-300 transition-colors duration-300">
-                            <i class="fas fa-envelope text-sm"></i>
-                            <span class="font-medium">Contact</span>
-                        </span>
-                    </a>
-                    
-                    <!-- Google Translate -->
-                    <div class="flex items-center space-x-2 bg-white bg-opacity-10 backdrop-blur px-3 py-2 rounded-full hover:bg-opacity-20 transition-all duration-300">
-                        <i class="fas fa-globe text-yellow-300 text-sm"></i>
-                        <div id="google_translate_element" class="translate-element"></div>
+                <!-- Website Name & Tagline - Fully Responsive -->
+                <div class="flex-1 min-w-0 px-2 sm:px-4 website-name-container">
+                    <h1 id="website-name" class="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-800 tracking-wide leading-tight break-words">
+                        Om Sri Mahakali Bhairavi Jyotishya Shastram
+                    </h1>
+                    <div id="website-subtitles" class="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-gray-600 mt-1 md:mt-2 font-medium">
+                        <p id="subtitle1" class="break-words">Specialized Astrology & Pooja Services</p>
+                        <p id="subtitle2" class="hidden break-words"></p>
+                        <p id="subtitle3" class="hidden break-words"></p>
                     </div>
                 </div>
                 
                 <!-- Mobile Menu Toggle -->
-                <button id="mobile-menu-btn" class="lg:hidden text-white focus:outline-none hover:text-yellow-300 transition-colors duration-300 p-2">
-                    <i class="fas fa-bars text-2xl"></i>
+                <button id="mobile-menu-btn" class="lg:hidden p-3 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors">
+                    <i class="fas fa-bars text-3xl"></i>
                 </button>
             </div>
-            
-            <!-- Mobile Navigation Menu -->
-            <div id="mobile-menu" class="lg:hidden hidden">
-                <div class="py-4 space-y-3 border-t border-purple-400 border-opacity-30">
-                    <a href="/" class="mobile-nav-link flex items-center space-x-3 py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded-lg transition-all duration-300">
-                        <i class="fas fa-home text-yellow-300"></i>
-                        <span class="font-medium">Home</span>
-                    </a>
-                    <a href="#services" class="mobile-nav-link flex items-center space-x-3 py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded-lg transition-all duration-300">
-                        <i class="fas fa-magic text-yellow-300"></i>
-                        <span class="font-medium">Services</span>
-                    </a>
-                    <a href="#gallery" class="mobile-nav-link flex items-center space-x-3 py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded-lg transition-all duration-300">
-                        <i class="fas fa-images text-yellow-300"></i>
-                        <span class="font-medium">Gallery</span>
-                    </a>
-                    <a href="#faq" class="mobile-nav-link flex items-center space-x-3 py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded-lg transition-all duration-300">
-                        <i class="fas fa-question-circle text-yellow-300"></i>
-                        <span class="font-medium">FAQ</span>
-                    </a>
-                    <a href="contact.html" class="mobile-nav-link flex items-center space-x-3 py-2 px-4 hover:bg-white hover:bg-opacity-10 rounded-lg transition-all duration-300">
-                        <i class="fas fa-envelope text-yellow-300"></i>
-                        <span class="font-medium">Contact</span>
-                    </a>
-                    
-                    <!-- Mobile Google Translate -->
-                    <div class="mobile-nav-link flex items-center space-x-3 py-2 px-4 bg-white bg-opacity-10 rounded-lg mt-3">
-                        <i class="fas fa-globe text-yellow-300"></i>
-                        <div id="google_translate_element_mobile" class="translate-element-mobile"></div>
+        </div>
+    </header>
+
+    <!-- Main Navigation Bar (Blue/Purple Theme) - Increased Height -->
+    <nav id="main-navbar" class="bg-gradient-to-r from-purple-700 via-purple-600 to-indigo-700 text-white sticky top-0 z-50 shadow-2xl">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16 md:h-20 lg:h-24">
+                
+                <!-- Just Menu Items (No Logo, No Brand in Navbar) -->
+                <div class="flex items-center space-x-4">
+                    <!-- Navbar is for menu items only -->
+                </div>
+                
+                <!-- Desktop Menu (Same as Home Page) -->
+                <div id="desktop-menu" class="hidden lg:flex items-center space-x-2 flex-1 justify-center">
+                    <!-- Menu items will be loaded dynamically -->
+                </div>
+                
+                <!-- Language Selector -->
+                <div class="hidden lg:block relative">
+                    <button id="lang-dropdown-btn" class="flex items-center space-x-2 px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-20 transition-all duration-300 text-base md:text-lg font-medium">
+                        <i class="fas fa-globe text-xl"></i>
+                        <span>EN</span>
+                        <i class="fas fa-chevron-down text-sm"></i>
+                    </button>
+                    <div id="lang-dropdown" class="hidden absolute right-4 mt-2 w-48 bg-white rounded-lg shadow-xl border overflow-hidden">
+                        <div id="google_translate_element" class="p-2"></div>
                     </div>
+                </div>
+                
+                <!-- Mobile Menu Toggle -->
+                <button id="mobile-menu-toggle" class="lg:hidden p-2 rounded-lg hover:bg-white/20 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="lg:hidden hidden bg-purple-800">
+            <div class="container mx-auto px-4 py-3">
+                <!-- Website name in mobile menu -->
+                <div class="border-b border-purple-600 pb-3 mb-3">
+                    <h2 id="mobile-brand-title" class="text-lg font-bold">Sri Mahakali Bhairavi Astrology</h2>
+                    <p id="mobile-brand-subtitle" class="text-xs text-purple-200">Specialized Astrology & Pooja Services</p>
+                </div>
+                
+                <!-- Mobile menu items -->
+                <div id="mobile-menu-items" class="space-y-1">
+                    <!-- Menu items will be loaded dynamically -->
+                </div>
+                
+                <!-- Language in mobile -->
+                <div class="mt-3 pt-3 border-t border-purple-600">
+                    <button onclick="document.getElementById('lang-dropdown').classList.toggle('hidden')" class="w-full text-left px-3 py-2 rounded hover:bg-purple-700">
+                        <i class="fas fa-globe mr-2"></i>Language: EN
+                    </button>
                 </div>
             </div>
         </div>
     </nav>
+
     
     <!-- Contact Form Section -->
     <section class="pt-32 pb-20 bg-gradient-to-br from-purple-50 to-pink-50 min-h-screen">
@@ -266,9 +259,11 @@
 
             <div class="grid md:grid-cols-2 gap-8">
                 <!-- Contact Form -->
-                <div class="bg-white p-2 rounded-2xl shadow-lg">
-                    <h2 class="font-heading text-2xl font-bold mb-5">Send Us a Message</h2>
-                    <form id="contact-form" class="space-y-3">
+                <div class="bg-gradient-to-br from-white to-pink-50 p-8 rounded-2xl shadow-xl border-2 border-pink-100">
+                    <h2 class="font-heading text-2xl font-bold mb-6 text-purple-800">
+                        <i class="fas fa-envelope-open-text mr-2 text-pink-600"></i>Send Us a Message
+                    </h2>
+                    <form id="contact-form" class="space-y-4">
                         <div>
                             <label class="block text-gray-700 font-semibold mb-2">Name *</label>
                             <input type="text" id="name" required 
@@ -284,10 +279,16 @@
                         </div>
                         
                         <div>
-                            <label class="block text-gray-700 font-semibold mb-2">Email</label>
-                            <input type="email" id="email" 
+                            <label class="block text-gray-700 font-semibold mb-2">Email *</label>
+                            <input type="email" id="email" required 
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" 
-                                placeholder="your.email@example.com">
+                                placeholder="your@email.com">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-semibold mb-2">Phone</label>
+                            <input type="tel" id="phone" 
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" 
+                                placeholder="Your phone number">
                         </div>
                         
                         <div>
@@ -323,14 +324,21 @@
                 <!-- Contact Info & WhatsApp -->
                 <div class="space-y-6">
                     <!-- Quick Contact -->
-                    <div class="bg-white p-8 rounded-2xl shadow-lg">
-                        <h3 class="font-heading text-2xl font-bold mb-6">Quick Contact</h3>
-                        <div class="space-y-4">
+                    <div class="bg-gradient-to-br from-white to-purple-50 p-8 rounded-2xl shadow-xl border-2 border-purple-100">
+                        <h3 class="font-heading text-2xl font-bold mb-6 text-purple-800">
+                            <i class="fas fa-address-card mr-2 text-purple-600"></i>Quick Contact
+                        </h3>
+                        <div class="space-y-5">
                             <div class="flex items-start">
                                 <i class="fas fa-map-marker-alt text-primary text-2xl mt-1 mr-4"></i>
-                                <div>
+                                <div class="flex-1">
                                     <h4 class="font-semibold">Address</h4>
-                                    <p id="contact-address" class="text-gray-600">Loading...</p>
+                                    <p id="contact-address" class="text-gray-600 mb-2">Loading...</p>
+                                    <a id="view-on-maps" href="https://maps.app.goo.gl/jxzHozMFWs5LKCUr8" target="_blank" class="inline-flex items-center gap-2 text-purple-600 hover:text-purple-800 font-medium text-sm transition">
+                                        <i class="fas fa-map-marked-alt"></i>
+                                        <span>View on Google Maps</span>
+                                        <i class="fas fa-external-link-alt text-xs"></i>
+                                    </a>
                                 </div>
                             </div>
                             <div class="flex items-start">
@@ -416,14 +424,21 @@
         <div class="container mx-auto px-4 text-center">
             <div class="flex items-center justify-center space-x-2 mb-4">
                 <i class="fas fa-moon text-secondary text-3xl"></i>
-                <span class="font-heading text-2xl font-bold">Cosmic Astrology</span>
+                <span id="footer-business-name" class="font-heading text-2xl font-bold">Cosmic Astrology</span>
             </div>
             <div class="text-gray-300 mb-4">
-                <a href="index.html" class="hover:text-secondary mx-2">Home</a> |
-                <a href="index.html#services" class="hover:text-secondary mx-2">Services</a> |
-                <a href="privacy.html" class="hover:text-secondary mx-2">Privacy Policy</a>
+                <a href="/" class="hover:text-secondary mx-2 transition">Home</a> |
+                <a href="/#services" class="hover:text-secondary mx-2 transition">Services</a> |
+                <a href="/contact" class="hover:text-secondary mx-2 transition">Contact</a> |
+                <a href="/privacy" class="hover:text-secondary mx-2 transition">Privacy Policy</a>
             </div>
-            <p class="text-gray-300">&copy; 2025 Cosmic Astrology. All rights reserved.</p>
+            <p id="footer-copyright" class="text-gray-300">&copy; 2025 Cosmic Astrology. All rights reserved.</p>
+            <p class="mt-2 text-sm text-gray-400">
+                Developed by <a href="https://omkargouda.netlify.app/" target="_blank" class="text-purple-400 hover:text-purple-300 transition inline-flex items-center gap-1">
+                    <i class="fas fa-briefcase"></i>
+                    Omkar Gouda
+                </a>
+            </p>
         </div>
     </footer>
 
@@ -435,8 +450,11 @@
     <!-- Translation support removed - using inline translations -->
     
     <script>
-        // Initialize mobile menu
+        // Initialize page
         document.addEventListener('DOMContentLoaded', () => {
+            // Load navbar brand and menu
+            loadNavbar();
+            
             // Load and apply contact info from admin
             loadAndApplyContactInfo();
             
@@ -447,6 +465,190 @@
                 mobileMenu.classList.toggle('hidden');
             });
         });
+        
+        // Load navbar exactly like home page - ONLY from navbar_settings table
+        async function loadNavbar() {
+            try {
+                // Load ONLY from navbar_settings table
+                const brandResponse = await fetch('/api/navbar-settings');
+                if (brandResponse.ok) {
+                    const brandData = await brandResponse.json();
+                    console.log('Loading navbar from navbar_settings:', brandData);
+                    
+                    // Update website name and subtitle to match home page
+                    if (brandData.name) {
+                        const nameEl = document.getElementById('website-name');
+                        if (nameEl) {
+                            nameEl.textContent = brandData.name;
+                            nameEl.classList.add('animate-fade-in');
+                        }
+                    }
+                    
+                    if (brandData.subtitle1) {
+                        const subtitle1El = document.getElementById('subtitle1');
+                        if (subtitle1El) {
+                            subtitle1El.textContent = brandData.subtitle1;
+                            subtitle1El.classList.remove('hidden');
+                        }
+                    }
+                    
+                    if (brandData.subtitle2) {
+                        const subtitle2El = document.getElementById('subtitle2');
+                        if (subtitle2El) {
+                            subtitle2El.textContent = brandData.subtitle2;
+                            subtitle2El.classList.remove('hidden');
+                        }
+                    }
+                    
+                    if (brandData.subtitle3) {
+                        const subtitle3El = document.getElementById('subtitle3');
+                        if (subtitle3El) {
+                            subtitle3El.textContent = brandData.subtitle3;
+                            subtitle3El.classList.remove('hidden');
+                        }
+                    }
+                    
+                    // Update logo to match home page styling exactly
+                    if (brandData.logo_url) {
+                        const logoImg = document.getElementById('navbar-logo');
+                        if (logoImg) {
+                            logoImg.src = brandData.logo_url;
+                            logoImg.alt = brandData.name || 'Logo';
+                            logoImg.style.display = 'block';
+                            logoImg.style.maxWidth = '250px';
+                            logoImg.style.background = 'transparent';
+                            logoImg.className = 'h-20 w-auto sm:h-24 md:h-28 lg:h-32 xl:h-36 object-contain transition-transform duration-300 hover:scale-105';
+                            console.log('Logo loaded successfully:', brandData.logo_url);
+                        }
+                    }
+                    
+                    // Update navbar colors and handle transparency text color
+                    if (brandData.primary_color && brandData.secondary_color) {
+                        updateNavbarColors(brandData.primary_color, brandData.secondary_color, brandData.navbar_style);
+                    }
+                    
+                    // Apply layout settings
+                    applyNavbarLayout(brandData);
+                }
+                
+                // Load menu items from same source as home page
+                try {
+                    const menuResponse = await fetch('/api/menu-items?active=true');
+                    if (menuResponse.ok) {
+                        const menuItems = await menuResponse.json();
+                        if (menuItems && menuItems.length > 0) {
+                            renderMenuItems(menuItems);
+                        } else {
+                            renderDefaultMenuItems();
+                        }
+                    } else {
+                        renderDefaultMenuItems();
+                    }
+                } catch (menuError) {
+                    console.log('Menu loading failed, using defaults:', menuError);
+                    renderDefaultMenuItems();
+                }
+            } catch (error) {
+                console.error('Error loading navbar:', error);
+                renderDefaultMenuItems();
+            }
+        }
+        
+        // Render menu items
+        function renderMenuItems(items) {
+            const desktopMenu = document.getElementById('desktop-menu');
+            const mobileMenu = document.getElementById('mobile-menu-items');
+            
+            let desktopHTML = '';
+            let mobileHTML = '';
+            
+            items.forEach(item => {
+                const isContact = item.url === '/contact' || item.name.toLowerCase().includes('contact');
+                const activeClass = isContact ? 'bg-white/30 font-bold' : 'hover:bg-white/20';
+                const mobileActiveClass = isContact ? 'bg-white/20 font-bold' : 'hover:bg-purple-700';
+                
+                desktopHTML += `
+                    <a href="${item.url}" class="${activeClass} px-5 py-3 rounded-lg transition-all text-base xl:text-lg font-medium flex items-center space-x-2">
+                        <i class="${item.icon || 'fas fa-circle'}"></i>
+                        <span>${item.name}</span>
+                    </a>
+                `;
+                
+                mobileHTML += `
+                    <a href="${item.url}" class="block px-3 py-3 rounded ${mobileActiveClass} flex items-center space-x-2">
+                        <i class="${item.icon || 'fas fa-circle'}"></i>
+                        <span>${item.name}</span>
+                    </a>
+                `;
+            });
+            
+            desktopMenu.innerHTML = desktopHTML;
+            mobileMenu.innerHTML = mobileHTML;
+        }
+        
+        // Menu rendering functions - same as home page
+        function renderMenuItems(items) {
+            const desktopMenu = document.getElementById('desktop-menu');
+            const mobileMenuItems = document.getElementById('mobile-menu-items');
+            
+            if (!desktopMenu || !mobileMenuItems) return;
+            
+            desktopMenu.innerHTML = '';
+            mobileMenuItems.innerHTML = '';
+            
+            items.forEach(item => {
+                const isContact = item.url === '/contact' || item.name.toLowerCase().includes('contact');
+                
+                // Desktop menu item
+                const desktopLink = document.createElement('a');
+                desktopLink.href = item.url;
+                desktopLink.target = item.target || '_self';
+                desktopLink.className = `px-4 py-2 text-white hover:bg-white hover:bg-opacity-20 rounded-lg transition-all duration-300 font-medium text-sm lg:text-base whitespace-nowrap ${isContact ? 'bg-white bg-opacity-30 font-bold' : ''}`;
+                desktopLink.innerHTML = `
+                    <i class="${item.icon || 'fas fa-circle'} mr-1"></i>
+                    ${item.name}
+                `;
+                
+                desktopLink.addEventListener('click', function(e) {
+                    if (item.url.startsWith('#')) {
+                        e.preventDefault();
+                        window.location.href = '/' + item.url;
+                    }
+                });
+                desktopMenu.appendChild(desktopLink);
+                
+                // Mobile menu item
+                const mobileLink = document.createElement('a');
+                mobileLink.href = item.url;
+                mobileLink.target = item.target || '_self';
+                mobileLink.className = `block px-3 py-3 rounded transition-all duration-300 text-white font-medium ${isContact ? 'bg-white bg-opacity-20 font-bold' : 'hover:bg-purple-700'}`;
+                mobileLink.innerHTML = `
+                    <i class="${item.icon || 'fas fa-circle'} mr-2"></i>
+                    ${item.name}
+                `;
+                
+                mobileLink.addEventListener('click', function(e) {
+                    if (item.url.startsWith('#')) {
+                        e.preventDefault();
+                        window.location.href = '/' + item.url;
+                    }
+                });
+                mobileMenuItems.appendChild(mobileLink);
+            });
+        }
+        
+        // Fallback default menu items - same as home page
+        function renderDefaultMenuItems() {
+            const defaultItems = [
+                { name: 'Home', url: '/', icon: 'fas fa-home' },
+                { name: 'Services', url: '/#services', icon: 'fas fa-star' },
+                { name: 'Expert Solutions', url: '/#expert-solutions', icon: 'fas fa-lightbulb' },
+                { name: 'About', url: '/#about', icon: 'fas fa-user' },
+                { name: 'Gallery', url: '/#gallery', icon: 'fas fa-images' },
+                { name: 'Contact', url: '/contact', icon: 'fas fa-phone' }
+            ];
+            renderMenuItems(defaultItems);
+        }
         
         // Function to load contact info from localStorage and apply to page
         function loadAndApplyContactInfo() {
@@ -586,11 +788,11 @@
         });
         
         // Mobile menu toggle
-        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
         
-        if (mobileMenuToggle) {
-            mobileMenuToggle.addEventListener('click', function() {
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', function() {
                 mobileMenu.classList.toggle('hidden');
                 const icon = this.querySelector('i');
                 if (mobileMenu.classList.contains('hidden')) {
@@ -606,82 +808,56 @@
         // Load dynamic business info from API
         async function loadBusinessInfo() {
             try {
-                // Call loadBusinessInfoFromAPI instead
-                await loadBusinessInfoFromAPI();
-                return;
-                
-                if (config.success) {
-                    // Update address
-                    const addressEl = document.getElementById('contact-address');
-                    if (addressEl) {
-                        addressEl.textContent = config.businessAddress || 'Address not available';
+                const response = await fetch('/api/navbar-settings');
+                if (response.ok) {
+                    const info = await response.json();
+                    
+                    // Update website name and subtitles with responsive animations
+                    const websiteName = document.getElementById('website-name');
+                    if (websiteName && info.name) {
+                        websiteName.textContent = info.name;
+                        websiteName.classList.add('animate-fade-in');
                     }
                     
-                    // Update phone
-                    const phoneEl = document.getElementById('contact-phone');
-                    if (phoneEl) {
-                        phoneEl.textContent = config.whatsappNumber || '+91 98765 43210';
+                    const subtitle1 = document.getElementById('subtitle1');
+                    if (subtitle1 && info.subtitle1) {
+                        subtitle1.textContent = info.subtitle1;
+                        subtitle1.classList.remove('hidden');
+                        subtitle1.classList.add('animate-fade-in-delay');
                     }
                     
-                    // Update email
-                    const emailEl = document.getElementById('contact-email');
-                    if (emailEl) {
-                        emailEl.textContent = config.emailAddress || 'info@cosmicastrology.com';
+                    const subtitle2 = document.getElementById('subtitle2');
+                    if (subtitle2 && info.subtitle2) {
+                        subtitle2.textContent = info.subtitle2;
+                        subtitle2.classList.remove('hidden');
+                        subtitle2.classList.add('animate-fade-in-delay');
                     }
                     
-                    // Update working hours
-                    const weekdayEl = document.getElementById('contact-hours-weekday');
-                    if (weekdayEl) {
-                        weekdayEl.textContent = 'Mon - Sat: ' + (config.hoursWeekday || '9:00 AM - 8:00 PM');
+                    const subtitle3 = document.getElementById('subtitle3');
+                    if (subtitle3 && info.subtitle3) {
+                        subtitle3.textContent = info.subtitle3;
+                        subtitle3.classList.remove('hidden');
+                        subtitle3.classList.add('animate-fade-in-delay');
                     }
                     
-                    const sundayEl = document.getElementById('contact-hours-sunday');
-                    if (sundayEl) {
-                        sundayEl.textContent = 'Sunday: ' + (config.hoursSunday || '10:00 AM - 6:00 PM');
+                    // Update logo - NO DUPLICATE
+                    const logo = document.getElementById('navbar-logo');
+                    if (logo && info.logo_url) {
+                        logo.src = info.logo_url;
+                        logo.style.display = 'block';
                     }
                     
-                    // Update WhatsApp links
-                    const whatsappLinks = document.querySelectorAll('a[href^="https://wa.me"]');
-                    const whatsappNum = config.whatsappNumber ? config.whatsappNumber.replace(/\D/g, '') : '918431729319';
-                    whatsappLinks.forEach(link => {
-                        link.href = `https://wa.me/${whatsappNum}?text=Hi%2C%20I%20want%20astrology%20consultation`;
-                    });
-                    
-                    // Update social media links
-                    if (config.socialMedia) {
-                        const socialLinks = {
-                            'fa-facebook': config.socialMedia.facebook,
-                            'fa-instagram': config.socialMedia.instagram,
-                            'fa-twitter': config.socialMedia.twitter,
-                            'fa-youtube': config.socialMedia.youtube,
-                            'fa-linkedin': config.socialMedia.linkedin
-                        };
-                        
-                        document.querySelectorAll('.fab').forEach(icon => {
-                            for (const [iconClass, url] of Object.entries(socialLinks)) {
-                                if (icon.classList.contains(iconClass) && url) {
-                                    const link = icon.closest('a');
-                                    if (link) {
-                                        link.href = url;
-                                        link.target = '_blank';
-                                    }
-                                }
-                            }
-                        });
+                    // Update logo - direct display with transparent background
+                    const logoImg = document.getElementById('navbar-logo');
+                    if (logoImg && info.logo_url) {
+                        console.log('Loading contact page logo:', info.logo_url);
+                        logoImg.src = info.logo_url;
+                        logoImg.className = 'h-16 w-auto md:h-20 lg:h-24 object-contain transition-transform duration-300 hover:scale-105';
+                        logoImg.style.display = 'block';
+                        logoImg.style.maxWidth = '200px';
+                        logoImg.style.background = 'transparent';
                     }
-                }
-            } catch (error) {
-                console.error('Error loading business info:', error);
-            }
-        }
-        
-        // Load business info from API
-        async function loadBusinessInfoFromAPI() {
-            try {
-                const response = await fetch('/api/business-info');
-                const info = await response.json();
-                
-                if (info) {
+                    
                     // Update address
                     const addressEl = document.getElementById('contact-address');
                     if (addressEl && info.address) {
@@ -690,8 +866,8 @@
                     
                     // Update phone
                     const phoneEl = document.getElementById('contact-phone');
-                    if (phoneEl && info.phone) {
-                        phoneEl.textContent = info.phone;
+                    if (phoneEl && info.phone_number) {
+                        phoneEl.textContent = info.phone_number;
                     }
                     
                     // Update email
@@ -703,45 +879,273 @@
                     // Update working hours
                     const weekdayEl = document.getElementById('contact-hours-weekday');
                     if (weekdayEl) {
-                        weekdayEl.textContent = 'Mon - Sat: ' + (info.business_hours_weekday || '9:00 AM - 8:00 PM');
+                        weekdayEl.textContent = 'Mon - Sat: ' + (info.hours_weekday || '9:00 AM - 8:00 PM');
                     }
                     
                     const sundayEl = document.getElementById('contact-hours-sunday');
                     if (sundayEl) {
-                        sundayEl.textContent = 'Sunday: ' + (info.business_hours_sunday || '10:00 AM - 6:00 PM');
+                        sundayEl.textContent = 'Sunday: ' + (info.hours_sunday || '10:00 AM - 6:00 PM');
                     }
                     
-                    // Update contact buttons
-                    const whatsappNum = info.phone ? info.phone.replace(/\D/g, '') : '918431729319';
+                    // Update WhatsApp links
                     const whatsappLinks = document.querySelectorAll('a[href^="https://wa.me"]');
+                    const whatsappNum = (info.whatsapp_number || info.phone || '918431729319').replace(/\D/g, '');
+                    const greetingMessage = encodeURIComponent('🙏 Namaste! Thank you for contacting us. I am interested in astrology consultation services. Please guide me with the next steps.');
                     whatsappLinks.forEach(link => {
-                        link.href = `https://wa.me/${whatsappNum}?text=Hello!%20I%27m%20interested%20in%20astrology%20consultation.%20Can%20you%20please%20guide%20me%3F`;
+                        link.href = `https://wa.me/${whatsappNum}?text=${greetingMessage}`;
                     });
                     
-                    // Update call button
-                    const callButton = document.getElementById('call-button');
-                    if (callButton && info.phone) {
-                        callButton.href = `tel:${info.phone}`;
-                        const displayPhone = document.getElementById('display-phone');
-                        if (displayPhone) displayPhone.textContent = info.phone;
-                    }
+                    // Update social media links
+                    const socialLinks = {
+                        'fa-facebook': info.facebook,
+                        'fa-instagram': info.instagram,
+                        'fa-twitter': info.twitter,
+                        'fa-youtube': info.youtube
+                    };
                     
-                    // Update email button
-                    const emailButton = document.getElementById('email-button');
-                    if (emailButton && info.email) {
-                        emailButton.href = `mailto:${info.email}?subject=Astrology Consultation Inquiry&body=Hello,%0D%0A%0D%0AI am interested in your astrology services. Please provide more information.%0D%0A%0D%0AThank you!`;
-                        const displayEmail = document.getElementById('display-email');
-                        if (displayEmail) displayEmail.textContent = info.email;
-                    }
+                    document.querySelectorAll('.fab').forEach(icon => {
+                        for (const [iconClass, url] of Object.entries(socialLinks)) {
+                            if (icon.classList.contains(iconClass) && url) {
+                                const link = icon.closest('a');
+                                if (link) {
+                                    link.href = url;
+                                    link.target = '_blank';
+                                }
+                            }
+                        }
+                    });
                 }
             } catch (error) {
-                console.error('Error loading business info from API:', error);
+                console.error('Error loading business info:', error);
             }
         }
         
-        // Load business info on page load
-        loadBusinessInfo();
+        // Load ALL contact data from business_info table ONLY - comprehensive fetch
+        async function loadBusinessInfoFromAPI() {
+            try {
+                const response = await fetch(`/api/business-info?t=${Date.now()}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch business info');
+                }
+                const info = await response.json();
+                console.log('Loading ALL contact data from business_info table:', info);
+                
+                if (info) {
+                    // Update Quick Contact section - all from business_info
+                    updateElement('contact-address', info.address || 'Address not configured');
+                    updateElement('contact-phone', info.phone || 'Phone not configured');
+                    updateElement('contact-email', info.email || 'Email not configured');
+                    updateElement('contact-hours-weekday', `Mon - Sat: ${info.hours_weekday || info.working_hours || '9:00 AM - 8:00 PM'}`);
+                    updateElement('contact-hours-sunday', `Sunday: ${info.hours_sunday || info.sunday_hours || '10:00 AM - 6:00 PM'}`);
+                    
+                    // Update Contact Us Directly buttons - enhanced WhatsApp
+                    const whatsappNum = (info.whatsapp_number || info.whatsapp || info.phone || '918431729319').replace(/\D/g, '');
+                    console.log('Using WhatsApp number:', whatsappNum);
+                    
+                    const whatsappLinks = document.querySelectorAll('a[href*="wa.me"]');
+                    whatsappLinks.forEach(link => {
+                        const message = encodeURIComponent(`Hello! I'm interested in ${info.business_name || 'astrology'} consultation. Can you please guide me?`);
+                        link.href = `https://wa.me/${whatsappNum}?text=${message}`;
+                    });
+                    
+                    // Update call button with proper phone formatting
+                    const callButton = document.getElementById('call-button');
+                    if (callButton && info.phone) {
+                        callButton.href = `tel:${info.phone.replace(/\D/g, '')}`;
+                        updateElement('display-phone', formatPhone(info.phone));
+                    }
+                    
+                    // Update email button with business context
+                    const emailButton = document.getElementById('email-button');
+                    if (emailButton && info.email) {
+                        const subject = encodeURIComponent(`${info.business_name || 'Astrology'} Consultation Inquiry`);
+                        const body = encodeURIComponent(`Hello,\n\nI am interested in your astrology services. Please provide more information about:\n\n- Available services\n- Consultation timings\n- Pricing details\n\nThank you!`);
+                        emailButton.href = `mailto:${info.email}?subject=${subject}&body=${body}`;
+                        updateElement('display-email', info.email);
+                    }
+                    
+                    // Update Follow Us social media links from business_info
+                    updateSocialLinks(info);
+                    
+                    // Update Footer Contact Us from business_info
+                    updateFooterContact(info);
+                    
+                    // Setup chatbot contact info from business_info
+                    setupChatbotContact(info);
+                    
+                    // Update location/map info if available
+                    updateLocationInfo(info);
+                    
+                    console.log('✅ All contact data loaded successfully from business_info table');
+                }
+            } catch (error) {
+                console.error('Error loading business info from business_info table:', error);
+                // Show fallback messages
+                updateElement('contact-address', 'Please configure business info in admin dashboard');
+                updateElement('contact-phone', 'Please configure phone in admin dashboard');
+                updateElement('contact-email', 'Please configure email in admin dashboard');
+            }
+        }
+        
+        // Update Google Maps location link
+        function updateLocationInfo(info) {
+            const mapsLink = document.getElementById('view-on-maps');
+            if (mapsLink && info.google_location_url) {
+                mapsLink.href = info.google_location_url;
+            }
+        }
+        
+        // Format phone number for display
+        function formatPhone(phone) {
+            if (!phone) return '';
+            const cleaned = phone.replace(/\D/g, '');
+            if (cleaned.length === 10) {
+                return `+91 ${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6)}`;
+            }
+            return phone;
+        }
+        
+        // Helper function to safely update elements
+        function updateElement(id, content) {
+            const element = document.getElementById(id);
+            if (element && content) {
+                element.textContent = content;
+            }
+        }
+        
+        // Update social media links from business_info
+        function updateSocialLinks(info) {
+            if (info.facebook_url) {
+                const fbLink = document.querySelector('a[href*="facebook"]');
+                if (fbLink) fbLink.href = info.facebook_url;
+            }
+            if (info.instagram_url) {
+                const igLink = document.querySelector('a[href*="instagram"]');
+                if (igLink) igLink.href = info.instagram_url;
+            }
+            if (info.twitter_url) {
+                const twitterLink = document.querySelector('a[href*="twitter"]');
+                if (twitterLink) twitterLink.href = info.twitter_url;
+            }
+            if (info.youtube_url) {
+                const youtubeLink = document.querySelector('a[href*="youtube"]');
+                if (youtubeLink) youtubeLink.href = info.youtube_url;
+            }
+        }
+        
+        // Update footer contact info from business_info
+        function updateFooterContact(info) {
+            // Update business name in footer
+            const footerName = document.getElementById('footer-business-name');
+            if (footerName && info.name) {
+                footerName.textContent = info.name;
+            }
+            
+            // Update copyright text
+            const footerCopyright = document.getElementById('footer-copyright');
+            if (footerCopyright && info.name) {
+                footerCopyright.innerHTML = `&copy; 2025 ${info.name}. All rights reserved.`;
+            }
+        }
+        
+        // Setup chatbot contact info from business_info table
+        function setupChatbotContact(info) {
+            // Global object for chatbot integration - ALL from business_info
+            window.businessContactInfo = {
+                phone: info.phone,
+                email: info.email,
+                whatsapp: info.whatsapp_number || info.whatsapp || info.phone,
+                address: info.address,
+                businessName: info.business_name || info.name,
+                workingHours: {
+                    weekday: info.hours_weekday || info.working_hours,
+                    sunday: info.hours_sunday || info.sunday_hours
+                },
+                location: info.location,
+                website: info.website
+            };
+            
+            // Update chatbot widget if it exists
+            if (typeof updateChatbotInfo === 'function') {
+                updateChatbotInfo(window.businessContactInfo);
+            }
+        }
+        
+        // Update location/map information
+        function updateLocationInfo(info) {
+            // Update any map or location widgets
+            if (info.latitude && info.longitude) {
+                window.businessLocation = {
+                    lat: parseFloat(info.latitude),
+                    lng: parseFloat(info.longitude),
+                    address: info.address
+                };
+            }
+            
+            // Update Google Maps links if present
+            const mapLinks = document.querySelectorAll('a[href*="maps.google"], a[href*="goo.gl/maps"]');
+            if (info.address && mapLinks.length > 0) {
+                const encodedAddress = encodeURIComponent(info.address);
+                mapLinks.forEach(link => {
+                    link.href = `https://maps.google.com/?q=${encodedAddress}`;
+                });
+            }
+        }
+        
+        // Enhanced navbar color and layout functions
+        function updateNavbarColors(primaryColor, secondaryColor, navbarStyle) {
+            const navbar = document.getElementById('main-navbar');
+            const titleEl = document.getElementById('navbar-title');
+            const subtitleEl = document.getElementById('navbar-subtitle');
+            const menuItems = document.querySelectorAll('#desktop-menu a');
+            
+            if (navbarStyle === 'solid') {
+                navbar.style.background = primaryColor;
+                // Keep white text for solid backgrounds
+                setTextColor('#ffffff');
+            } else if (navbarStyle === 'transparent') {
+                navbar.style.background = 'rgba(255, 255, 255, 0.1)';
+                navbar.style.backdropFilter = 'blur(10px)';
+                // Use dark text for transparent backgrounds
+                setTextColor('#1f2937');
+            } else {
+                // Default gradient
+                navbar.style.background = `linear-gradient(to right, ${primaryColor}, ${secondaryColor})`;
+                // Keep white text for gradient backgrounds
+                setTextColor('#ffffff');
+            }
+        }
+        
+        function setTextColor(color) {
+            const titleEl = document.getElementById('navbar-title');
+            const subtitleEl = document.getElementById('navbar-subtitle');
+            const menuItems = document.querySelectorAll('#desktop-menu a');
+            
+            if (titleEl) titleEl.style.color = color;
+            if (subtitleEl) subtitleEl.style.color = color;
+            menuItems.forEach(item => {
+                item.style.color = color;
+            });
+        }
+        
+        function applyNavbarLayout(settings) {
+            // Apply navbar height
+            if (settings.navbar_height) {
+                const navbar = document.getElementById('main-navbar');
+                const heights = {
+                    'small': 'h-14',
+                    'medium': 'h-16 md:h-20', 
+                    'large': 'h-20 md:h-24'
+                };
+                const heightClass = heights[settings.navbar_height] || 'h-16 md:h-20';
+                navbar.className = navbar.className.replace(/h-\d+(?:\s+md:h-\d+)?/g, heightClass);
+            }
+        }
+        
+        // Load business info on page load - ONLY from business_info table
         loadBusinessInfoFromAPI();
+        
+        // loadNavbarMenu(); // Removed - function not defined, menu items API doesn't exist
     </script>
     
 </body>

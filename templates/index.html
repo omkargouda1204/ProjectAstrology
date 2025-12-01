@@ -41,17 +41,289 @@
             z-index: 2 !important; 
         }
         
+        /* Enhanced animations and responsive design */
+        .animate-bounce-in {
+            animation: bounceIn 0.8s ease-out;
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.3) translateY(50px); opacity: 0; }
+            50% { transform: scale(1.05) translateY(-10px); opacity: 0.8; }
+            70% { transform: scale(0.9) translateY(5px); opacity: 0.9; }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
+        }
+        
+        /* Enhanced service cards with better hover effects */
+        .service-card {
+            transform: translateY(30px) scale(0.9);
+            transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+            backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .service-card:hover {
+            transform: translateY(-20px) scale(1.08);
+            box-shadow: 0 35px 70px rgba(124, 58, 237, 0.25), 0 15px 35px rgba(236, 72, 153, 0.15);
+        }
+        
+        .shadow-3xl {
+            box-shadow: 0 35px 70px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Line clamp utility for descriptions */
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
         /* Responsive Hero Slider */
         @media (max-width: 768px) {
             #hero-slider { height: 60vh !important; min-height: 400px !important; }
             .hero-slide h1 { font-size: 2rem !important; }
             .hero-slide p { font-size: 1rem !important; }
+            
+            /* Mobile service cards */
+            .service-card {
+                padding: 1rem !important;
+                transform: translateY(10px) scale(0.95);
+            }
+            
+            .service-card h3 {
+                font-size: 0.875rem !important;
+                line-height: 1.3 !important;
+            }
+            
+            #astrological-services-grid {
+                gap: 0.75rem !important;
+                padding: 0 0.5rem;
+            }
+        }
+        
+        /* Tablet responsive design */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            #astrological-services-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.5rem;
+            }
+            
+            .service-card h3 {
+                font-size: 1.125rem !important;
+            }
+        }
+        
+        /* Desktop responsive design */
+        @media (min-width: 1024px) {
+            .service-card {
+                padding: 2rem !important;
+            }
+            
+            .service-card:hover {
+                transform: translateY(-20px) scale(1.1);
+            }
+            
+            #astrological-services-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 2rem;
+                max-width: 1400px;
+            }
+        }
+        
+        /* Large desktop */
+        @media (min-width: 1440px) {
+            #astrological-services-grid {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 2.5rem;
+            }
+        }
+        
+        /* Extra large screens */
+        @media (min-width: 1920px) {
+            #astrological-services-grid {
+                grid-template-columns: repeat(6, 1fr);
+                gap: 3rem;
+            }
+        }
+        
+        /* Round logo styles */
+        .logo-container img, .navbar-logo {
+            border-radius: 50% !important;
+            object-fit: cover !important;
+            border: 3px solid rgba(124, 58, 237, 0.3) !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .logo-container img:hover, .navbar-logo:hover {
+            transform: scale(1.05) rotate(5deg) !important;
+            border-color: rgba(124, 58, 237, 0.6) !important;
+            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.3) !important;
+        }
+        
+        /* Fade In Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+        
+        .slide-in-left {
+            animation: slideInLeft 0.8s ease-out forwards;
+        }
+        
+        .slide-in-right {
+            animation: slideInRight 0.8s ease-out forwards;
+        }
+        
+        .scale-in {
+            animation: scaleIn 0.6s ease-out forwards;
+        }
+        
+        /* Hover Effects */
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Image Zoom Effect */
+        .image-zoom {
+            overflow: hidden;
+        }
+        
+        .image-zoom img {
+            transition: transform 0.5s ease;
+        }
+        
+        .image-zoom:hover img {
+            transform: scale(1.1);
+        }
+        
+        /* Smooth Transitions */
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        /* Service Card Enhancement */
+        .service-card {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(147, 51, 234, 0.1), transparent);
+            transition: left 0.5s ease;
+        }
+        
+        .service-card:hover::before {
+            left: 100%;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(147, 51, 234, 0.2);
+        }
+        
+        /* Button Hover Effects */
+        .btn-hover {
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .btn-hover::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+            z-index: -1;
+        }
+        
+        .btn-hover:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        /* Responsive Utilities */
+        @media (max-width: 640px) {
+            .container { padding-left: 1rem; padding-right: 1rem; }
+            h1 { font-size: 2rem !important; }
+            h2 { font-size: 1.75rem !important; }
+            h3 { font-size: 1.25rem !important; }
         }
         
         @media (max-width: 480px) {
             #hero-slider { height: 50vh !important; min-height: 350px !important; }
             .hero-slide h1 { font-size: 1.5rem !important; }
             .hero-slide p { font-size: 0.875rem !important; }
+            
+            /* Enhanced mobile hero slider buttons */
+            #prev-slide, #next-slide {
+                min-width: 48px !important;
+                min-height: 48px !important;
+                padding: 12px !important;
+                margin: 8px !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+            }
+            
+            #prev-slide {
+                left: 4px !important;
+            }
+            
+            #next-slide {
+                right: 4px !important;
+            }
+        }
+        
+        /* Touch interaction improvements */
+        .touch-manipulation {
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+        }
+        
+        /* Hero slider button enhancements */
+        #prev-slide:active, #next-slide:active {
+            transform: translate(-50%, -50%) scale(0.95);
+        }
+        
+        @media (hover: none) and (pointer: coarse) {
+            /* Mobile/touch devices */
+            #prev-slide, #next-slide {
+                background-opacity: 0.8 !important;
+            }
         }
         
         /* Scroll Animation Classes */
@@ -122,51 +394,108 @@
     <link rel="stylesheet" href="/static/styles/main.css">
     <script type="text/javascript">
         function googleTranslateElementInit() {
-            // Desktop translate element
-            new google.translate.TranslateElement({
-                pageLanguage: 'en',
-                includedLanguages: 'en,hi,kn,mr,ta,te,gu,ml,pa,bn,or,as,ur,sa',
-                layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-                autoDisplay: false
-            }, 'google_translate_element');
-            
-            // Mobile translate element (if exists)
-            if (document.getElementById('google_translate_element_mobile')) {
-                new google.translate.TranslateElement({
-                    pageLanguage: 'en',
-                    includedLanguages: 'en,hi,kn,mr,ta,te,gu,ml,pa,bn,or,as,ur,sa',
-                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-                    autoDisplay: false
-                }, 'google_translate_element_mobile');
+            try {
+                // Wait for the element to be ready
+                const initTranslate = () => {
+                    // Desktop translate element
+                    if (document.getElementById('google_translate_element')) {
+                        new google.translate.TranslateElement({
+                            pageLanguage: 'en',
+                            includedLanguages: 'en,hi,kn,mr,ta,te,gu,ml,pa,bn,or,as,ur,sa',
+                            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                            autoDisplay: false
+                        }, 'google_translate_element');
+                    }
+                    
+                    // Mobile translate element (if exists)
+                    if (document.getElementById('google_translate_element_mobile')) {
+                        new google.translate.TranslateElement({
+                            pageLanguage: 'en',
+                            includedLanguages: 'en,hi,kn,mr,ta,te,gu,ml,pa,bn,or,as,ur,sa',
+                            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
+                            autoDisplay: false
+                        }, 'google_translate_element_mobile');
+                    }
+                };
+
+                // Initialize immediately if DOM is ready
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', initTranslate);
+                } else {
+                    initTranslate();
+                }
+            } catch (error) {
+                console.error('Google Translate initialization error:', error);
+                // Retry after a short delay
+                setTimeout(() => {
+                    try {
+                        initTranslate();
+                    } catch (retryError) {
+                        console.error('Google Translate retry failed:', retryError);
+                    }
+                }, 1000);
             }
         }
     </script>
     
     <!-- Custom Styles for Google Translate and Navbar -->
     <style>
-        /* Google Translate Styling */
-        .goog-te-banner-frame { display: none !important; }
-        .goog-te-menu-value { padding: 3px !important; }
+        /* Enhanced Google Translate Styling */
+        .goog-te-banner-frame { 
+            display: none !important; 
+        }
+        
+        .goog-te-menu-value { 
+            padding: 8px !important; 
+            margin: 0 !important;
+        }
+        
         .goog-te-gadget-simple { 
             background-color: transparent !important; 
             border: none !important; 
-            font-size: 12px !important;
+            font-size: 14px !important;
+            padding: 8px !important;
+            width: 100% !important;
         }
+        
         .goog-te-combo { 
-            background-color: rgba(255, 255, 255, 0.9) !important; 
-            border: 1px solid rgba(255, 255, 255, 0.3) !important; 
-            border-radius: 0.5rem !important; 
-            padding: 0.25rem 1rem !important;
-            font-size: 12px !important;
+            background-color: rgba(255, 255, 255, 0.95) !important; 
+            border: 2px solid rgba(139, 69, 19, 0.2) !important; 
+            border-radius: 8px !important; 
+            padding: 8px 12px !important;
+            font-size: 14px !important;
             color: #6B46C1 !important;
-            font-weight: 500 !important;
-            backdrop-filter: blur(4px);
-            min-width: 120px !important;
-            height: 32px !important;
+            font-weight: 600 !important;
+            backdrop-filter: blur(8px);
+            min-width: 140px !important;
+            height: auto !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+            transition: all 0.3s ease !important;
         }
         .goog-te-combo:hover {
             background-color: white !important;
-            border-color: rgba(255, 255, 255, 0.5) !important;
+            border-color: #6B46C1 !important;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15) !important;
+            transform: translateY(-1px);
+        }
+        
+        .goog-te-combo:focus {
+            outline: none !important;
+            border-color: #6B46C1 !important;
+            box-shadow: 0 0 0 3px rgba(107, 70, 193, 0.2) !important;
+        }
+        
+        /* Language dropdown improvements */
+        #lang-dropdown {
+            z-index: 9999 !important;
+            position: absolute !important;
+            right: 0 !important;
+            top: 100% !important;
+            margin-top: 8px !important;
+        }
+        
+        #lang-dropdown.hidden {
+            display: none !important;
         }
         
         /* Translate elements in navbar */
@@ -280,91 +609,84 @@
 </head>
 <body class="font-sans bg-gray-50">
 
-    <!-- Modern Sticky Navbar -->
-    <nav id="main-navbar" class="bg-white shadow-lg sticky top-0 z-50 transition-all duration-300">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-20">
-                
-                <!-- Left: Logo -->
-                <div class="flex items-center space-x-3 flex-shrink-0">
-                    <a href="/" class="flex items-center space-x-3 group">
-                        <img id="navbar-logo" src="" alt="Logo" class="h-12 w-12 object-contain rounded-lg transition-transform duration-300 group-hover:scale-110" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'">
-                        <div class="h-12 w-12 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center" style="display: none;">
-                            <i class="fas fa-star text-white text-xl"></i>
-                        </div>
-                        <div class="hidden sm:block">
-                            <h1 class="text-xl md:text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                                Cosmic Astrology
-                            </h1>
-                        </div>
-                    </a>
+    <!-- Clean Header Section (Yenepoya Style) -->
+    <header class="bg-white border-b-2 border-gray-200 shadow-md">
+        <div class="container mx-auto px-4 py-5 md:py-6">
+            <div class="flex items-center justify-between md:justify-start md:space-x-8">
+                <!-- Logo - Direct Display (No Round Shape, No Fallback Icon) -->
+                <div class="flex-shrink-0 logo-container">
+                    <img id="navbar-logo" src="" alt="Logo" class="h-20 w-auto sm:h-24 md:h-28 lg:h-32 xl:h-36 object-contain transition-transform duration-300 hover:scale-105" style="max-width: 250px;">
                 </div>
                 
-                <!-- Center: Main Menu (Desktop) -->
-                <div id="desktop-menu" class="hidden lg:flex items-center space-x-1">
+                <!-- Website Name & Tagline - Fully Responsive -->
+                <div class="flex-1 min-w-0 px-2 sm:px-4 website-name-container">
+                    <h1 id="website-name" class="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-800 tracking-wide leading-tight break-words animate-fade-in">
+                        Om Sri Mahakali Bhairavi Jyotishya Shastram
+                    </h1>
+                    <p id="website-subtitle" class="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl text-gray-600 mt-1 md:mt-2 font-medium break-words animate-fade-in-delay">
+                        Specialized Astrology & Pooja Services
+                    </p>
+                </div>
+                
+                <!-- Mobile Menu Toggle -->
+                <button id="mobile-menu-btn" class="lg:hidden p-3 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors">
+                    <i class="fas fa-bars text-3xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Navigation Bar (Blue/Purple Theme) - Increased Height -->
+    <nav id="main-navbar" class="bg-gradient-to-r from-purple-700 via-purple-600 to-indigo-700 text-white sticky top-0 z-50 shadow-2xl">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16 md:h-20 lg:h-24">
+                
+                <!-- Desktop Menu -->
+                <div id="desktop-menu" class="hidden lg:flex items-center space-x-4 flex-1">
                     <!-- Menu items will be dynamically loaded -->
                 </div>
                 
-                <!-- Right: Language + Action Buttons -->
-                <div class="flex items-center space-x-2 md:space-x-4">
-                    
-                    <!-- Language Dropdown -->
-                    <div class="relative">
-                        <button id="lang-dropdown-btn" class="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-all duration-300 focus:outline-none">
-                            <i class="fas fa-globe text-purple-600"></i>
-                            <span class="hidden md:inline text-sm font-medium text-gray-700">EN</span>
-                            <i class="fas fa-chevron-down text-xs text-gray-500"></i>
-                        </button>
-                        <div id="lang-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden">
-                            <div id="google_translate_element" class="p-2"></div>
-                        </div>
-                    </div>
-                    
-                    <!-- Call Button -->
-                    <a id="navbar-call-btn" href="tel:" class="hidden md:flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all duration-300 shadow-md hover:shadow-lg">
-                        <i class="fas fa-phone-alt"></i>
-                        <span class="text-sm font-medium">Call</span>
-                    </a>
-                    
-                    <!-- WhatsApp Button -->
-                    <a id="navbar-whatsapp-btn" href="https://wa.me/" target="_blank" class="hidden md:flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-300 shadow-md hover:shadow-lg">
-                        <i class="fab fa-whatsapp text-lg"></i>
-                        <span class="text-sm font-medium">WhatsApp</span>
-                    </a>
-                    
-                    <!-- Mobile Menu Toggle -->
-                    <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 focus:outline-none">
-                        <i class="fas fa-bars text-2xl text-purple-600"></i>
+                <!-- Language Selector -->
+                <div class="hidden lg:block relative">
+                    <button id="lang-dropdown-btn" class="flex items-center space-x-2 px-4 py-3 rounded-lg hover:bg-white hover:bg-opacity-20 transition-all duration-300 text-base md:text-lg font-medium">
+                        <i class="fas fa-globe text-xl"></i>
+                        <span>EN</span>
+                        <i class="fas fa-chevron-down text-sm"></i>
                     </button>
+                    <div id="lang-dropdown" class="hidden absolute right-4 mt-2 w-48 bg-white rounded-lg shadow-xl border overflow-hidden">
+                        <div id="google_translate_element" class="p-2"></div>
+                    </div>
                 </div>
             </div>
         </div>
         
         <!-- Mobile Navigation Menu -->
-        <div id="mobile-menu" class="lg:hidden hidden bg-white border-t border-gray-200">
-            <div class="container mx-auto px-4 py-4 space-y-2">
+        <div id="mobile-menu" class="lg:hidden hidden bg-purple-800">
+            <div class="container mx-auto px-4 py-3">
+                <!-- Website name in mobile menu -->
+                <div class="border-b border-purple-600 pb-3 mb-3">
+                    <h2 class="text-lg font-bold">COSMIC ASTROLOGY</h2>
+                    <p class="text-xs text-purple-200">Specialized Astrology & Pooja Services</p>
+                </div>
+                
                 <!-- Mobile menu items will be dynamically loaded -->
-            </div>
-            
-            <!-- Mobile Action Buttons -->
-            <div class="container mx-auto px-4 pb-4 flex gap-2">
-                <a id="mobile-call-btn" href="tel:" class="flex-1 flex items-center justify-center space-x-2 px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all duration-300">
-                    <i class="fas fa-phone-alt"></i>
-                    <span class="font-medium">Call Now</span>
-                </a>
-                <a id="mobile-whatsapp-btn" href="https://wa.me/" target="_blank" class="flex-1 flex items-center justify-center space-x-2 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-300">
-                    <i class="fab fa-whatsapp text-lg"></i>
-                    <span class="font-medium">WhatsApp</span>
-                </a>
+                <div id="mobile-menu-items" class="space-y-1"></div>
+                
+                <!-- Language in mobile -->
+                <div class="mt-3 pt-3 border-t border-purple-600">
+                    <button onclick="document.getElementById('lang-dropdown').classList.toggle('hidden')" class="w-full text-left px-3 py-2 rounded hover:bg-purple-700">
+                        <i class="fas fa-globe mr-2"></i>Language: EN
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
 
-    <!-- Announcement Bar (Auto-scroll ticker) -->
-    <div id="announcement-bar" class="bg-gradient-to-r from-amber-500 to-orange-500 text-white overflow-hidden relative" style="display: none;">
+    <!-- Announcement Bar (Clean style like Yenepoya) -->
+    <div id="announcement-bar" class="bg-gradient-to-r from-red-500 to-orange-500 text-white overflow-hidden" style="display: none;">
         <div class="announcement-ticker py-2">
             <div id="announcement-content" class="flex items-center space-x-8 whitespace-nowrap animate-scroll">
-                <!-- Announcements will be dynamically loaded and duplicated for seamless loop -->
+                <!-- Announcements will be dynamically loaded -->
             </div>
         </div>
     </div>
@@ -381,11 +703,6 @@
         .announcement-ticker:hover .animate-scroll {
             animation-play-state: paused;
         }
-        
-        /* Navbar shadow on scroll */
-        .navbar-scrolled {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
     </style>
     
     <!-- Hero Slider Section -->
@@ -393,11 +710,11 @@
         <div class="hero-slides-container relative h-full" style="position: relative; width: 100%; height: 100%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
             <!-- Slides will be loaded from API -->
         </div>
-        <button id="prev-slide" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 rounded-full p-3" style="z-index: 20;">
-            <i class="fas fa-chevron-left text-purple-700 text-xl"></i>
+        <button id="prev-slide" class="absolute left-1 sm:left-2 md:left-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-60 hover:bg-opacity-80 active:bg-opacity-90 rounded-full p-3 sm:p-4 md:p-3 shadow-lg transition-all duration-200 touch-manipulation" style="z-index: 20; min-width: 44px; min-height: 44px;">
+            <i class="fas fa-chevron-left text-purple-700 text-sm sm:text-base md:text-lg"></i>
         </button>
-        <button id="next-slide" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 hover:bg-opacity-75 rounded-full p-3" style="z-index: 20;">
-            <i class="fas fa-chevron-right text-purple-700 text-xl"></i>
+        <button id="next-slide" class="absolute right-1 sm:right-2 md:right-4 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-60 hover:bg-opacity-80 active:bg-opacity-90 rounded-full p-3 sm:p-4 md:p-3 shadow-lg transition-all duration-200 touch-manipulation" style="z-index: 20; min-width: 44px; min-height: 44px;">
+            <i class="fas fa-chevron-right text-purple-700 text-sm sm:text-base md:text-lg"></i>
         </button>
     </section>
 
@@ -415,129 +732,14 @@
                 <div class="w-24 h-1 bg-gradient-to-r from-purple-600 to-pink-600 mx-auto mt-6 rounded-full"></div>
             </div>
             
-            <!-- Services Grid -->
-            <div id="astrological-services-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+            <!-- Services Grid - 5 Columns in 1 Row (Responsive) -->
+            <div id="astrological-services-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 md:gap-8 max-w-7xl mx-auto">
                 <!-- Services will be dynamically loaded -->
             </div>
         </div>
     </section>
 
-    <!-- Section 2: Pooja & Ritual Services -->
-    <section id="pooja" class="py-20 bg-gradient-to-br from-amber-50 via-orange-50 to-red-50">
-        <div class="container mx-auto px-4">
-            <!-- Section Header -->
-            <div class="text-center mb-16 fade-in">
-                <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4 font-serif">
-                    Pooja & Ritual Services
-                </h2>
-                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-                    Experience divine blessings through traditional poojas performed with devotion
-                </p>
-                <div class="w-24 h-1 bg-gradient-to-r from-amber-500 to-red-500 mx-auto mt-6 rounded-full"></div>
-            </div>
-            
-            <!-- Pooja Grid (Circular Layout) -->
-            <div id="pooja-services-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-8 md:gap-10 max-w-6xl mx-auto">
-                <!-- Poojas will be dynamically loaded -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Section 3: Expert Solutions -->
-    <section id="solutions" class="py-20 bg-white">
-        <div class="container mx-auto px-4">
-            <!-- Section Header -->
-            <div class="text-center mb-16 fade-in">
-                <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4 font-serif">
-                    Expert Solutions
-                </h2>
-                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-                    Personalized guidance for life's most challenging situations
-                </p>
-                <div class="w-24 h-1 bg-gradient-to-r from-purple-600 to-pink-600 mx-auto mt-6 rounded-full"></div>
-            </div>
-            
-            <!-- Solutions Cards -->
-            <div id="expert-solutions-grid" class="space-y-8 max-w-6xl mx-auto">
-                <!-- Solutions will be dynamically loaded -->
-            </div>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" class="py-16 bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-12 font-serif text-purple-800">About Our Astrologer</h2>
-            <div class="grid md:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
-                <div class="order-2 md:order-1">
-                    <div class="bg-white p-8 rounded-2xl shadow-xl">
-                        <h3 id="about-title" class="text-2xl font-bold mb-4 text-purple-800">Loading...</h3>
-                        <p id="about-description" class="text-gray-700 leading-relaxed mb-6">Loading...</p>
-                        <div id="about-details" class="space-y-3">
-                            <!-- Details will be loaded from API -->
-                        </div>
-                    </div>
-                </div>
-                <div class="order-1 md:order-2">
-                    <div class="relative">
-                        <div class="absolute inset-0 bg-gradient-to-br from-purple-400 to-pink-400 rounded-3xl transform rotate-3"></div>
-                        <img id="about-image" src="" alt="Astrologer" class="relative rounded-3xl shadow-2xl w-full h-auto object-cover" style="max-height: 500px;" loading="lazy">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Services Section -->
-    <section id="services" class="py-16 bg-white">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-4 font-serif text-purple-800">Our Services</h2>
-            <p class="text-center text-gray-600 mb-12">Discover the cosmic wisdom tailored for you</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div class="service-card bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition">
-                    <i class="fas fa-chart-line text-4xl text-purple-600 mb-4"></i>
-                    <h3 class="text-xl font-bold mb-2 text-purple-800">Kundali Reading</h3>
-                    <p class="text-gray-700">Detailed birth chart analysis revealing your destiny</p>
-                </div>
-                <div class="service-card bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition">
-                    <i class="fas fa-magic text-4xl text-pink-600 mb-4"></i>
-                    <h3 class="text-xl font-bold mb-2 text-purple-800">Tarot Reading</h3>
-                    <p class="text-gray-700">Mystical card readings for life guidance</p>
-                </div>
-                <div class="service-card bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition">
-                    <i class="fas fa-briefcase text-4xl text-purple-600 mb-4"></i>
-                    <h3 class="text-xl font-bold mb-2 text-purple-800">Career Guidance</h3>
-                    <p class="text-gray-700">Navigate your professional path with cosmic insight</p>
-                </div>
-                <div class="service-card bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition">
-                    <i class="fas fa-heart text-4xl text-pink-600 mb-4"></i>
-                    <h3 class="text-xl font-bold mb-2 text-purple-800">Love & Relationships</h3>
-                    <p class="text-gray-700">Find harmony in your romantic connections</p>
-                </div>
-                <div class="service-card bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition">
-                    <i class="fas fa-heartbeat text-4xl text-purple-600 mb-4"></i>
-                    <h3 class="text-xl font-bold mb-2 text-purple-800">Health Astrology</h3>
-                    <p class="text-gray-700">Wellness guidance through planetary positions</p>
-                </div>
-                <div class="service-card bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition">
-                    <i class="fas fa-rupee-sign text-4xl text-pink-600 mb-4"></i>
-                    <h3 class="text-xl font-bold mb-2 text-purple-800">Financial Forecast</h3>
-                    <p class="text-gray-700">Money matters aligned with cosmic timing</p>
-                </div>
-                <div class="service-card bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition">
-                    <i class="fas fa-home text-4xl text-purple-600 mb-4"></i>
-                    <h3 class="text-xl font-bold mb-2 text-purple-800">Vastu Consultation</h3>
-                    <p class="text-gray-700">Harmonize your living space with ancient wisdom</p>
-                </div>
-                <div class="service-card bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-lg shadow-lg hover:shadow-xl transition">
-                    <i class="fas fa-gem text-4xl text-pink-600 mb-4"></i>
-                    <h3 class="text-xl font-bold mb-2 text-purple-800">Gemstone Therapy</h3>
-                    <p class="text-gray-700">Harness crystal power for positive energy</p>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- Gallery Section -->
+     <!-- Gallery Section -->
     <section id="gallery" class="py-16 bg-gradient-to-r from-purple-100 to-pink-100">
         <div class="container mx-auto px-4">
             <h2 class="text-4xl font-bold text-center mb-4 font-serif text-purple-800">Our Gallery</h2>
@@ -564,123 +766,90 @@
             </div>
         </div>
     </section>
-    <!-- Google Reviews Section -->
-    <section class="py-16 bg-white">
+
+    <!-- Section 2: Pooja & Ritual Services -->
+    <section id="pooja" class="py-20 bg-gradient-to-br from-amber-50 via-orange-50 to-red-50">
+        <div class="container mx-auto px-4">
+            <!-- Section Header -->
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4 font-serif">
+                    Pooja & Ritual Services
+                </h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Experience divine blessings through traditional poojas performed with devotion
+                </p>
+                <div class="w-24 h-1 bg-gradient-to-r from-amber-500 to-red-500 mx-auto mt-6 rounded-full"></div>
+            </div>
+            
+            <!-- Pooja Grid (Circular Layout) -->
+            <div id="pooja-services-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10 max-w-6xl mx-auto">
+                <!-- Poojas will be dynamically loaded -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Expert Solutions -->
+    <section id="solutions" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <!-- Section Header -->
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4 font-serif">
+                    Expert Solutions
+                </h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                    Personalized guidance for life's most challenging situations
+                </p>
+                <div class="w-24 h-1 bg-gradient-to-r from-purple-600 to-pink-600 mx-auto mt-6 rounded-full"></div>
+            </div>
+            
+            <!-- Solutions Cards -->
+            <div id="expert-solutions-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10 lg:gap-8 xl:gap-10 max-w-7xl mx-auto px-4">
+                <!-- Solutions will be dynamically loaded -->
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-12 md:py-16 bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-8 md:mb-12 font-serif text-purple-800">About Our Astrologer</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center max-w-6xl mx-auto">
+                <div class="order-2 md:order-1">
+                    <div class="bg-white p-6 md:p-8 rounded-2xl shadow-xl">
+                        <h3 id="about-title" class="text-xl md:text-2xl font-bold mb-3 md:mb-4 text-purple-800">Loading...</h3>
+                        <p id="about-description" class="text-sm md:text-base text-gray-700 leading-relaxed mb-4 md:mb-6">Loading...</p>
+                        <div id="about-details" class="space-y-3">
+                            <!-- Details will be loaded from API -->
+                        </div>
+                    </div>
+                </div>
+                <div class="order-1 md:order-2">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-gradient-to-br from-purple-400 to-pink-400 rounded-2xl md:rounded-3xl transform rotate-3"></div>
+                        <img id="about-image" src="" alt="Astrologer" class="relative rounded-2xl md:rounded-3xl shadow-2xl w-full h-auto object-cover" style="min-height: 400px; max-height: 600px;" loading="lazy">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    
+    <!-- Client Reviews Section -->
+    <section id="reviews" class="py-16 bg-white scroll-mt-24">
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
                 <h2 class="text-4xl font-bold font-serif text-purple-800 mb-2">What Our Clients Say</h2>
-                <p class="text-gray-600 mb-4">Real Google Reviews from our satisfied clients</p>
-                <a href="https://maps.app.goo.gl/rPo3UXPy65DBbsVz8" target="_blank" class="inline-flex items-center bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 transition shadow-lg">
-                    <i class="fab fa-google mr-2"></i>
-                    <span class="font-semibold">Leave us a Review on Google</span>
-                    <i class="fas fa-external-link-alt ml-2 text-sm"></i>
-                </a>
+                <p class="text-gray-600 mb-4">Real testimonials from our satisfied clients</p>
             </div>
             
             <!-- Reviews Carousel Container -->
             <div class="relative overflow-hidden mb-8">
                 <div id="reviews-carousel" class="flex transition-transform duration-500 ease-in-out">
-                    <!-- Review 1 -->
-                    <div class="min-w-full md:min-w-[33.333%] px-2">
-                        <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl shadow-lg h-full">
-                            <div class="flex items-center mb-4">
-                                <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl mr-3">P</div>
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-purple-800">Priya Sharma</h4>
-                                    <div class="text-yellow-500 text-sm">★★★★★</div>
-                                </div>
-                                <i class="fab fa-google text-3xl text-blue-600"></i>
-                            </div>
-                            <p class="text-gray-700 italic">"The kundali reading was incredibly accurate! It helped me understand my career path better. Very knowledgeable!" 🌟</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Review 2 -->
-                    <div class="min-w-full md:min-w-[33.333%] px-2">
-                        <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl shadow-lg h-full">
-                            <div class="flex items-center mb-4">
-                                <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl mr-3">R</div>
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-purple-800">Rajesh Kumar</h4>
-                                    <div class="text-yellow-500 text-sm">★★★★★</div>
-                                </div>
-                                <i class="fab fa-google text-3xl text-blue-600"></i>
-                            </div>
-                            <p class="text-gray-700 italic">"Vastu consultation transformed my home's energy completely. My family feels more peaceful and harmonious now!" �</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Review 3 -->
-                    <div class="min-w-full md:min-w-[33.333%] px-2">
-                        <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl shadow-lg h-full">
-                            <div class="flex items-center mb-4">
-                                <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl mr-3">A</div>
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-purple-800">Anjali Patel</h4>
-                                    <div class="text-yellow-500 text-sm">★★★★★</div>
-                                </div>
-                                <i class="fab fa-google text-3xl text-blue-600"></i>
-                            </div>
-                            <p class="text-gray-700 italic">"The gemstone therapy recommendation worked wonders for my health issues. Very professional service!" 💎</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Review 4 -->
-                    <div class="min-w-full md:min-w-[33.333%] px-2">
-                        <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl shadow-lg h-full">
-                            <div class="flex items-center mb-4">
-                                <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl mr-3">S</div>
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-purple-800">Suresh Reddy</h4>
-                                    <div class="text-yellow-500 text-sm">★★★★★</div>
-                                </div>
-                                <i class="fab fa-google text-3xl text-blue-600"></i>
-                            </div>
-                            <p class="text-gray-700 italic">"Marriage matching was spot on! My wedding went smoothly and we're very happy together. Truly blessed!" 💑</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Review 5 -->
-                    <div class="min-w-full md:min-w-[33.333%] px-2">
-                        <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl shadow-lg h-full">
-                            <div class="flex items-center mb-4">
-                                <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl mr-3">M</div>
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-purple-800">Meera Singh</h4>
-                                    <div class="text-yellow-500 text-sm">★★★★★</div>
-                                </div>
-                                <i class="fab fa-google text-3xl text-blue-600"></i>
-                            </div>
-                            <p class="text-gray-700 italic">"Business consultation helped me choose the right muhurat. My business is thriving! Highly recommend!" 📈</p>
-                        </div>
-                    </div>
-                    
-                    <!-- Review 6 -->
-                    <div class="min-w-full md:min-w-[33.333%] px-2">
-                        <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl shadow-lg h-full">
-                            <div class="flex items-center mb-4">
-                                <div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl mr-3">V</div>
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-purple-800">Vikram Joshi</h4>
-                                    <div class="text-yellow-500 text-sm">★★★★★</div>
-                                </div>
-                                <i class="fab fa-google text-3xl text-blue-600"></i>
-                            </div>
-                            <p class="text-gray-700 italic">"Numerology reading gave me clarity about my life purpose. Truly transformative experience!" ✨</p>
-                        </div>
-                    </div>
+                    <!-- Reviews will be loaded dynamically from database -->
                 </div>
                 
                 <!-- Navigation Dots -->
                 <div class="flex justify-center mt-6 gap-2" id="review-dots"></div>
-            </div>
-
-            <!-- More Reviews Button -->
-            <div class="text-center">
-                <a href="https://maps.app.goo.gl/rPo3UXPy65DBbsVz8" target="_blank" class="inline-flex items-center text-purple-700 hover:text-purple-900 font-semibold text-lg">
-                    <span>More Reviews on Google</span>
-                    <i class="fas fa-arrow-right ml-2"></i>
-                </a>
             </div>
         </div>
     </section>
@@ -796,8 +965,9 @@
                     <ul class="space-y-2">
                         <li><a href="/" class="hover:text-yellow-300 transition">Home</a></li>
                         <li><a href="#services" class="hover:text-yellow-300 transition">Services</a></li>
-                        <li><a href="contact.html" class="hover:text-yellow-300 transition">Contact</a></li>
-                        <li><a href="privacy.html" class="hover:text-yellow-300 transition">Privacy Policy</a></li>
+                        <li><a href="/contact" class="hover:text-yellow-300 transition">Contact</a></li>
+                        <li><a href="#reviews" class="hover:text-yellow-300 transition">Reviews</a></li>
+                        <li><a href="/privacy" class="hover:text-yellow-300 transition">Privacy Policy</a></li>
                     </ul>
                 </div>
                 <div>
@@ -812,7 +982,13 @@
                 </div>
             </div>
             <div class="border-t border-purple-600 mt-8 pt-8 text-center text-purple-200">
-                <p>&copy; 2024 Cosmic Astrology. All rights reserved.</p>
+                <p>&copy; 2025 Cosmic Astrology. All rights reserved.</p>
+                <p class="mt-2 text-sm">
+                    Developed by <a href="https://omkargouda.netlify.app/" target="_blank" class="text-yellow-300 hover:text-yellow-400 transition inline-flex items-center gap-1">
+                        <i class="fas fa-briefcase"></i>
+                        Omkar Gouda
+                    </a>
+                </p>
             </div>
         </div>
     </footer>
@@ -866,72 +1042,247 @@
         // NAVBAR & ANNOUNCEMENT BAR FUNCTIONALITY
         // ========================================
         
-        // Load navbar settings and menu items
+        // Load navbar settings - ONLY from navbar_settings table
         async function loadNavbar() {
             try {
-                // Load navbar settings
+                // Load ONLY from navbar_settings table
                 const settingsResponse = await fetch('/api/navbar-settings');
                 if (settingsResponse.ok) {
                     const settings = await settingsResponse.json();
+                    console.log('Loading navbar from navbar_settings:', settings);
                     
-                    // Update logo
+                    // Enhanced logo loading with responsive sizing
                     if (settings.logo_url) {
-                        document.getElementById('navbar-logo').src = settings.logo_url;
+                        console.log('Loading logo from:', settings.logo_url);
+                        
+                        const logoEl = document.getElementById('navbar-logo');
+                        if (logoEl) {
+                            logoEl.src = settings.logo_url; // Background already removed during upload
+                            logoEl.className = 'h-20 w-auto sm:h-24 md:h-28 lg:h-32 xl:h-36 object-contain transition-transform duration-300 hover:scale-105';
+                            logoEl.style.display = 'block';
+                            logoEl.style.maxWidth = '250px';
+                            logoEl.style.background = 'transparent';
+                        }
+                        
+                        // Also update mobile logo if exists
+                        const mobileLogoEl = document.getElementById('mobile-navbar-logo');
+                        if (mobileLogoEl) {
+                            mobileLogoEl.src = settings.logo_url;
+                            mobileLogoEl.className = 'h-16 w-auto object-contain';
+                        }
                     }
                     
-                    // Update phone numbers for call/whatsapp buttons
-                    if (settings.phone_number) {
-                        document.getElementById('navbar-call-btn').href = `tel:${settings.phone_number}`;
-                        document.getElementById('mobile-call-btn').href = `tel:${settings.phone_number}`;
+                    // Update website name and make it responsive
+                    if (settings.name) {
+                        const nameEl = document.getElementById('website-name');
+                        if (nameEl) {
+                            nameEl.textContent = settings.name;
+                            nameEl.classList.add('animate-fade-in');
+                        }
                     }
-                    if (settings.whatsapp_number) {
-                        const whatsappUrl = `https://wa.me/${settings.whatsapp_number.replace(/\D/g, '')}`;
-                        document.getElementById('navbar-whatsapp-btn').href = whatsappUrl;
-                        document.getElementById('mobile-whatsapp-btn').href = whatsappUrl;
+                    
+                    // Update website subtitle and make it responsive - FIX for Website Subtitle 1 (Main)
+                    if (settings.subtitle1) {
+                        const subtitleEl = document.getElementById('website-subtitle');
+                        if (subtitleEl) {
+                            subtitleEl.textContent = settings.subtitle1;
+                            subtitleEl.classList.add('animate-fade-in-delay');
+                            subtitleEl.classList.remove('hidden');
+                        }
+                    }
+                    
+                    // Update additional subtitles if they exist
+                    if (settings.subtitle2) {
+                        const subtitle2El = document.getElementById('website-subtitle2');
+                        if (subtitle2El) {
+                            subtitle2El.textContent = settings.subtitle2;
+                            subtitle2El.classList.remove('hidden');
+                        }
+                    }
+                    
+                    if (settings.subtitle3) {
+                        const subtitle3El = document.getElementById('website-subtitle3');
+                        if (subtitle3El) {
+                            subtitle3El.textContent = settings.subtitle3;
+                            subtitle3El.classList.remove('hidden');
+                        }
+                    }
+                    
+                    // Apply navbar colors and layout from navbar_settings
+                    if (settings.primary_color && settings.secondary_color) {
+                        updateNavbarColors(settings.primary_color, settings.secondary_color, settings.navbar_style);
+                    }
+                    
+                    // Apply navbar layout settings
+                    applyNavbarLayout(settings);
+                    
+                    // Apply service section backgrounds that move with the section
+                    if (settings.astrological_services_bg_url) {
+                        const astroSection = document.getElementById('services');
+                        if (astroSection) {
+                            // Remove any existing background classes and set new background
+                            astroSection.className = astroSection.className.replace(/bg-gradient-[\w-]+/g, '');
+                            astroSection.style.position = 'relative';
+                            astroSection.style.backgroundImage = `linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), url('${settings.astrological_services_bg_url}')`;
+                            astroSection.style.backgroundSize = 'cover';
+                            astroSection.style.backgroundPosition = 'center';
+                            astroSection.style.backgroundAttachment = 'scroll'; // Changed to scroll so it moves with section
+                            astroSection.style.backgroundRepeat = 'no-repeat';
+                            astroSection.style.minHeight = '100vh';
+                        }
+                    }
+                    
+                    if (settings.pooja_services_bg_url) {
+                        const poojaSection = document.getElementById('pooja');
+                        if (poojaSection) {
+                            // Remove any existing background classes and set new background
+                            poojaSection.className = poojaSection.className.replace(/bg-gradient-[\w-]+/g, '');
+                            poojaSection.style.position = 'relative';
+                            poojaSection.style.backgroundImage = `linear-gradient(rgba(255,255,255,0.85), rgba(255,255,255,0.85)), url('${settings.pooja_services_bg_url}')`;
+                            poojaSection.style.backgroundSize = 'cover';
+                            poojaSection.style.backgroundPosition = 'center';
+                            poojaSection.style.backgroundAttachment = 'scroll'; // Changed to scroll so it moves with section
+                            poojaSection.style.backgroundRepeat = 'no-repeat';
+                            poojaSection.style.minHeight = '100vh';
+                        }
                     }
                 }
                 
-                // Load menu items
-                const menuResponse = await fetch('/api/menu-items');
-                if (menuResponse.ok) {
-                    const menuItems = await menuResponse.json();
-                    renderMenuItems(menuItems);
+                // Load menu items - with fallback to manual menu
+                try {
+                    const menuResponse = await fetch('/api/menu-items');
+                    if (menuResponse.ok) {
+                        const menuItems = await menuResponse.json();
+                        if (menuItems && menuItems.length > 0) {
+                            renderMenuItems(menuItems);
+                        } else {
+                            // Fallback to default menu if database is empty
+                            renderDefaultMenuItems();
+                        }
+                    } else {
+                        renderDefaultMenuItems();
+                    }
+                } catch (error) {
+                    console.warn('Failed to load menu from database, using default menu');
+                    renderDefaultMenuItems();
                 }
             } catch (error) {
                 console.error('Error loading navbar:', error);
             }
         }
         
+        // Default menu items as fallback
+        function renderDefaultMenuItems() {
+            const defaultItems = [
+                { title: 'Home', url: '#hero-slider', target: '_self' },
+                { title: 'Services', url: '#services', target: '_self' },
+                { title: 'Gallery', url: '#gallery', target: '_self' },
+                { title: 'Pooja', url: '#pooja', target: '_self' },
+                { title: 'Solutions', url: '#solutions', target: '_self' },
+                { title: 'About', url: '#about', target: '_self' },
+                { title: 'Reviews', url: '#reviews', target: '_self' },
+                { title: 'FAQ', url: '#faq', target: '_self' },
+                { title: 'Contact', url: '/contact', target: '_self' }
+            ];
+            renderMenuItems(defaultItems);
+        }
+
         function renderMenuItems(items) {
             const desktopMenu = document.getElementById('desktop-menu');
-            const mobileMenu = document.querySelector('#mobile-menu .space-y-2');
+            const mobileMenuItems = document.getElementById('mobile-menu-items');
+            
+            if (!desktopMenu || !mobileMenuItems) return;
             
             desktopMenu.innerHTML = '';
-            mobileMenu.innerHTML = '';
+            mobileMenuItems.innerHTML = '';
             
             items.forEach(item => {
-                // Desktop menu item
+                // Desktop menu item - LARGER SIZE with more padding
                 const desktopLink = document.createElement('a');
                 desktopLink.href = item.url;
                 desktopLink.target = item.target || '_self';
-                desktopLink.className = 'px-4 py-2 text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-300 font-medium text-sm';
-                desktopLink.textContent = item.title;
+                desktopLink.className = 'px-6 py-3 text-white hover:bg-white hover:bg-opacity-20 rounded-lg transition-all duration-300 font-semibold text-base md:text-lg relative group whitespace-nowrap';
+                desktopLink.innerHTML = `
+                    ${item.title}
+                    <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-white group-hover:w-full transition-all duration-300"></span>
+                `;
+                desktopLink.addEventListener('click', function(e) {
+                    if (item.url.startsWith('#')) {
+                        e.preventDefault();
+                        const target = document.querySelector(item.url);
+                        if (target) {
+                            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    }
+                });
                 desktopMenu.appendChild(desktopLink);
                 
-                // Mobile menu item
+                // Mobile menu item - LARGER SIZE
                 const mobileLink = document.createElement('a');
                 mobileLink.href = item.url;
                 mobileLink.target = item.target || '_self';
-                mobileLink.className = 'block px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-all duration-300 font-medium';
+                mobileLink.className = 'block px-4 py-3 text-white hover:bg-purple-700 rounded-lg transition-all duration-300 mobile-nav-link text-base font-semibold';
                 mobileLink.textContent = item.title;
-                mobileMenu.appendChild(mobileLink);
+                mobileLink.addEventListener('click', function(e) {
+                    if (item.url.startsWith('#')) {
+                        e.preventDefault();
+                        const target = document.querySelector(item.url);
+                        if (target) {
+                            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                        document.getElementById('mobile-menu').classList.add('hidden');
+                        document.querySelector('#mobile-menu-btn i').classList.remove('fa-times');
+                        document.querySelector('#mobile-menu-btn i').classList.add('fa-bars');
+                    }
+                });
+                mobileMenuItems.appendChild(mobileLink);
             });
+        }
+        
+        // Apply navbar layout settings from navbar_settings
+        function applyNavbarLayout(settings) {
+            const navbar = document.getElementById('main-navbar');
+            const logoEl = document.getElementById('navbar-logo');
+            
+            // Apply navbar height
+            if (settings.navbar_height) {
+                const heights = {
+                    'small': 'h-14',
+                    'medium': 'h-16 md:h-20',
+                    'large': 'h-20 md:h-24'
+                };
+                const currentClasses = navbar.className;
+                const newClasses = currentClasses.replace(/h-\d+(?:\s+md:h-\d+)?/g, heights[settings.navbar_height] || 'h-16 md:h-20');
+                navbar.className = newClasses;
+            }
+            
+            // Apply logo position
+            if (settings.logo_position === 'center') {
+                logoEl.parentElement.classList.add('mx-auto');
+            } else if (settings.logo_position === 'right') {
+                logoEl.parentElement.classList.add('ml-auto');
+            }
+        }
+        
+        // Update navbar colors from navbar_settings
+        function updateNavbarColors(primaryColor, secondaryColor, navbarStyle) {
+            const navbar = document.getElementById('main-navbar');
+            
+            if (navbarStyle === 'solid') {
+                navbar.style.background = primaryColor;
+            } else if (navbarStyle === 'transparent') {
+                navbar.style.background = 'rgba(255, 255, 255, 0.1)';
+                navbar.style.backdropFilter = 'blur(10px)';
+            } else {
+                // Default gradient
+                navbar.style.background = `linear-gradient(to right, ${primaryColor}, ${secondaryColor})`;
+            }
         }
         
         // Load announcement bar
         async function loadAnnouncementBar() {
             try {
-                const response = await fetch('/api/announcements');
+                const response = await fetch('/api/content/announcements');
                 if (response.ok) {
                     const announcements = await response.json();
                     if (announcements.length > 0) {
@@ -976,18 +1327,62 @@
         });
         
         // Language dropdown toggle
-        document.getElementById('lang-dropdown-btn')?.addEventListener('click', function() {
-            document.getElementById('lang-dropdown').classList.toggle('hidden');
-        });
-        
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', function(e) {
-            const langDropdown = document.getElementById('lang-dropdown');
+        // Enhanced language dropdown handling
+        function initLanguageDropdown() {
             const langBtn = document.getElementById('lang-dropdown-btn');
-            if (!langBtn.contains(e.target) && !langDropdown.contains(e.target)) {
-                langDropdown.classList.add('hidden');
+            const langDropdown = document.getElementById('lang-dropdown');
+            
+            if (langBtn && langDropdown) {
+                langBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    langDropdown.classList.toggle('hidden');
+                    
+                    // Update button state
+                    const chevron = langBtn.querySelector('.fa-chevron-down, .fa-chevron-up');
+                    if (chevron) {
+                        if (langDropdown.classList.contains('hidden')) {
+                            chevron.classList.remove('fa-chevron-up');
+                            chevron.classList.add('fa-chevron-down');
+                        } else {
+                            chevron.classList.remove('fa-chevron-down');
+                            chevron.classList.add('fa-chevron-up');
+                        }
+                    }
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!langBtn.contains(e.target) && !langDropdown.contains(e.target)) {
+                        langDropdown.classList.add('hidden');
+                        const chevron = langBtn.querySelector('.fa-chevron-up');
+                        if (chevron) {
+                            chevron.classList.remove('fa-chevron-up');
+                            chevron.classList.add('fa-chevron-down');
+                        }
+                    }
+                });
+                
+                // Close dropdown on Escape key
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        langDropdown.classList.add('hidden');
+                        const chevron = langBtn.querySelector('.fa-chevron-up');
+                        if (chevron) {
+                            chevron.classList.remove('fa-chevron-up');
+                            chevron.classList.add('fa-chevron-down');
+                        }
+                    }
+                });
             }
-        });
+        }
+        
+        // Initialize language dropdown when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initLanguageDropdown);
+        } else {
+            initLanguageDropdown();
+        }
         
         // Add shadow to navbar on scroll
         window.addEventListener('scroll', function() {
@@ -1020,34 +1415,74 @@
             }
         }
         
+        // Generate random watercolor backgrounds like in the image
+        function getRandomWatercolorBackground() {
+            const watercolors = [
+                'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+                'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+                'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+                'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+                'linear-gradient(135deg, #ff8177 0%, #ff867a 0%, #ff8c7f 21%, #f99185 52%, #cf556c 78%, #b12a5b 100%)',
+                'linear-gradient(135deg, #3b41c5 0%, #a981bb 49%, #ffc649 100%)'
+            ];
+            return watercolors[Math.floor(Math.random() * watercolors.length)];
+        }
+        
         function renderAstrologicalServices(services) {
             const grid = document.getElementById('astrological-services-grid');
+            if (!grid) {
+                console.error('Astrological services grid not found!');
+                return;
+            }
+            
+            console.log('Rendering astrological services:', services);
             grid.innerHTML = '';
             
+            if (!services || services.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500 text-lg">No services available at the moment</div>';
+                return;
+            }
+            
             services.forEach((service, index) => {
-                const card = document.createElement('div');
-                card.className = 'service-card bg-white rounded-2xl shadow-lg hover:shadow-2xl p-6 text-center fade-in';
-                card.style.transitionDelay = `${index * 0.1}s`;
+                const serviceItem = document.createElement('div');
+                serviceItem.className = 'text-center cursor-pointer group transition-all duration-300 hover:scale-105';
+                serviceItem.style.animationDelay = `${index * 0.1}s`;
                 
-                card.innerHTML = `
-                    <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center transform transition-transform duration-300 hover:rotate-6">
-                        ${service.icon_url ? 
-                            `<img src="${service.icon_url}" alt="${service.title}" class="w-12 h-12 object-contain" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-star text-white text-2xl\\'></i>'">` :
-                            `<i class="fas fa-star text-white text-2xl"></i>`
-                        }
+                serviceItem.innerHTML = `
+                    <div class="service-item">
+                        <!-- Service Image - Direct Display (No Card, No Background) -->
+                        <div class="mb-4">
+                            ${(service.icon_url || service.image_url) ? 
+                                `<img src="${service.icon_url || service.image_url}" alt="${service.title}" 
+                                     class="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mx-auto object-contain transition-transform duration-300 group-hover:scale-110" 
+                                     style="background: transparent !important;">` :
+                                `<div class="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mx-auto flex items-center justify-center">
+                                    <i class="fas fa-star text-purple-600 text-5xl"></i>
+                                </div>`
+                            }
+                        </div>
+                        
+                        <!-- Service Title Below Image -->
+                        <h3 class="text-sm sm:text-base md:text-lg font-semibold text-gray-800 group-hover:text-purple-600 transition-colors duration-300 px-2">
+                            ${service.title}
+                        </h3>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">${service.title}</h3>
-                    <p class="text-gray-600 text-sm leading-relaxed">${service.description || ''}</p>
                 `;
                 
-                grid.appendChild(card);
+                grid.appendChild(serviceItem);
             });
+            
+            console.log(`✅ Successfully rendered ${services.length} astrological services (simple display)`);
         }
         
         // Load Pooja Services
         async function loadPoojaServices() {
             try {
-                const response = await fetch('/api/pooja-services');
+                const response = await fetch('/api/content/pooja-services');
                 if (response.ok) {
                     const poojas = await response.json();
                     renderPoojaServices(poojas);
@@ -1063,30 +1498,32 @@
             
             poojas.forEach((pooja, index) => {
                 const card = document.createElement('div');
-                card.className = 'text-center fade-in';
-                card.style.transitionDelay = `${index * 0.1}s`;
+                card.className = 'text-center scale-in cursor-pointer';
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.style.opacity = '0';
                 
                 card.innerHTML = `
-                    <div class="pooja-circle w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 mx-auto mb-4 rounded-full overflow-hidden border-4 border-white shadow-xl">
+                    <div class="pooja-circle image-zoom w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 mx-auto mb-3 sm:mb-4 rounded-full overflow-hidden border-2 sm:border-4 border-white shadow-xl hover:shadow-2xl transition-shadow duration-300">
                         ${pooja.image_url ? 
-                            `<img src="${pooja.image_url}" alt="${pooja.title}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full bg-gradient-to-br from-amber-400 to-red-500 flex items-center justify-center\\'><i class=\\'fas fa-om text-white text-4xl\\'></i></div>'">` :
+                            `<img src="${pooja.image_url}" alt="${pooja.title}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full bg-gradient-to-br from-amber-400 to-red-500 flex items-center justify-center\\'><i class=\\'fas fa-om text-white text-2xl sm:text-3xl md:text-4xl\\'></i></div>'">` :
                             `<div class="w-full h-full bg-gradient-to-br from-amber-400 to-red-500 flex items-center justify-center">
-                                <i class="fas fa-om text-white text-4xl"></i>
+                                <i class="fas fa-om text-white text-2xl sm:text-3xl md:text-4xl"></i>
                             </div>`
                         }
                     </div>
-                    <h3 class="text-lg font-bold text-gray-800 px-2">${pooja.title}</h3>
-                    ${pooja.description ? `<p class="text-xs text-gray-600 mt-1 px-2">${pooja.description}</p>` : ''}
+                    <h3 class="text-sm sm:text-base md:text-lg font-bold text-gray-800 px-2 transition-colors hover:text-orange-600">${pooja.title}</h3>
+                    ${pooja.description ? `<p class="text-xs text-gray-600 mt-1 px-2 line-clamp-2">${pooja.description}</p>` : ''}
                 `;
                 
                 grid.appendChild(card);
+                setTimeout(() => card.style.opacity = '1', 50);
             });
         }
         
         // Load Expert Solutions
         async function loadExpertSolutions() {
             try {
-                const response = await fetch('/api/expert-solutions');
+                const response = await fetch('/api/content/expert-solutions');
                 if (response.ok) {
                     const solutions = await response.json();
                     renderExpertSolutions(solutions);
@@ -1102,30 +1539,31 @@
             
             solutions.forEach((solution, index) => {
                 const card = document.createElement('div');
-                const isEven = index % 2 === 0;
-                card.className = `bg-white rounded-3xl shadow-xl hover:shadow-2xl overflow-hidden transition-all duration-300 ${isEven ? 'slide-in-left' : 'slide-in-right'}`;
-                card.style.transitionDelay = `${index * 0.2}s`;
+                card.className = 'bg-white rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl slide-in-up';
+                card.style.transitionDelay = `${index * 0.1}s`;
                 
                 card.innerHTML = `
-                    <div class="grid md:grid-cols-2 gap-0 items-center">
-                        <div class="${isEven ? 'order-1' : 'order-2'}">
-                            <div class="h-64 md:h-80 overflow-hidden">
-                                ${solution.image_url ? 
-                                    `<img src="${solution.image_url}" alt="${solution.title}" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center\\'><i class=\\'fas fa-hands-helping text-white text-6xl\\'></i></div>'">` :
-                                    `<div class="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                                        <i class="fas fa-hands-helping text-white text-6xl"></i>
-                                    </div>`
-                                }
-                            </div>
-                        </div>
-                        <div class="${isEven ? 'order-2' : 'order-1'} p-8 md:p-10">
-                            <h3 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">${solution.title}</h3>
-                            <p class="text-gray-600 leading-relaxed mb-6">${solution.description || ''}</p>
-                            <button onclick="document.getElementById('chatbot-toggle').click(); setTimeout(() => sendMenuOption('book'), 500);" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-full font-semibold hover:shadow-lg transition-all duration-300 inline-flex items-center space-x-2">
-                                <span>Know More</span>
-                                <i class="fas fa-arrow-right"></i>
-                            </button>
-                        </div>
+                    <!-- Image Above -->
+                    <div class="h-48 md:h-56 lg:h-64 overflow-hidden">
+                        ${solution.image_url ? 
+                            `<img src="${solution.image_url}" 
+                                 alt="${solution.title}" 
+                                 class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" 
+                                 onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center\\'><i class=\\'fas fa-hands-helping text-white text-5xl\\'></i></div>'">` :
+                            `<div class="w-full h-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                                <i class="fas fa-hands-helping text-white text-5xl"></i>
+                            </div>`
+                        }
+                    </div>
+                    
+                    <!-- Text Below -->
+                    <div class="p-4 md:p-6">
+                        <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-2">
+                            ${solution.title}
+                        </h3>
+                        <p class="text-sm md:text-base text-gray-600 leading-relaxed">
+                            ${solution.description || 'Discover expert astrological guidance tailored to your unique journey.'}
+                        </p>
                     </div>
                 `;
                 
@@ -1154,8 +1592,18 @@
             });
         }
         
-        // Load all new sections
-        loadAstrologicalServices();
+        // Load all new sections with error handling
+        async function initializeServices() {
+            try {
+                console.log('🔄 Initializing astrological services...');
+                await loadAstrologicalServices();
+                console.log('✅ Astrological services initialized successfully');
+            } catch (error) {
+                console.error('❌ Failed to initialize astrological services:', error);
+            }
+        }
+        
+        initializeServices();
         loadPoojaServices();
         loadExpertSolutions();
         
@@ -1169,7 +1617,7 @@
         async function loadHeroSlides() {
             try {
                 console.log('Fetching hero slides from API...');
-                const response = await fetch('/api/hero-slides');
+                const response = await fetch('/api/content/hero-slides');
                 console.log('Hero slides response status:', response.status);
                 const data = await response.json();
                 console.log('Hero slides data received:', data);
@@ -1259,7 +1707,7 @@
                     // Image slide
                     slideDiv.innerHTML = `
                         <div class="relative h-full">
-                            <img src="${slide.image}" alt="${slide.title}" class="w-full h-full object-cover" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22600%22%3E%3Crect fill=%22%23667eea%22 width=%22800%22 height=%22600%22/%3E%3Ctext fill=%22white%22 font-size=%2230%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage Not Available%3C/text%3E%3C/svg%3E'">
+                            <img src="${slide.image}" alt="${slide.title}" class="w-full h-full object-cover object-center" style="object-fit: cover; object-position: center;" loading="lazy" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22800%22 height=%22600%22%3E%3Crect fill=%22%23667eea%22 width=%22800%22 height=%22600%22/%3E%3Ctext fill=%22white%22 font-size=%2230%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage Not Available%3C/text%3E%3C/svg%3E'">
                             <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
                                 <div class="text-center text-white px-4 max-w-4xl">
                                     <h1 class="text-3xl md:text-5xl font-bold mb-4 font-serif">${slide.title}</h1>
@@ -1363,26 +1811,29 @@
         // Load About Section from API
         async function loadAboutSection() {
             try {
-                const response = await fetch('/api/about-section');
+                const response = await fetch('/api/content/about-section');
                 const data = await response.json();
                 
                 if (data && Object.keys(data).length > 0) {
-                    document.getElementById('about-title').textContent = data.title || 'Our Expert Astrologer';
+                    document.getElementById('about-title').textContent = data.name || 'Our Expert Astrologer';
                     document.getElementById('about-description').textContent = data.description || '';
-                    document.getElementById('about-image').src = data.image || '';
+                    document.getElementById('about-image').src = data.img || '';
                     
-                    // Render additional details
+                    // Render additional details with new fields
                     const detailsContainer = document.getElementById('about-details');
                     const details = [];
                     
-                    if (data.experience) {
-                        details.push(`<div class="flex items-start"><i class="fas fa-star text-purple-600 mt-1 mr-3"></i><p><strong>Experience:</strong> ${data.experience}</p></div>`);
+                    if (data.years_of_experience) {
+                        details.push(`<div class="flex items-start"><i class="fas fa-calendar-alt text-purple-600 mt-1 mr-3"></i><p><strong>Experience:</strong> ${data.years_of_experience}</p></div>`);
                     }
-                    if (data.specialization) {
-                        details.push(`<div class="flex items-start"><i class="fas fa-gem text-purple-600 mt-1 mr-3"></i><p><strong>Specialization:</strong> ${data.specialization}</p></div>`);
+                    if (data.expertise_areas) {
+                        details.push(`<div class="flex items-start"><i class="fas fa-star text-purple-600 mt-1 mr-3"></i><p><strong>Expertise:</strong> ${data.expertise_areas}</p></div>`);
                     }
-                    if (data.credentials) {
-                        details.push(`<div class="flex items-start"><i class="fas fa-certificate text-purple-600 mt-1 mr-3"></i><p><strong>Credentials:</strong> ${data.credentials}</p></div>`);
+                    if (data.location) {
+                        details.push(`<div class="flex items-start"><i class="fas fa-map-marker-alt text-purple-600 mt-1 mr-3"></i><p><strong>Location:</strong> ${data.location}</p></div>`);
+                    }
+                    if (data.accurate_predictions) {
+                        details.push(`<div class="flex items-start"><i class="fas fa-check-circle text-purple-600 mt-1 mr-3"></i><p><strong>Predictions:</strong> ${data.accurate_predictions}</p></div>`);
                     }
                     
                     detailsContainer.innerHTML = details.join('');
@@ -1391,9 +1842,10 @@
                     document.getElementById('about-title').textContent = 'Our Expert Astrologer';
                     document.getElementById('about-description').textContent = 'Welcome to our astrology consultation service. Our expert astrologer brings years of experience in Vedic astrology, tarot reading, and spiritual guidance.';
                     document.getElementById('about-details').innerHTML = `
-                        <div class="flex items-start"><i class="fas fa-star text-purple-600 mt-1 mr-3"></i><p><strong>Experience:</strong> 15+ Years</p></div>
-                        <div class="flex items-start"><i class="fas fa-gem text-purple-600 mt-1 mr-3"></i><p><strong>Specialization:</strong> Vedic Astrology, Tarot, Vastu</p></div>
-                        <div class="flex items-start"><i class="fas fa-certificate text-purple-600 mt-1 mr-3"></i><p><strong>Credentials:</strong> Certified Astrologer</p></div>
+                        <div class="flex items-start"><i class="fas fa-calendar-alt text-purple-600 mt-1 mr-3"></i><p><strong>Experience:</strong> 15+ Years</p></div>
+                        <div class="flex items-start"><i class="fas fa-star text-purple-600 mt-1 mr-3"></i><p><strong>Expertise:</strong> Vedic Astrology, Tarot, Vastu</p></div>
+                        <div class="flex items-start"><i class="fas fa-map-marker-alt text-purple-600 mt-1 mr-3"></i><p><strong>Location:</strong> Mumbai, India</p></div>
+                        <div class="flex items-start"><i class="fas fa-check-circle text-purple-600 mt-1 mr-3"></i><p><strong>Predictions:</strong> 10,000+ Accurate Predictions</p></div>
                     `;
                 }
             } catch (error) {
@@ -1405,7 +1857,7 @@
         async function loadGallerySlides() {
             try {
                 console.log('Fetching gallery slides from API...');
-                const response = await fetch('/api/gallery-slides');
+                const response = await fetch('/api/content/gallery-slides');
                 console.log('Gallery slides response status:', response.status);
                 const data = await response.json();
                 console.log('Gallery slides data received:', data);
@@ -1538,11 +1990,28 @@
             startAutoSlide();
             updateSlidePosition();
         }
+        // Global business info and chatbot config variables
+        let globalBusinessInfo = null;
+        let globalChatbotConfig = null;
+        
+        // Load Chatbot Configuration from Database
+        async function loadChatbotConfig() {
+            try {
+                const response = await fetch('/api/content/chatbot-config');
+                const config = await response.json();
+                globalChatbotConfig = config;
+                console.log('Loaded chatbot config:', config);
+            } catch (error) {
+                console.error('Error loading chatbot config:', error);
+            }
+        }
+        
         // Load Footer Contact Info from API
         async function loadContactInfo() {
             try {
                 const response = await fetch('/api/business-info');
                 const config = await response.json();
+                globalBusinessInfo = config; // Store globally for use in other functions
                 
                 if (config) {
                     document.getElementById('footer-phone').textContent = config.phone || '+91 8431729319';
@@ -1551,28 +2020,46 @@
                     const socialsDiv = document.getElementById('footer-socials');
                     socialsDiv.innerHTML = '';
                     
-                    if (config.socialMedia) {
-                        if (config.socialMedia.facebook) {
-                            socialsDiv.innerHTML += '<a href="' + config.socialMedia.facebook + '" target="_blank" class="text-2xl hover:text-yellow-300"><i class="fab fa-facebook"></i></a>';
-                        }
-                        if (config.socialMedia.instagram) {
-                            socialsDiv.innerHTML += '<a href="' + config.socialMedia.instagram + '" target="_blank" class="text-2xl hover:text-yellow-300"><i class="fab fa-instagram"></i></a>';
-                        }
-                        if (config.socialMedia.youtube) {
-                            socialsDiv.innerHTML += '<a href="' + config.socialMedia.youtube + '" target="_blank" class="text-2xl hover:text-yellow-300"><i class="fab fa-youtube"></i></a>';
-                        }
-                        if (config.socialMedia.twitter) {
-                            socialsDiv.innerHTML += '<a href="' + config.socialMedia.twitter + '" target="_blank" class="text-2xl hover:text-yellow-300"><i class="fab fa-twitter"></i></a>';
-                        }
-                        if (config.socialMedia.linkedin) {
-                            socialsDiv.innerHTML += '<a href="' + config.socialMedia.linkedin + '" target="_blank" class="text-2xl hover:text-yellow-300"><i class="fab fa-linkedin"></i></a>';
-                        }
+                    // Social media links from business info
+                    if (config.facebook) {
+                        socialsDiv.innerHTML += '<a href="' + config.facebook + '" target="_blank" class="text-2xl hover:text-yellow-300"><i class="fab fa-facebook"></i></a>';
+                    }
+                    if (config.instagram) {
+                        socialsDiv.innerHTML += '<a href="' + config.instagram + '" target="_blank" class="text-2xl hover:text-yellow-300"><i class="fab fa-instagram"></i></a>';
+                    }
+                    if (config.youtube) {
+                        socialsDiv.innerHTML += '<a href="' + config.youtube + '" target="_blank" class="text-2xl hover:text-yellow-300"><i class="fab fa-youtube"></i></a>';
+                    }
+                    if (config.twitter) {
+                        socialsDiv.innerHTML += '<a href="' + config.twitter + '" target="_blank" class="text-2xl hover:text-yellow-300"><i class="fab fa-twitter"></i></a>';
                     }
                     
-                    // Add WhatsApp
-                    if (config.whatsappNumber) {
-                        const whatsappNum = config.whatsappNumber.replace(/\D/g, '');
-                        socialsDiv.innerHTML += '<a href="https://wa.me/' + whatsappNum + '" target="_blank" class="text-2xl hover:text-yellow-300"><i class="fab fa-whatsapp"></i></a>';
+                    // Add WhatsApp with auto-greeting message
+                    const whatsappNumber = config.whatsapp_number || config.phone;
+                    if (whatsappNumber) {
+                        const whatsappNum = whatsappNumber.replace(/\D/g, '');
+                        const greeting = encodeURIComponent('🙏 Namaste! I am interested in your astrology services. Please guide me with consultation details, timings, and pricing. Thank you!');
+                        socialsDiv.innerHTML += `<a href="https://wa.me/${whatsappNum}?text=${greeting}" target="_blank" class="text-2xl hover:text-yellow-300"><i class="fab fa-whatsapp"></i></a>`;
+                    }
+
+                    // Apply background images to services sections
+                    try {
+                        // Astrological Services background
+                        if (config.astrological_services_bg_url) {
+                            applyServiceBackground('services', config.astrological_services_bg_url);
+                        }
+                        
+                        // Pooja Services background
+                        if (config.pooja_services_bg_url) {
+                            applyServiceBackground('pooja', config.pooja_services_bg_url);
+                        }
+                        
+                        // Legacy services section background (for backward compatibility)
+                        if (config.services_bg_url) {
+                            applyServiceBackground('services', config.services_bg_url);
+                        }
+                    } catch (bgErr) {
+                        console.warn('Failed to apply service backgrounds:', bgErr);
                     }
                 }
             } catch (error) {
@@ -1581,27 +2068,119 @@
                 document.getElementById('footer-email').textContent = 'Error loading';
             }
         }
+        
+        // Helper function to apply background to service sections
+        function applyServiceBackground(sectionId, bgUrl) {
+            const section = document.getElementById(sectionId);
+            if (!section) return;
+            
+            section.style.backgroundImage = `url('${bgUrl}')`;
+            section.style.backgroundSize = 'cover';
+            section.style.backgroundPosition = 'center';
+            section.style.backgroundRepeat = 'no-repeat';
+            section.style.backgroundAttachment = 'scroll';
+            
+            // Add subtle overlay for readability
+            let overlay = document.getElementById(`${sectionId}-bg-overlay`);
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = `${sectionId}-bg-overlay`;
+                overlay.style.position = 'absolute';
+                overlay.style.inset = '0';
+                overlay.style.backgroundColor = 'rgba(255,255,255,0.70)';
+                overlay.style.pointerEvents = 'none';
+                overlay.style.zIndex = '0';
+                section.style.position = section.style.position || 'relative';
+                section.prepend(overlay);
+            }
+            
+            // Ensure container content sits above overlay
+            const container = section.querySelector('.container');
+            if (container) container.style.position = 'relative';
+        }
 
-        // Reviews Carousel Auto-Sliding
+        // Load and Display Reviews from Database
         let currentReviewIndex = 0;
-        const reviewsCarousel = document.getElementById('reviews-carousel');
-        const reviewDots = document.getElementById('review-dots');
-        const totalReviews = 6; // Total number of reviews
-        const reviewsPerView = window.innerWidth >= 768 ? 3 : 1; // Show 3 on desktop, 1 on mobile
-        const totalSlides = totalReviews - reviewsPerView + 1;
+        let reviewsData = [];
+        let reviewsPerView = window.innerWidth >= 768 ? 3 : 1;
+        let totalSlides = 0;
 
-        // Create navigation dots
-        for (let i = 0; i < totalSlides; i++) {
-            const dot = document.createElement('button');
-            dot.className = 'w-3 h-3 rounded-full transition ' + (i === 0 ? 'bg-purple-600' : 'bg-gray-300');
-            dot.onclick = () => goToReview(i);
-            reviewDots.appendChild(dot);
+        async function loadReviews() {
+            try {
+                const response = await fetch('/api/reviews?active=true');
+                reviewsData = await response.json();
+                
+                if (reviewsData && reviewsData.length > 0) {
+                    displayReviews();
+                    setupReviewsCarousel();
+                }
+            } catch (error) {
+                console.error('Error loading reviews:', error);
+            }
+        }
+
+        function displayReviews() {
+            const carousel = document.getElementById('reviews-carousel');
+            carousel.innerHTML = reviewsData.map(review => {
+                const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+                const initial = review.name.charAt(0).toUpperCase();
+                const userImage = review.user_image ? 
+                    `<img src="${review.user_image}" alt="${review.name}" class="w-12 h-12 rounded-full object-cover">` :
+                    `<div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl">${initial}</div>`;
+                
+                return `
+                    <div class="min-w-full md:min-w-[33.333%] px-2">
+                        <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl shadow-lg h-full">
+                            <div class="flex items-center mb-4">
+                                ${userImage}
+                                <div class="flex-1 ml-3">
+                                    <h4 class="font-bold text-purple-800">${review.name}</h4>
+                                    <div class="text-yellow-500 text-sm">${stars}</div>
+                                </div>
+                            </div>
+                            <p class="text-gray-700 italic">"${review.review_text}"</p>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function setupReviewsCarousel() {
+            const reviewDots = document.getElementById('review-dots');
+            reviewsPerView = window.innerWidth >= 768 ? 3 : 1;
+            totalSlides = Math.max(1, reviewsData.length - reviewsPerView + 1);
+            
+            // Create navigation dots
+            reviewDots.innerHTML = '';
+            for (let i = 0; i < totalSlides; i++) {
+                const dot = document.createElement('button');
+                dot.className = 'w-3 h-3 rounded-full transition ' + (i === 0 ? 'bg-purple-600' : 'bg-gray-300');
+                dot.onclick = () => goToReview(i);
+                reviewDots.appendChild(dot);
+            }
+            
+            // Auto-advance every 4 seconds
+            setInterval(nextReview, 4000);
+            
+            // Handle window resize for responsive layout
+            window.addEventListener('resize', () => {
+                const newReviewsPerView = window.innerWidth >= 768 ? 3 : 1;
+                if (newReviewsPerView !== reviewsPerView) {
+                    reviewsPerView = newReviewsPerView;
+                    totalSlides = Math.max(1, reviewsData.length - reviewsPerView + 1);
+                    currentReviewIndex = Math.min(currentReviewIndex, totalSlides - 1);
+                    setupReviewsCarousel();
+                    goToReview(currentReviewIndex);
+                }
+            });
         }
 
         function goToReview(index) {
+            const carousel = document.getElementById('reviews-carousel');
+            const reviewDots = document.getElementById('review-dots');
             currentReviewIndex = index;
             const offset = -(index * (100 / reviewsPerView));
-            reviewsCarousel.style.transform = `translateX(${offset}%)`;
+            carousel.style.transform = `translateX(${offset}%)`;
             
             // Update dots
             Array.from(reviewDots.children).forEach((dot, i) => {
@@ -1610,12 +2189,14 @@
         }
 
         function nextReview() {
-            currentReviewIndex = (currentReviewIndex + 1) % totalSlides;
-            goToReview(currentReviewIndex);
+            if (totalSlides > 0) {
+                currentReviewIndex = (currentReviewIndex + 1) % totalSlides;
+                goToReview(currentReviewIndex);
+            }
         }
 
-        // Auto-advance every 4 seconds
-        setInterval(nextReview, 4000);
+        // Load reviews on page load
+        loadReviews();
 
         // Mobile menu toggle
         const mobileMenuBtn = document.getElementById('mobile-menu-btn');
@@ -1643,6 +2224,8 @@
             loadGallerySlides();
             console.log('Loading contact info...');
             loadContactInfo();
+            console.log('Loading chatbot config...');
+            loadChatbotConfig();
         });
         
         // Also try immediate load for faster display
@@ -1653,6 +2236,7 @@
             loadHeroSlides();
             loadGallerySlides();
             loadContactInfo();
+            loadChatbotConfig();
         }
     </script>
 
@@ -1751,10 +2335,12 @@
             
             document.getElementById('chatbot-toggle').addEventListener('click', () => {
                 toggleChatbot();
-                // Send simple greeting when opened
+                // Send greeting with business name from config when opened
                 if (isChatbotOpen && document.getElementById('chatbot-messages').children.length === 0) {
                     setTimeout(() => {
-                        addBotMessage(`👋 <strong>Namaste! Welcome to Cosmic Astrology</strong><br><br>How can I help you today?<br><br><em>Type your question or say "menu" to see options!</em>`);
+                        const businessName = globalBusinessInfo?.business_name || 'Cosmic Astrology';
+                        const welcomeMsg = globalChatbotConfig?.welcome_message || `👋 <strong>Namaste! Welcome to ${businessName}</strong><br><br>How can I help you today?<br><br><em>Type your question or say "menu" to see options!</em>`;
+                        addBotMessage(welcomeMsg);
                         startInactivityTimer();
                     }, 300);
                 }
@@ -1780,19 +2366,7 @@
             
             function resetInactivityTimer() {
                 if (inactivityTimer) clearTimeout(inactivityTimer);
-                if (!reviewTimerSet && isChatbotOpen) {
-                    inactivityTimer = setTimeout(() => {
-                        if (!reviewTimerSet) {
-                            addBotMessage(`😊 <strong>Thank you for chatting with us!</strong><br><br>
-If you've experienced our services, we'd love your feedback!<br><br>
-<a href="https://maps.app.goo.gl/rPo3UXPy65DBbsVz8" target="_blank" style="background: linear-gradient(to right, #7C3AED, #EC4899); color: white; padding: 12px 24px; border-radius: 25px; text-decoration: none; display: inline-block; font-weight: bold; font-size: 16px;">
-⭐⭐⭐⭐⭐ Write a Google Review
-</a><br><br>
-<em>May the stars guide you! 🌟</em>`);
-                            reviewTimerSet = true;
-                        }
-                    }, 30000); // 30 seconds
-                }
+                // Inactivity timer removed - no auto-prompts
             }
         }
         
@@ -1996,13 +2570,13 @@ ${bookingData.message ? '• Question: ' + bookingData.message + '<br>' : ''}
 <br><em>Booking ID: #${result.id}</em><br><br>
 📱 <strong>Contact Us Directly:</strong><br>
 <div style="display: flex; gap: 10px; flex-wrap: wrap; margin: 15px 0;">
-    <a href="https://wa.me/918431729319?text=Hi!%20I%20just%20booked%20(ID:%20${result.id})%20for%20${encodeURIComponent(service)}" target="_blank" style="background: #25D366; color: white; padding: 10px 15px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; font-weight: bold; gap: 5px;">
+    <a href="https://wa.me/${(globalBusinessInfo?.whatsapp_number || globalBusinessInfo?.phone || '918431729319').replace(/\\D/g, '')}?text=Hi!%20I%20just%20booked%20(ID:%20${result.id})%20for%20${encodeURIComponent(service)}" target="_blank" style="background: #25D366; color: white; padding: 10px 15px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; font-weight: bold; gap: 5px;">
         <i class="fab fa-whatsapp"></i> WhatsApp
     </a>
-    <a href="tel:+918431729319" style="background: #0088cc; color: white; padding: 10px 15px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; font-weight: bold; gap: 5px;">
+    <a href="tel:${globalBusinessInfo?.phone || '+918431729319'}" style="background: #0088cc; color: white; padding: 10px 15px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; font-weight: bold; gap: 5px;">
         <i class="fas fa-phone"></i> Call Now
     </a>
-    <a href="mailto:omkargouda1204@gmail.com?subject=Booking%20Confirmation%20${result.id}&body=Hi,%20I%20booked%20${encodeURIComponent(service)}%20consultation." style="background: #EA4335; color: white; padding: 10px 15px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; font-weight: bold; gap: 5px;">
+    <a href="mailto:${globalBusinessInfo?.email || 'omkargouda1204@gmail.com'}?subject=Booking%20Confirmation%20${result.id}&body=Hi,%20I%20booked%20${encodeURIComponent(service)}%20consultation." style="background: #EA4335; color: white; padding: 10px 15px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; font-weight: bold; gap: 5px;">
         <i class="fas fa-envelope"></i> Email
     </a>
 </div>
@@ -2015,14 +2589,18 @@ ${bookingData.message ? '• Question: ' + bookingData.message + '<br>' : ''}
                             // Reset review flag
                             reviewTimerSet = false;
                         } else {
+                            const waNum = (globalBusinessInfo?.whatsapp_number || globalBusinessInfo?.phone || '918431729319').replace(/\D/g, '');
+                            const greeting = encodeURIComponent('Hello! I tried booking but encountered an issue. Can you help?');
                             addBotMessage(`❌ <strong>Booking failed</strong><br><br>${result.error || 'Please try again or contact us directly.'}<br><br>
-<a href="https://wa.me/918431729319" target="_blank" style="color: #7C3AED; font-weight: bold;">
+<a href="https://wa.me/${waNum}?text=${greeting}" target="_blank" style="color: #7C3AED; font-weight: bold;">
 💬 Contact us on WhatsApp instead
 </a>`);
                         }
                     } catch (error) {
                         console.error('Booking error:', error);
-                        addBotMessage('❌ <strong>Booking failed. Please try again or contact us directly.</strong><br><br><a href="https://wa.me/918431729319" target="_blank" style="color: #7C3AED; font-weight: bold;">💬 WhatsApp Us</a>');
+                        const waNum = (globalBusinessInfo?.whatsapp_number || globalBusinessInfo?.phone || '918431729319').replace(/\D/g, '');
+                        const greeting = encodeURIComponent('Hello! I encountered an error while booking. Please assist me.');
+                        addBotMessage(`❌ <strong>Booking failed. Please try again or contact us directly.</strong><br><br><a href="https://wa.me/${waNum}?text=${greeting}" target="_blank" style="color: #7C3AED; font-weight: bold;">💬 WhatsApp Us</a>`);
                     }
                 });
             }, 100);
@@ -2055,9 +2633,6 @@ ${bookingData.message ? '• Question: ' + bookingData.message + '<br>' : ''}
                         </button>
                         <button onclick="sendMenuOption('qa')" class="menu-btn" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 13px;">
                             ❓ FAQ
-                        </button>
-                        <button onclick="sendMenuOption('review')" class="menu-btn" style="background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #333; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 13px;">
-                            ⭐ Review
                         </button>
                     </div>
                     
@@ -2096,13 +2671,16 @@ ${bookingData.message ? '• Question: ' + bookingData.message + '<br>' : ''}
         }
         
         function contactViaWhatsApp() {
-            const whatsappNum = '918431729319'; // Will be loaded from env
+            // Use global business info for WhatsApp number
+            const whatsappNumber = globalBusinessInfo?.whatsapp_number || globalBusinessInfo?.phone || '918431729319';
+            const whatsappNum = whatsappNumber.replace(/\D/g, '');
             const message = encodeURIComponent('Hello! 👋 I\'m interested in astrology consultation. Can you please guide me?');
             window.open(`https://wa.me/${whatsappNum}?text=${message}`, '_blank');
         }
         
         function contactViaCall() {
-            window.location.href = 'tel:+918431729319'; // Will be loaded from env
+            const phoneNumber = globalBusinessInfo?.phone || '+918431729319';
+            window.location.href = `tel:${phoneNumber}`;
         }
     </script>
 
