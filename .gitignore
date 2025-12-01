@@ -48,6 +48,18 @@ instance/
 
 # Testing
 .coverage
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+.npm
+
+# Uploaded files (keep directory structure, ignore content)
+static/uploads/*
+!static/uploads/.gitkeep
 htmlcov/
 .pytest_cache/
 

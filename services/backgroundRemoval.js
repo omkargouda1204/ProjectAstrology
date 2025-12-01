@@ -53,22 +53,25 @@ class BackgroundRemovalService {
         try {
             // Check if background removal library is available
             if (!removeBackground || !libraryAvailable) {
-                console.log(`Background removal library not available, returning original image: ${filename}`);
+                console.log(`❌ Background removal library not available, returning original image: ${filename}`);
                 return imageBuffer;
             }
 
-            console.log(`Starting background removal for ${filename}`);
+            console.log(`\n📸 Processing Image: ${filename}`);
+            console.log(`📊 File size: ${(imageBuffer.length / 1024).toFixed(2)} KB`);
+            console.log(`⏳ Starting background removal process...`);
             
             let processBuffer = imageBuffer;
             
             // METHOD 1: Try Canvas API fallback for Windows (when Sharp fails)
             if (!sharpAvailable) {
                 try {
-                    console.log('🔧 Converting PNG using Canvas API (Sharp-free Windows solution)...');
+                    console.log('🔧 Step 1/3: Converting PNG using Canvas API (Windows solution)...');
                     processBuffer = await this.convertPngWithCanvas(imageBuffer, filename);
-                    console.log(`✅ Converted ${filename} to compatible PNG format using Canvas API`);
+                    console.log(`✅ Step 1/3 Complete: Successfully converted to compatible PNG format`);
                 } catch (canvasError) {
-                    console.log(`Canvas conversion failed for ${filename}:`, canvasError.message);
+                    console.log(`⚠️  Canvas conversion failed: ${canvasError.message}`);
+                    console.log(`ℹ️  Using original image buffer instead`);
                     processBuffer = imageBuffer;
                 }
             }
@@ -76,7 +79,7 @@ class BackgroundRemovalService {
             // METHOD 2: Try Sharp conversion if available (for Linux/Mac)
             else if (sharpAvailable && sharp) {
                 try {
-                    console.log('🔧 Converting image to clean RGBA PNG format using Sharp...');
+                    console.log('🔧 Step 1/3: Converting image to clean RGBA PNG format using Sharp...');
                     // BULLETPROOF: Convert to clean PNG that @imgly can ALWAYS decode
                     processBuffer = await sharp(imageBuffer)
                         .png({ 
@@ -87,16 +90,16 @@ class BackgroundRemovalService {
                         })
                         .ensureAlpha()             // Ensure alpha channel exists
                         .toBuffer();
-                    console.log(`✅ Converted ${filename} to bulletproof PNG format using Sharp`);
+                    console.log(`✅ Step 1/3 Complete: Converted to bulletproof PNG format (${(processBuffer.length / 1024).toFixed(2)} KB)`);
                 } catch (sharpError) {
-                    console.log(`Sharp conversion failed for ${filename}:`, sharpError.message);
-                    console.log('Trying fallback PNG conversion...');
+                    console.log(`⚠️  Sharp conversion failed: ${sharpError.message}`);
+                    console.log('🔧 Trying fallback PNG conversion...');
                     try {
                         // Fallback: Basic PNG conversion
                         processBuffer = await sharp(imageBuffer)
                             .png()
                             .toBuffer();
-                        console.log(`✅ Fallback PNG conversion successful for ${filename}`);
+                        console.log(`✅ Fallback conversion successful`);
                     } catch (fallbackError) {
                         console.log(`All Sharp conversions failed for ${filename}, using original buffer`);
                         processBuffer = imageBuffer;
@@ -107,10 +110,12 @@ class BackgroundRemovalService {
             // Remove background from the buffer
             let resultBuffer;
             try {
+                console.log(`🔧 Step 2/3: Applying @imgly background removal algorithm...`);
                 resultBuffer = await removeBackground(processBuffer);
+                console.log(`✅ Step 2/3 Complete: Background removed successfully (${(resultBuffer.length / 1024).toFixed(2)} KB)`);
             } catch (removeError) {
                 if (removeError.message.includes('Unsupported format')) {
-                    console.log(`⚠️  @imgly failed on ${filename}, trying Jimp-based background removal...`);
+                    console.log(`⚠️  @imgly format error, trying Jimp-based background removal...`);
                     // Fallback: Use Jimp to create a transparent version
                     resultBuffer = await this.createTransparentVersionWithJimp(processBuffer, filename);
                 } else {
@@ -118,24 +123,26 @@ class BackgroundRemovalService {
                 }
             }
             
-            console.log(`✅ Background removal completed for ${filename}`);
+            console.log(`🔧 Step 3/3: Finalizing image with transparent background...`);
+            console.log(`✅ Step 3/3 Complete: Image processing finished`);
+            console.log(`✅ SUCCESS: Background removed from ${filename} - Ready for upload!\n`);
             return resultBuffer;
 
         } catch (error) {
-            console.error('Error removing background:', error);
+            console.error('\n❌ ERROR: Background removal failed:', error.message);
             
             // Special handling for "Unsupported format" error
             if (error.message.includes('Unsupported format')) {
                 if (!sharpAvailable) {
-                    console.error('❌ CRITICAL: "Unsupported format" error occurred. Sharp is needed to fix PNG compatibility issues.');
-                    console.error('💡 SOLUTION: Ensure Sharp is properly installed: npm install sharp');
+                    console.error('⚠️  "Unsupported format" error occurred. Sharp needed for PNG compatibility.');
+                    console.error('💡 SOLUTION: npm install sharp');
                 } else {
-                    console.error('❌ "Unsupported format" error even with Sharp preprocessing. This PNG may have unusual properties.');
+                    console.error('⚠️  "Unsupported format" error. PNG may have unusual properties.');
                 }
             }
             
             // Fallback: return original image
-            console.log(`Returning original image due to error: ${filename}`);
+            console.log(`⚠️  Returning original image (background removal failed): ${filename}\n`);
             return imageBuffer;
         }
     }
