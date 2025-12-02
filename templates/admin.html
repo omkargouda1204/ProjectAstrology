@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Om Sri Mahakali Bhairavi Astrology Center</title>
-    <meta name="robots" content="noindex, nofollow">
-    <meta name="googlebot" content="noindex, nofollow">
+    <title>Admin Dashboard - Cosmic Astrology</title>
     <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="/static/styles/main.css">
     <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.15.4/css/all.css">
@@ -38,16 +36,24 @@
         <!-- Navbar -->
         <nav class="bg-gradient-to-r from-purple-700 to-pink-600 text-white shadow-lg sticky top-0 z-50">
             <div class="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
-                <div class="flex justify-between items-center">
+                <div class="flex justify-between items-center gap-2 sm:gap-4">
                     <h1 class="text-lg sm:text-2xl font-bold">
                         <i class="fas fa-moon mr-1 sm:mr-2"></i>
                         <span class="hidden sm:inline">Admin Dashboard</span>
                         <span class="sm:hidden">Admin</span>
                     </h1>
-                    <button onclick="logout()" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-3 sm:px-6 py-2 rounded-lg transition font-semibold text-sm sm:text-base">
-                        <i class="fas fa-sign-out-alt mr-0 sm:mr-2"></i>
+                    <div class="flex gap-2">
+                        <a href="/" target="_blank" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-2 sm:px-4 py-2 rounded-lg transition font-semibold text-xs sm:text-sm flex items-center">
+                            <i class="fas fa-external-link-alt mr-1 sm:mr-2"></i>
+                            <span class="hidden sm:inline">Visit Website</span>
+                            <span class="sm:hidden">Visit</span>
+                        </a>
+                        <button onclick="logout()" class="bg-white bg-opacity-20 hover:bg-opacity-30 px-2 sm:px-4 py-2 rounded-lg transition font-semibold text-xs sm:text-sm flex items-center">
+                            <i class="fas fa-sign-out-alt mr-1 sm:mr-2"></i>
                         <span class="hidden sm:inline">Logout</span>
+                            <span class="sm:hidden">Out</span>
                     </button>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -202,7 +208,7 @@
             <div id="hero-section" class="tab-content hidden">
                 <div class="bg-white rounded-2xl shadow-lg p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">
+                        <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
                             <i class="fas fa-images text-purple-600 mr-2"></i>Hero Slides Management
                         </h2>
                         <button id="add-hero-slide-btn" class="admin-btn admin-btn-primary">
@@ -253,7 +259,7 @@
             <div id="gallery-section" class="tab-content hidden">
                 <div class="bg-white rounded-2xl shadow-lg p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">
+                        <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
                             <i class="fas fa-photo-video text-blue-600 mr-2"></i>Gallery Management
                         </h2>
                         <button id="add-gallery-image-btn" class="admin-btn admin-btn-primary">
@@ -304,7 +310,7 @@
             <div id="messages-section" class="tab-content hidden">
                 <div class="bg-white rounded-2xl shadow-lg p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">
+                        <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
                             <i class="fas fa-envelope text-green-600 mr-2"></i>Contact Messages
                         </h2>
                         <div class="flex items-center space-x-2">
@@ -320,7 +326,7 @@
             <div id="bookings-section" class="tab-content hidden">
                 <div class="bg-white rounded-2xl shadow-lg p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">
+                        <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
                             <i class="fas fa-calendar-check text-orange-600 mr-2"></i>Booking Requests
                         </h2>
                         <div class="flex items-center space-x-2">
@@ -451,7 +457,7 @@
             <div id="chatbot-section" class="tab-content hidden">
                 <div class="bg-white rounded-2xl shadow-lg p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">
+                        <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
                             <i class="fas fa-robot text-purple-600 mr-2"></i>Chatbot Configuration
                         </h2>
                         <button type="button" id="edit-chatbot-btn" onclick="toggleChatbotEdit()" class="admin-btn admin-btn-secondary">
@@ -633,7 +639,7 @@
             <div id="brand-settings-section" class="tab-content hidden">
                 <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">
+                        <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
                             <i class="fas fa-palette text-purple-600 mr-2"></i>Brand & Navigation Settings
                         </h2>
                         <button id="brand-edit-btn" type="button" class="admin-btn admin-btn-secondary">
@@ -827,11 +833,11 @@
             <div id="announcements-section" class="tab-content hidden">
                 <div class="bg-white rounded-2xl shadow-lg p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">
+                        <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
                             <i class="fas fa-bullhorn text-orange-600 mr-2"></i>Announcement Bar Management
                         </h2>
-                        <button onclick="showAnnouncementForm()" class="admin-btn admin-btn-success">
-                            <i class="fas fa-plus mr-2"></i>Add Announcement
+                        <button onclick="showAnnouncementForm()" class="admin-btn admin-btn-success text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-3">
+                            <i class="fas fa-plus mr-1 sm:mr-2"></i><span class="hidden sm:inline">Add Announcement</span><span class="sm:hidden">Add</span>
                         </button>
                     </div>
                     
@@ -849,12 +855,12 @@
                                     <input type="number" id="announcement-order" class="admin-input w-32" placeholder="Order" value="0">
                                 </div>
                             </div>
-                            <div class="flex gap-3">
-                                <button type="submit" class="admin-btn admin-btn-success">
-                                    <i class="fas fa-save mr-2"></i>Save Announcement
+                            <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                                <button type="submit" class="admin-btn admin-btn-success text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-3 w-full sm:w-auto">
+                                    <i class="fas fa-save mr-1 sm:mr-2"></i><span class="hidden sm:inline">Save Announcement</span><span class="sm:hidden">Save</span>
                                 </button>
-                                <button type="button" onclick="cancelAnnouncementEdit()" class="admin-btn admin-btn-secondary">
-                                    <i class="fas fa-times mr-2"></i>Cancel
+                                <button type="button" onclick="cancelAnnouncementEdit()" class="admin-btn admin-btn-secondary text-xs sm:text-sm px-3 sm:px-4 py-2 sm:py-3 w-full sm:w-auto">
+                                    <i class="fas fa-times mr-1 sm:mr-2"></i>Cancel
                                 </button>
                             </div>
                         </form>
@@ -870,7 +876,7 @@
             <div id="astrological-services-section" class="tab-content hidden">
                 <div class="bg-white rounded-2xl shadow-lg p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">
+                        <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
                             <i class="fas fa-star text-purple-600 mr-2"></i>Astrological Services
                         </h2>
                         <button onclick="showAstroServiceForm()" class="admin-btn admin-btn-success">
@@ -945,7 +951,7 @@
             <div id="pooja-services-section" class="tab-content hidden">
                 <div class="bg-white rounded-2xl shadow-lg p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">
+                        <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
                             <i class="fas fa-om text-orange-600 mr-2"></i>Pooja & Ritual Services
                         </h2>
                         <button onclick="showPoojaServiceForm()" class="admin-btn admin-btn-success">
@@ -995,7 +1001,7 @@
             <div id="expert-solutions-section" class="tab-content hidden">
                 <div class="bg-white rounded-2xl shadow-lg p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">
+                        <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
                             <i class="fas fa-hands-helping text-purple-600 mr-2"></i>Expert Solutions
                         </h2>
                         <button onclick="showExpertSolutionForm()" class="admin-btn admin-btn-success">
@@ -1045,7 +1051,7 @@
             <div id="reviews-section" class="tab-content hidden">
                 <div class="bg-white rounded-2xl shadow-lg p-6">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">
+                        <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-gray-800">
                             <i class="fas fa-star text-purple-600 mr-2"></i>Client Reviews
                         </h2>
                         <button onclick="showReviewForm()" class="admin-btn admin-btn-success">
@@ -1114,7 +1120,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Password Change Section -->
                     <div class="bg-white rounded-2xl shadow-lg p-6">
-                        <h2 class="text-xl font-bold mb-6 text-gray-800">
+                        <h2 class="text-base sm:text-lg md:text-xl font-bold mb-4 sm:mb-6 text-gray-800">
                             <i class="fas fa-lock text-red-600 mr-2"></i>Change Password
                         </h2>
                         <form id="change-password-form" class="space-y-4">
@@ -1145,7 +1151,7 @@
 
                     <!-- System Information Section -->
                     <div class="bg-white rounded-2xl shadow-lg p-6">
-                        <h2 class="text-xl font-bold mb-6 text-gray-800">
+                        <h2 class="text-base sm:text-lg md:text-xl font-bold mb-4 sm:mb-6 text-gray-800">
                             <i class="fas fa-info-circle text-blue-600 mr-2"></i>System Information
                         </h2>
                         <div class="space-y-4">
@@ -1327,6 +1333,77 @@
             }
         });
 
+        // Define editAnnouncement globally BEFORE any onclick handlers are created
+        window.editAnnouncement = async function(id) {
+            try {
+                console.log('Loading announcement with ID:', id);
+                const idNum = parseInt(id);
+                if (isNaN(idNum)) {
+                    throw new Error('Invalid announcement ID');
+                }
+                
+                // Fetch announcement - route is /api/announcements/:id
+                const response = await fetch(`/api/announcements/${idNum}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                console.log('Announcement response status:', response.status, response.statusText);
+                
+                if (!response.ok) {
+                    let errorMessage = `Failed to fetch announcement: ${response.status}`;
+                    try {
+                        const errorData = await response.json();
+                        errorMessage = errorData.error || errorMessage;
+                    } catch (e) {
+                        // If response is not JSON, use status text
+                        errorMessage = response.statusText || errorMessage;
+                    }
+                    throw new Error(errorMessage);
+                }
+                
+                const announcement = await response.json();
+                console.log('Announcement data:', announcement);
+                
+                if (!announcement || !announcement.id) {
+                    throw new Error('Announcement not found');
+                }
+                
+                // Populate form with announcement data
+                const idField = document.getElementById('announcement-id');
+                const textField = document.getElementById('announcement-text');
+                const activeField = document.getElementById('announcement-active');
+                const orderField = document.getElementById('announcement-order');
+                const formContainer = document.getElementById('announcement-form-container');
+                
+                if (!idField || !textField || !activeField || !orderField) {
+                    throw new Error('Announcement form fields not found');
+                }
+                
+                idField.value = announcement.id;
+                textField.value = announcement.text || '';
+                activeField.checked = announcement.active !== false;
+                orderField.value = announcement.display_order || 0;
+                
+                // Show form
+                if (formContainer) {
+                    formContainer.classList.remove('hidden');
+                    formContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    throw new Error('Announcement form container not found');
+                }
+            } catch (error) {
+                console.error('Error loading announcement:', error);
+                const errorMsg = error.message || 'Failed to load announcement';
+                if (typeof showNotification === 'function') {
+                    showNotification(errorMsg, 'error');
+                } else {
+                    alert('Error loading announcement: ' + errorMsg);
+                }
+            }
+        };
+
         // Tab Switching
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -1417,7 +1494,7 @@
                 container.innerHTML = slides.map(slide => `
                     <div class="bg-white rounded-xl p-6 shadow-lg">
                         <div class="w-full h-48 mb-4 rounded-lg overflow-hidden bg-gray-100">
-                            <img src="${slide.image}" alt="${slide.title}" class="w-full h-full object-cover object-center" style="object-fit: cover;" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23667eea%22 width=%22400%22 height=%22300%22/%3E%3Ctext fill=%22white%22 font-size=%2220%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage Not Available%3C/text%3E%3C/svg%3E'" loading="lazy">
+                            <img src="${slide.image}?t=${Date.now()}" alt="${slide.title}" class="w-full h-full object-cover object-center" style="object-fit: cover; display: block;" loading="eager" crossorigin="anonymous" onload="console.log('Admin hero slide loaded:', '${slide.image}')" onerror="console.error('Admin hero slide failed:', '${slide.image}'); this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23667eea%22 width=%22400%22 height=%22300%22/%3E%3Ctext fill=%22white%22 font-size=%2220%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage Not Available%3C/text%3E%3C/svg%3E'">
                         </div>
                         <h3 class="font-bold text-lg mb-2">${slide.title}</h3>
                         <p class="text-gray-600 mb-4">${slide.description || ''}</p>
@@ -1451,7 +1528,7 @@
                 container.innerHTML = slides.map(slide => `
                     <div class="bg-white rounded-xl overflow-hidden shadow-lg">
                         <div class="w-full h-48 overflow-hidden bg-gray-100">
-                            <img src="${slide.image}" alt="${slide.title}" class="w-full h-full object-cover object-center" style="object-fit: cover;" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%2364748b%22 width=%22400%22 height=%22300%22/%3E%3Ctext fill=%22white%22 font-size=%2220%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage Not Available%3C/text%3E%3C/svg%3E'" loading="lazy">
+                            <img src="${slide.image}?t=${Date.now()}" alt="${slide.title}" class="w-full h-full object-cover object-center" style="object-fit: cover; display: block;" loading="eager" crossorigin="anonymous" onload="console.log('Admin gallery slide loaded:', '${slide.image}')" onerror="console.error('Admin gallery slide failed:', '${slide.image}'); this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%2364748b%22 width=%22400%22 height=%22300%22/%3E%3Ctext fill=%22white%22 font-size=%2220%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage Not Available%3C/text%3E%3C/svg%3E'">
                         </div>
                         <div class="p-4">
                             <h4 class="font-semibold mb-2">${slide.title}</h4>
@@ -2448,63 +2525,70 @@
         
         function cancelAnnouncementEdit() {
             document.getElementById('announcement-form-container').classList.add('hidden');
+            document.getElementById('announcement-form').reset();
+            document.getElementById('announcement-id').value = '';
         }
+        
         
         async function deleteAnnouncement(id) {
             if (confirm('Delete this announcement?')) {
-                await fetch(`/api/announcements/${id}`, { method: 'DELETE' });
+                try {
+                    const response = await fetch(`/api/announcements/${id}`, { method: 'DELETE' });
+                    if (response.ok) {
                 loadAnnouncements();
-            }
-        }
-        
-        async function editAnnouncement(id) {
-            try {
-                const response = await fetch('/api/announcements');
-                if (response.ok) {
-                    const items = await response.json();
-                    const item = items.find(i => i.id === id);
-                    if (!item) return;
-                    
-                    document.getElementById('announcement-id').value = item.id;
-                    document.getElementById('announcement-text').value = item.text;
-                    document.getElementById('announcement-active').checked = item.active;
-                    document.getElementById('announcement-order').value = item.display_order || 0;
-                    
-                    document.getElementById('announcement-form-container').classList.remove('hidden');
-                    document.getElementById('announcement-form-container').scrollIntoView({ behavior: 'smooth' });
-                    document.getElementById('announcement-text').focus();
+                        showNotification('Announcement deleted successfully', 'success');
+                    } else {
+                        throw new Error('Failed to delete');
+                    }
+                } catch (error) {
+                    console.error('Error deleting announcement:', error);
+                    showNotification('Error deleting announcement', 'error');
                 }
-            } catch (error) {
-                console.error('Error loading announcement:', error);
-                alert('Error loading announcement');
             }
         }
         
         document.getElementById('announcement-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+            try {
             const id = document.getElementById('announcement-id').value;
             const data = {
-                text: document.getElementById('announcement-text').value,
+                    text: document.getElementById('announcement-text').value.trim(),
                 active: document.getElementById('announcement-active').checked,
                 display_order: parseInt(document.getElementById('announcement-order').value) || 0
             };
             
+                if (!data.text) {
+                    showNotification('Please enter announcement text', 'error');
+                    return;
+                }
+                
+                let response;
             if (id) {
-                await fetch(`/api/announcements/${id}`, {
+                    response = await fetch(`/api/announcements/${id}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
             } else {
-                await fetch('/api/announcements', {
+                    response = await fetch('/api/announcements', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
             }
             
+                if (response.ok) {
+                    showNotification(id ? 'Announcement updated successfully' : 'Announcement added successfully', 'success');
             cancelAnnouncementEdit();
             loadAnnouncements();
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Failed to save announcement');
+                }
+            } catch (error) {
+                console.error('Error saving announcement:', error);
+                showNotification(error.message || 'Error saving announcement', 'error');
+            }
         });
         
         // Astro Services, Pooja Services, Expert Solutions follow similar patterns
@@ -2525,7 +2609,7 @@
                         <div class="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200">
                             ${item.icon_url ? 
                                 `<div class="flex justify-center mb-2">
-                                    <img src="${item.icon_url}" class="w-16 h-16 object-contain" alt="${item.title}">
+                                    <img src="${item.icon_url}?t=${Date.now()}" class="w-16 h-16 object-contain" alt="${item.title}" style="display: block;" loading="eager" crossorigin="anonymous" onload="console.log('Astro service icon loaded:', '${item.icon_url}')" onerror="console.error('Astro service icon failed:', '${item.icon_url}'); this.onerror=null; this.style.display='none';">
                                 </div>` : 
                                 `<div class="flex justify-center mb-2">
                                     <div class="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">

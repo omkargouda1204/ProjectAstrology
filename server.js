@@ -32,13 +32,8 @@ app.use(compression());
 // CORS configuration
 app.use(cors({
     origin: process.env.CORS_ORIGIN || '*',
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    credentials: true
 }));
-
-// Handle OPTIONS requests explicitly
-app.options('*', cors());
 
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
@@ -78,17 +73,6 @@ app.get('/setup', (req, res) => {
     res.sendFile(path.join(__dirname, 'setup.html'));
 });
 
-// SEO files
-app.get('/sitemap.xml', (req, res) => {
-    res.setHeader('Content-Type', 'application/xml');
-    res.sendFile(path.join(__dirname, 'public', 'sitemap.xml'));
-});
-
-app.get('/robots.txt', (req, res) => {
-    res.setHeader('Content-Type', 'text/plain');
-    res.sendFile(path.join(__dirname, 'public', 'robots.txt'));
-});
-
 // ========================================
 // API ROUTES
 // ========================================
@@ -120,10 +104,10 @@ app.use((err, req, res, next) => {
 });
 
 // ========================================
-// START SERVER WITH ERROR HANDLING
+// START SERVER
 // ========================================
 
-const server = app.listen(PORT, () => {
+app.listen(PORT, () => {
     console.log(`
 ╔═══════════════════════════════════════════════════════╗
 ║                                                       ║
@@ -140,38 +124,6 @@ const server = app.listen(PORT, () => {
 ║                                                       ║
 ╚═══════════════════════════════════════════════════════╝
     `);
-});
-
-// Handle errors
-server.on('error', (error) => {
-    if (error.code === 'EADDRINUSE') {
-        console.error(`❌ Port ${PORT} is already in use!`);
-        console.error('🔧 Trying to use alternative port...');
-        const newPort = PORT + 1;
-        app.listen(newPort, () => {
-            console.log(`✅ Server started on alternative port: ${newPort}`);
-        });
-    } else {
-        console.error('Server error:', error);
-        process.exit(1);
-    }
-});
-
-// Graceful shutdown
-process.on('SIGINT', () => {
-    console.log('\n\nSIGINT received. Shutting down gracefully...');
-    server.close(() => {
-        console.log('✅ Server closed');
-        process.exit(0);
-    });
-});
-
-process.on('SIGTERM', () => {
-    console.log('\n\nSIGTERM received. Shutting down gracefully...');
-    server.close(() => {
-        console.log('✅ Server closed');
-        process.exit(0);
-    });
 });
 
 // Graceful shutdown

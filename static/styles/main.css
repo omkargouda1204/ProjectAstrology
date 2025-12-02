@@ -998,6 +998,13 @@ body {
 }
 
 /* Admin Dashboard Responsive Styles */
+.admin-btn, .admin-btn-sm, .btn, .btn-primary, .btn-danger, .btn-success, .btn-secondary {
+    min-height: 44px;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+}
+
 @media (max-width: 1280px) {
     .admin-container {
         padding: 1.5rem;
@@ -1006,6 +1013,12 @@ body {
     .tab-btn {
         padding: 0.75rem 1.25rem;
         font-size: 0.875rem;
+        min-height: 44px;
+    }
+    
+    .admin-btn, .admin-btn-sm {
+        padding: 0.625rem 1rem;
+        font-size: 0.813rem;
     }
 }
 
@@ -1063,9 +1076,30 @@ body {
         grid-template-columns: 1fr;
     }
     
-    .admin-btn {
+    .admin-btn, .admin-btn-sm, .btn, .btn-primary, .btn-danger, .btn-success, .btn-secondary {
         width: 100%;
         justify-content: center;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        min-height: 44px;
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Admin section titles responsive */
+    h2.text-2xl, h2.text-xl {
+        font-size: 1.25rem !important;
+        padding: 0.75rem 0 !important;
+    }
+    
+    /* Admin form buttons container */
+    .flex.gap-3, .flex.gap-4 {
+        flex-direction: column;
+        gap: 0.5rem !important;
+    }
+    
+    /* Admin buttons with icons */
+    .admin-btn i, .btn i {
+        margin-right: 0.25rem !important;
     }
     
     .flex.gap-4 {
@@ -1134,32 +1168,41 @@ body {
    TESTIMONIALS & CAROUSEL RESPONSIVE STYLES
    ============================================ */
 
-/* Reviews carousel responsive adjustments */
+/* Reviews carousel responsive adjustments - One Row Auto Slider */
 #reviews-carousel {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     transition: transform 0.5s ease-in-out;
+    overflow: hidden;
+    width: 100%;
 }
 
 .review-card {
-    flex: 1 1 100%;
-    min-width: 100%;
-    padding: 1rem;
+    flex-shrink: 0;
+    padding: 0.5rem;
+}
+
+/* Mobile: Show 1 review per slide */
+@media (max-width: 767px) {
+    #reviews-carousel > div {
+        width: 100% !important;
+        min-width: 100% !important;
+    }
 }
 
 /* Tablet: Show 2 reviews per slide */
-@media (min-width: 768px) and (max-width: 1024px) {
-    .review-card {
-        flex: 1 1 50%;
-        min-width: 50%;
+@media (min-width: 768px) and (max-width: 1023px) {
+    #reviews-carousel > div {
+        width: 50% !important;
+        min-width: 50% !important;
     }
 }
 
 /* Desktop: Show 3 reviews per slide */
-@media (min-width: 1025px) {
-    .review-card {
-        flex: 1 1 33.333%;
-        min-width: 33.333%;
+@media (min-width: 1024px) {
+    #reviews-carousel > div {
+        width: 33.333% !important;
+        min-width: 33.333% !important;
     }
 }
 

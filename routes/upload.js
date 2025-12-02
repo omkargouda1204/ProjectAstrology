@@ -41,17 +41,6 @@ const upload = multer({
 // FILE UPLOAD ENDPOINT
 // ========================================
 
-// Test endpoint to verify upload route is accessible
-router.get('/upload/test', (req, res) => {
-    res.json({ 
-        success: true, 
-        message: 'Upload endpoint is accessible',
-        acceptedMethods: ['POST'],
-        expectedFields: ['file', 'folder'],
-        maxFileSize: '5MB'
-    });
-});
-
 // Single file upload with background removal (Supabase Storage)
 router.post('/upload', upload.single('file'), async (req, res) => {
     try {
@@ -67,10 +56,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
             const folder = req.body.folder || 'others';
             const removeBackground = req.body.removeBackground === 'true';
             
-            console.log('\n📁 FILE UPLOAD REQUEST');
-            console.log(`📂 Folder: ${folder}`);
-            console.log(`📄 Filename: ${req.file.originalname}`);
-            console.log(`💾 Size: ${(req.file.size / 1024).toFixed(2)} KB`);
+            console.log('Upload request - Folder:', folder, ', RemoveBackground:', removeBackground);
             
             // Validate and organize folders properly
             const allowedFolders = {
@@ -100,8 +86,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
             // Apply background removal for service images
             if (shouldRemoveBackground) {
                 try {
-                    console.log(`\n🎨 BACKGROUND REMOVAL PROCESS STARTED`);
-                    console.log(`📸 Processing: ${req.file.originalname}`);
+                    console.log(`Applying background removal for ${req.file.originalname}`);
                     processedBuffer = await backgroundRemovalService.removeBackgroundFromBuffer(
                         req.file.buffer, 
                         req.file.originalname
@@ -113,10 +98,9 @@ router.post('/upload', upload.single('file'), async (req, res) => {
                     processedFilename = `${name}_transparent.png`;
                     contentType = 'image/png';
                     
-                    console.log(`✅ Background removal completed successfully\n`);
+                    console.log(`Background removal completed for ${req.file.originalname}`);
                 } catch (bgError) {
-                    console.error(`⚠️  Background removal failed: ${bgError.message}`);
-                    console.log(`⚠️  Continuing with original image\n`);
+                    console.error('Background removal failed, using original:', bgError);
                     // Continue with original file if background removal fails
                 }
             }
@@ -126,7 +110,6 @@ router.post('/upload', upload.single('file'), async (req, res) => {
             const filename = path.basename(processedFilename, ext) + '-' + uniqueSuffix + ext;
             const storagePath = `${targetFolder}/${filename}`;
             
-            console.log(`⬆️  Uploading to Supabase: ${storagePath}`);
             const { data, error } = await supabase.storage
                 .from(bucketName)
                 .upload(storagePath, processedBuffer, {
@@ -135,7 +118,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
                 });
 
             if (error) {
-                console.error('❌ Supabase upload error:', error);
+                console.error('Supabase upload error:', error);
                 return res.status(500).json({ error: 'Upload to storage failed: ' + error.message });
             }
 
@@ -143,11 +126,6 @@ router.post('/upload', upload.single('file'), async (req, res) => {
             const { data: { publicUrl } } = supabase.storage
                 .from(bucketName)
                 .getPublicUrl(storagePath);
-            
-            console.log(`✅ Upload successful!`);
-            console.log(`📍 Public URL: ${publicUrl}`);
-            console.log(`💾 File size: ${(processedBuffer.length / 1024).toFixed(2)} KB`);
-            console.log(`🎨 Background removed: ${shouldRemoveBackground ? 'YES ✅' : 'NO'}\n`);
             
             return res.json({
                 success: true,

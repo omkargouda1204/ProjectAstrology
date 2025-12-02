@@ -315,7 +315,7 @@ async function getFallbackResponse(message) {
         📞 <strong>Contact</strong> - Get in touch<br>
         📱 <strong>Social</strong> - Follow us online<br>
         ❓ <strong>FAQ</strong> - Common questions<br><br>
-        💫 <em>Click any button above or type your question!</em>`;
+        💫 <em>Click any button above or type your question! I'm here to help answer any questions you have.</em>`;
     }
     
     if (msg.includes('price') || msg.includes('cost') || msg.includes('fee')) {
@@ -335,17 +335,112 @@ async function getFallbackResponse(message) {
         💫 <em>May the stars guide you!</em>`;
     }
     
-    // Default response for unrecognized messages
+    // Additional Q&A responses for common astrology questions
+    if (msg.includes('horoscope') || msg.includes('kundali') || msg.includes('birth chart')) {
+        return `🌟 <strong>Horoscope & Kundali Reading</strong><br><br>
+        We provide comprehensive horoscope and kundali analysis including:<br>
+        • Complete birth chart analysis<br>
+        • Planetary positions and their effects<br>
+        • Dasha predictions (planetary periods)<br>
+        • Career, health, and relationship insights<br>
+        • Remedies for planetary doshas<br><br>
+        📅 <em>Book a consultation to get your detailed horoscope reading!</em>`;
+    }
+    
+    if (msg.includes('love') || msg.includes('marriage') || msg.includes('relationship')) {
+        return `💕 <strong>Love & Marriage Astrology</strong><br><br>
+        Our love and marriage services include:<br>
+        • Kundali matching for marriage compatibility<br>
+        • Love problem solutions<br>
+        • Relationship counseling through astrology<br>
+        • Manglik dosha remedies<br>
+        • Marriage delay solutions<br><br>
+        💫 <em>Get guidance for your love life and relationships!</em>`;
+    }
+    
+    if (msg.includes('career') || msg.includes('job') || msg.includes('business')) {
+        return `💼 <strong>Career & Business Astrology</strong><br><br>
+        We offer specialized services for:<br>
+        • Career guidance and job predictions<br>
+        • Business astrology and financial planning<br>
+        • Best career options based on your chart<br>
+        • Business success remedies<br>
+        • Timing for important business decisions<br><br>
+        📈 <em>Unlock your professional potential with astrology!</em>`;
+    }
+    
+    if (msg.includes('pooja') || msg.includes('puja') || msg.includes('ritual')) {
+        return `🕉️ <strong>Pooja & Ritual Services</strong><br><br>
+        We perform various poojas and rituals:<br>
+        • Navagraha Shanti Pooja (Planetary peace)<br>
+        • Graha Dosha Nivarana (Planetary remedy)<br>
+        • Mahakali Pooja & Bhairavi Pooja<br>
+        • Havan and Yagna services<br>
+        • Special poojas for specific needs<br><br>
+        🙏 <em>Connect with divine energy through our pooja services!</em>`;
+    }
+    
+    if (msg.includes('dosha') || msg.includes('remedy') || msg.includes('problem')) {
+        return `🔮 <strong>Dosha Remedies & Solutions</strong><br><br>
+        We provide solutions for:<br>
+        • Manglik Dosha remedies<br>
+        • Rahu Ketu Dosha solutions<br>
+        • Shani Dosha remedies<br>
+        • Navagraha Dosha nivarana<br>
+        • General life problem solutions<br><br>
+        ✨ <em>Get effective remedies for all planetary doshas!</em>`;
+    }
+    
+    if (msg.includes('vastu') || msg.includes('feng shui') || msg.includes('home')) {
+        return `🏠 <strong>Vastu Consultation</strong><br><br>
+        Our Vastu services include:<br>
+        • Home and office Vastu analysis<br>
+        • Energy alignment and corrections<br>
+        • Direction-based recommendations<br>
+        • Remedies for Vastu doshas<br>
+        • Commercial property Vastu<br><br>
+        🏡 <em>Create positive energy in your living space!</em>`;
+    }
+    
+    if (msg.includes('gemstone') || msg.includes('stone') || msg.includes('ratna')) {
+        return `💎 <strong>Gemstone Consultation</strong><br><br>
+        We provide:<br>
+        • Personalized gemstone recommendations<br>
+        • Birthstone analysis based on your chart<br>
+        • Gemstone quality verification<br>
+        • Wearing methods and mantras<br>
+        • Gemstone remedies for planetary issues<br><br>
+        ✨ <em>Find the perfect gemstone for your needs!</em>`;
+    }
+    
+    if (msg.includes('online') || msg.includes('phone') || msg.includes('consultation')) {
+        return `📞 <strong>Online & Phone Consultation</strong><br><br>
+        We offer consultations through:<br>
+        • Phone consultations<br>
+        • WhatsApp astrology reading<br>
+        • Online video consultations<br>
+        • Email consultations<br>
+        • In-person visits (Mysuru)<br><br>
+        📅 <em>Book your preferred consultation method!</em>`;
+    }
+    
+    // Default response for unrecognized messages - Always provide helpful answer
+    const whatsapp = businessInfo.whatsapp_number || businessInfo.phone || '';
     return `✨ <strong>Thank you for your message!</strong><br><br>
-    I'd love to help you with that! For the most accurate and personalized assistance, I recommend:<br><br>
-    📞 <strong>Speaking directly with our astrologer:</strong><br>
+    I'm here to help you with astrology consultations, services, bookings, and more.<br><br>
+    💡 <strong>Here's how I can assist you:</strong><br>
+    • Ask about our services (horoscope reading, kundali matching, pooja services)<br>
+    • Book a consultation appointment<br>
+    • Get our business hours and location<br>
+    • Contact information<br>
+    • Pricing and packages<br>
+    • Love & marriage solutions<br>
+    • Career & business astrology<br>
+    • Dosha remedies<br><br>
+    📞 <strong>For immediate assistance:</strong><br>
     • Call: ${phone}<br>
-    • WhatsApp: Click the button below<br><br>
-    Or try asking about:<br>
-    • Our services 🌟<br>
-    • Booking a consultation 📅<br>
-    • Business hours ⏰<br><br>
-    <em>Type "menu" to see all available options!</em>`;
+    • WhatsApp: ${whatsapp || 'Click the WhatsApp button'}<br><br>
+    💫 <em>Feel free to ask me anything about our astrology services! Type "menu" to see all options.</em>`;
 }
 
 module.exports = router;

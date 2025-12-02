@@ -164,6 +164,37 @@ router.get('/announcements', async (req, res) => {
     }
 });
 
+router.get('/announcements/:id', async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+        if (isNaN(id)) {
+            return res.status(400).json({ error: 'Invalid announcement ID' });
+        }
+        
+        const { data, error } = await supabase
+            .from('announcement_bar')
+            .select('*')
+            .eq('id', id)
+            .single();
+            
+        if (error) {
+            if (error.code === 'PGRST116') {
+                return res.status(404).json({ error: 'Announcement not found' });
+            }
+            throw error;
+        }
+        
+        if (!data) {
+            return res.status(404).json({ error: 'Announcement not found' });
+        }
+        
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching announcement:', error);
+        res.status(500).json({ error: error.message || 'Failed to fetch announcement' });
+    }
+});
+
 // Add missing service routes
 router.get('/astrological-services', async (req, res) => {
     try {
@@ -206,6 +237,16 @@ router.post('/hero-slides', async (req, res) => {
     }
 });
 
+router.get('/hero-slides/:id', async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('hero_slides').select('*').eq('id', req.params.id).single();
+        if (error) throw error;
+        res.json(data || {});
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 router.put('/hero-slides/:id', async (req, res) => {
     try {
         const { data, error } = await supabase.from('hero_slides').update({ ...req.body, updated_at: new Date().toISOString() }).eq('id', req.params.id).select();
@@ -231,6 +272,16 @@ router.post('/gallery-slides', async (req, res) => {
         const { data, error } = await supabase.from('gallery_slides').insert([{ ...req.body, active: true }]).select();
         if (error) throw error;
         res.json({ success: true, data: data[0] });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+router.get('/gallery-slides/:id', async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('gallery_slides').select('*').eq('id', req.params.id).single();
+        if (error) throw error;
+        res.json(data || {});
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
