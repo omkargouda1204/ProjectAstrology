@@ -76,23 +76,28 @@
             z-index: 2 !important; 
         }
         
-        /* Infinite Scroll Reviews Carousel */
-        @keyframes infiniteScroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-        }
+        /* Reviews Auto-Slider (Gallery Style) */
         #reviews-carousel {
             display: flex;
-            width: fit-content;
-            animation: infiniteScroll 30s linear infinite;
-        }
-        #reviews-carousel:hover {
-            animation-play-state: paused;
+            transition: transform 0.5s ease-in-out;
+            gap: 1rem;
         }
         .review-card {
             flex-shrink: 0;
-            width: 350px;
-            margin: 0 10px;
+            width: 100%;
+            min-width: 100%;
+        }
+        @media (min-width: 768px) {
+            .review-card {
+                width: 50%;
+                min-width: 50%;
+            }
+        }
+        @media (min-width: 1024px) {
+            .review-card {
+                width: 33.333%;
+                min-width: 33.333%;
+            }
         }
         
         /* Enhanced animations and responsive design */
@@ -1821,8 +1826,10 @@
                         <!-- Service Image - Direct Display (No Card, No Background) -->
                         <div class="mb-4">
                             ${(service.icon_url || service.image_url) ? 
-                                `<img src="${service.icon_url || service.image_url}" alt="${service.title} - Om Sri Mahakali Bhairavi Astrology Center" 
+                                `<img src="${service.icon_url || service.image_url}" 
+                                     alt="${service.title} - Astrology Service" 
                                      loading="lazy"
+                                     onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\\'w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mx-auto flex items-center justify-center\\'><i class=\\'fas fa-star text-purple-600 text-5xl\\'></i></div>';"
                                      class="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mx-auto object-contain transition-transform duration-300 group-hover:scale-110" 
                                      style="background: transparent !important;">` :
                                 `<div class="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mx-auto flex items-center justify-center">
@@ -2485,14 +2492,18 @@
             }
         }
 
+        let currentReviewSlide = 0;
+        let reviewsPerView = 1;
+        let totalReviewSlides = 0;
+        let reviewAutoSlideInterval = null;
+
         function displayReviews() {
             const carousel = document.getElementById('reviews-carousel');
-            // Create review card HTML
             const reviewCards = reviewsData.map(review => {
                 const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
                 const initial = review.name.charAt(0).toUpperCase();
                 const userImage = review.user_image ? 
-                    `<img src="${review.user_image}" alt="${review.name} - Client Review - Om Sri Mahakali Bhairavi Astrology Center" loading="lazy" class="w-12 h-12 rounded-full object-cover">` :
+                    `<img src="${review.user_image}" alt="${review.name} - Client Review" loading="lazy" class="w-12 h-12 rounded-full object-cover" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl\'>${initial}</div>';" >` :
                     `<div class="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full flex items-center justify-center text-white font-bold text-xl">${initial}</div>`;
                 
                 return `
@@ -2511,14 +2522,81 @@
                 `;
             }).join('');
             
-            // Duplicate reviews for infinite scroll effect
-            carousel.innerHTML = reviewCards + reviewCards;
+            carousel.innerHTML = reviewCards;
         }
 
         function setupReviewsCarousel() {
-            // Hide navigation dots for infinite scroll
+            updateReviewsPerView();
+            createReviewDots();
+            startReviewAutoSlide();
+            
+            window.addEventListener('resize', () => {
+                const newReviewsPerView = getReviewsPerView();
+                if (newReviewsPerView !== reviewsPerView) {
+                    updateReviewsPerView();
+                    currentReviewSlide = 0;
+                    goToReviewSlide(0);
+                    createReviewDots();
+                }
+            });
+        }
+
+        function getReviewsPerView() {
+            if (window.innerWidth >= 1024) return 3;
+            if (window.innerWidth >= 768) return 2;
+            return 1;
+        }
+
+        function updateReviewsPerView() {
+            reviewsPerView = getReviewsPerView();
+            totalReviewSlides = Math.ceil(reviewsData.length / reviewsPerView);
+        }
+
+        function createReviewDots() {
             const reviewDots = document.getElementById('review-dots');
-            reviewDots.style.display = 'none';
+            reviewDots.innerHTML = '';
+            reviewDots.style.display = 'flex';
+            
+            for (let i = 0; i < totalReviewSlides; i++) {
+                const dot = document.createElement('button');
+                dot.className = 'w-3 h-3 rounded-full transition ' + (i === 0 ? 'bg-purple-600' : 'bg-gray-300');
+                dot.onclick = () => {
+                    stopReviewAutoSlide();
+                    goToReviewSlide(i);
+                    startReviewAutoSlide();
+                };
+                reviewDots.appendChild(dot);
+            }
+        }
+
+        function goToReviewSlide(index) {
+            const carousel = document.getElementById('reviews-carousel');
+            const reviewDots = document.getElementById('review-dots');
+            currentReviewSlide = index;
+            
+            const offset = -(index * (100 / reviewsPerView));
+            carousel.style.transform = `translateX(${offset}%)`;
+            
+            Array.from(reviewDots.children).forEach((dot, i) => {
+                dot.className = 'w-3 h-3 rounded-full transition ' + (i === index ? 'bg-purple-600' : 'bg-gray-300');
+            });
+        }
+
+        function nextReviewSlide() {
+            currentReviewSlide = (currentReviewSlide + 1) % totalReviewSlides;
+            goToReviewSlide(currentReviewSlide);
+        }
+
+        function startReviewAutoSlide() {
+            stopReviewAutoSlide();
+            reviewAutoSlideInterval = setInterval(nextReviewSlide, 4000);
+        }
+
+        function stopReviewAutoSlide() {
+            if (reviewAutoSlideInterval) {
+                clearInterval(reviewAutoSlideInterval);
+                reviewAutoSlideInterval = null;
+            }
         }
 
         // Load reviews on page load
