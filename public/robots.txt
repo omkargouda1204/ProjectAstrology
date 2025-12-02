@@ -1,0 +1,25 @@
+# robots.txt for Om Sri Mahakali Bhairavi Astrology Center
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /temp/
+Disallow: /node_modules/
+
+# Sitemap location
+Sitemap: https://astrology-center.com/sitemap.xml
+
+# Crawl-delay for bots (optional)
+Crawl-delay: 10
+
+# Specific bot rules
+User-agent: Googlebot
+Allow: /
+Disallow: /admin
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin
