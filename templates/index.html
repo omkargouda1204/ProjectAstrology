@@ -1205,13 +1205,13 @@
             </div>
             
             <!-- Reviews Carousel Container -->
-            <div class="relative overflow-hidden mb-8">
-                <div id="reviews-carousel" class="flex transition-transform duration-500 ease-in-out">
+            <div class="relative overflow-hidden mb-8" style="width: 100%; overflow-x: hidden;">
+                <div id="reviews-carousel" class="flex" style="flex-wrap: nowrap; white-space: nowrap;">
                     <!-- Reviews will be loaded dynamically from database -->
                 </div>
                 
                 <!-- Navigation Dots -->
-                <div class="flex justify-center mt-6 gap-2" id="review-dots"></div>
+                <div class="flex justify-center mt-6 gap-2" id="review-dots" style="display: none;"></div>
             </div>
         </div>
     </section>
