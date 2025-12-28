@@ -32,7 +32,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
     storage: storage,
     limits: {
-        fileSize: parseInt(process.env.MAX_FILE_SIZE) || 5 * 1024 * 1024 // Default 5MB
+        fileSize: parseInt(process.env.MAX_FILE_SIZE) || 10 * 1024 * 1024 // Default 10MB
     },
     fileFilter: fileFilter
 });
@@ -44,7 +44,12 @@ const upload = multer({
 // Single file upload with background removal (Supabase Storage)
 router.post('/upload', upload.single('file'), async (req, res) => {
     try {
+        console.log('Upload request received');
+        console.log('File:', req.file ? req.file.originalname : 'No file');
+        console.log('Body:', req.body);
+        
         if (!req.file) {
+            console.error('No file provided in request');
             return res.status(400).json({ error: 'No file uploaded' });
         }
 
@@ -105,39 +110,79 @@ router.post('/upload', upload.single('file'), async (req, res) => {
                 }
             }
             
+            // Generate unique filename
             const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-            const ext = path.extname(processedFilename);
-            const filename = path.basename(processedFilename, ext) + '-' + uniqueSuffix + ext;
+            const outExt = path.extname(processedFilename);
+            const filename = path.basename(processedFilename, outExt) + '-' + uniqueSuffix + outExt;
             const storagePath = `${targetFolder}/${filename}`;
             
-            const { data, error } = await supabase.storage
-                .from(bucketName)
-                .upload(storagePath, processedBuffer, {
-                    contentType: contentType,
-                    upsert: false
-                });
-
-            if (error) {
-                console.error('Supabase upload error:', error);
-                return res.status(500).json({ error: 'Upload to storage failed: ' + error.message });
-            }
-
-            // Get public URL
-            const { data: { publicUrl } } = supabase.storage
-                .from(bucketName)
-                .getPublicUrl(storagePath);
+            // CRITICAL: Save to local upload folder FIRST (primary storage)
+            const localPath = path.join(uploadDir, filename);
+            const localUrl = `/static/uploads/${filename}`;
             
+            console.log('📁 Attempting to save to:', localPath);
+            console.log('📂 Upload directory:', uploadDir);
+            console.log('📂 Directory exists:', fs.existsSync(uploadDir));
+            
+            try {
+                // Ensure directory exists
+                if (!fs.existsSync(uploadDir)) {
+                    console.log('Creating upload directory...');
+                    fs.mkdirSync(uploadDir, { recursive: true });
+                }
+                
+                // Write file synchronously to ensure it completes
+                fs.writeFileSync(localPath, processedBuffer, { encoding: null, flag: 'w' });
+                console.log(`✅ SUCCESS: Image saved to local folder: ${localPath}`);
+                console.log(`📊 File size: ${fs.statSync(localPath).size} bytes`);
+            } catch (localError) {
+                console.error('❌ CRITICAL ERROR saving to local folder:', localError);
+                console.error('Error stack:', localError.stack);
+                return res.status(500).json({ 
+                    error: 'Failed to save image to server',
+                    details: localError.message,
+                    path: localPath
+                });
+            }
+            
+            // Try to save to Supabase Storage (backup, optional)
+            let publicUrl = null;
+            
+            try {
+                const { data, error } = await supabase.storage
+                    .from(bucketName)
+                    .upload(storagePath, processedBuffer, {
+                        contentType: contentType,
+                        upsert: false
+                    });
+
+                if (error) {
+                    console.warn('⚠️ Supabase upload failed (local save succeeded):', error.message);
+                } else {
+                    const { data: urlData } = supabase.storage
+                        .from(bucketName)
+                        .getPublicUrl(storagePath);
+                    publicUrl = urlData.publicUrl;
+                    console.log('✅ Also saved to Supabase:', storagePath);
+                }
+            } catch (supabaseError) {
+                console.warn('⚠️ Supabase connection issue (local save succeeded):', supabaseError.message);
+            }
+            
+            // Return success with local URL as primary
             return res.json({
                 success: true,
                 message: shouldRemoveBackground ? 
                     'File uploaded successfully with background removal' : 
                     'File uploaded successfully',
-                url: publicUrl,
+                url: localUrl,  // Use local URL as primary
+                supabaseUrl: publicUrl,  // Keep Supabase URL as backup (may be null)
+                localUrl: localUrl,
                 filename: filename,
                 originalName: req.file.originalname,
                 backgroundRemoved: shouldRemoveBackground,
                 size: req.file.size,
-                storage: 'supabase'
+                storage: publicUrl ? 'local+supabase' : 'local'
             });
         } else {
             // Fallback to local storage
@@ -146,12 +191,29 @@ router.post('/upload', upload.single('file'), async (req, res) => {
             const filename = path.basename(req.file.originalname, ext) + '-' + uniqueSuffix + ext;
             const filepath = path.join(uploadDir, filename);
             
-            fs.writeFileSync(filepath, req.file.buffer);
+            console.log('📁 Saving to local folder:', filepath);
+            console.log('📂 Upload directory exists:', fs.existsSync(uploadDir));
+            
+            try {
+                // Ensure directory exists
+                if (!fs.existsSync(uploadDir)) {
+                    console.log('Creating upload directory...');
+                    fs.mkdirSync(uploadDir, { recursive: true });
+                }
+                
+                // Write file
+                fs.writeFileSync(filepath, req.file.buffer);
+                console.log('✅ File saved successfully:', filepath);
+                console.log('📊 File size:', fs.statSync(filepath).size, 'bytes');
+            } catch (err) {
+                console.error('❌ Error saving file:', err);
+                return res.status(500).json({ error: 'Failed to save file: ' + err.message });
+            }
             
             return res.json({
                 success: true,
                 message: 'File uploaded successfully',
-                url: `/uploads/${filename}`,
+                url: `/static/uploads/${filename}`,
                 filename: filename,
                 originalName: req.file.originalname,
                 size: req.file.size,
@@ -340,6 +402,39 @@ router.get('/uploads', async (req, res) => {
         res.status(500).json({ error: 'Failed to list files: ' + error.message });
     }
 });
+
+// Helper function to delete old images
+async function deleteOldImage(imageUrl) {
+    if (!imageUrl) return;
+    
+    try {
+        // Delete from Supabase if it's a Supabase URL
+        if (imageUrl.includes('supabase') && supabase) {
+            const bucketName = process.env.SUPABASE_STORAGE_BUCKET || 'astrology';
+            // Extract file path from URL
+            const urlParts = imageUrl.split('/storage/v1/object/public/');
+            if (urlParts.length > 1) {
+                const filePath = urlParts[1].split('/').slice(1).join('/'); // Remove bucket name
+                const { error } = await supabase.storage.from(bucketName).remove([filePath]);
+                if (error) console.error('Supabase delete error:', error);
+                else console.log('Deleted from Supabase:', filePath);
+            }
+        }
+        
+        // Delete from local folder
+        const filename = path.basename(imageUrl);
+        const localPath = path.join(uploadDir, filename);
+        if (fs.existsSync(localPath)) {
+            fs.unlinkSync(localPath);
+            console.log('Deleted from local folder:', localPath);
+        }
+    } catch (error) {
+        console.error('Error deleting old image:', error);
+    }
+}
+
+// Export for use in other routes
+router.deleteOldImage = deleteOldImage;
 
 // Error handling middleware for multer
 router.use((error, req, res, next) => {

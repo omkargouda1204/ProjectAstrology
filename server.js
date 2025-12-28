@@ -4,6 +4,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const path = require('path');
+const expressLayouts = require('express-ejs-layouts');
 
 // Import routes
 const adminRoutes = require('./routes/admin');
@@ -15,6 +16,17 @@ const servicesRoutes = require('./routes/services');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// ========================================
+// VIEW ENGINE SETUP (EJS)
+// ========================================
+
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'templates'));
+app.use(expressLayouts);
+app.set('layout', 'base');
+app.set('layout extractScripts', true);
+app.set('layout extractStyles', true);
 
 // ========================================
 // MIDDLEWARE
@@ -43,7 +55,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/static', express.static(path.join(__dirname, 'static')));
 app.use('/uploads', express.static(path.join(__dirname, 'static/uploads')));
 
-// Serve HTML templates
+// Serve HTML files
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'templates', 'index.html'));
 });
@@ -115,7 +127,7 @@ app.listen(PORT, () => {
 ║                                                       ║
 ║   Status: Running                                     ║
 ║   Port: ${PORT}                                       ║
-║   Environment: ${process.env.NODE_ENV || 'development'}                           ║
+║   Environment: ${process.env.NODE_ENV || 'development'}║
 ║                                                       ║
 ║   API Endpoints:                                      ║
 ║   • http://localhost:${PORT}/                         ║

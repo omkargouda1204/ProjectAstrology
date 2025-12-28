@@ -1,6 +1,52 @@
 const express = require('express');
 const router = express.Router();
 const { supabase } = require('../config/database');
+const path = require('path');
+const fs = require('fs');
+
+// Helper function to delete old image from storage
+async function deleteOldImage(imageUrl) {
+    if (!imageUrl) return;
+    
+    try {
+        // Delete from local folder
+        if (imageUrl.includes('/static/uploads/')) {
+            const filename = imageUrl.split('/').pop();
+            const localPath = path.join(__dirname, '..', 'static', 'uploads', filename);
+            if (fs.existsSync(localPath)) {
+                fs.unlinkSync(localPath);
+                console.log('Deleted local file:', filename);
+            }
+        }
+        
+        // Delete from Supabase if it's a Supabase URL
+        if (supabase && imageUrl.includes('supabase')) {
+            try {
+                const url = new URL(imageUrl);
+                const pathParts = url.pathname.split('/');
+                const bucketIndex = pathParts.findIndex(part => part === 'storage');
+                if (bucketIndex !== -1) {
+                    const bucketName = pathParts[bucketIndex + 2];
+                    const filePath = pathParts.slice(bucketIndex + 4).join('/');
+                    
+                    if (bucketName && filePath) {
+                        const { error } = await supabase.storage
+                            .from(bucketName)
+                            .remove([filePath]);
+                        
+                        if (!error) {
+                            console.log('Deleted from Supabase:', filePath);
+                        }
+                    }
+                }
+            } catch (err) {
+                console.warn('Could not delete from Supabase:', err.message);
+            }
+        }
+    } catch (error) {
+        console.error('Error deleting old image:', error);
+    }
+}
 
 // ========================================
 // ASTROLOGICAL SERVICES CRUD
@@ -66,9 +112,13 @@ router.post('/astrological-services', async (req, res) => {
 // Update astrological service (simplified - title + image only)
 router.put('/astrological-services/:id', async (req, res) => {
     try {
+        // Get old image URL before update
+        const { data: oldData } = await supabase.from('astrological_services').select('image_url, icon_url').eq('id', req.params.id).single();
+        
         const updateData = {
             title: req.body.title,
             image_url: req.body.image_url,
+            icon_url: req.body.icon_url,
             active: req.body.active,
             display_order: req.body.display_order,
             updated_at: new Date().toISOString()
@@ -86,6 +136,24 @@ router.put('/astrological-services/:id', async (req, res) => {
             .select();
             
         if (error) throw error;
+        
+        // Delete old images if new images are provided and different
+        if (oldData) {
+            try {
+                if (oldData.image_url && req.body.image_url && oldData.image_url !== req.body.image_url) {
+                    await deleteOldImage(oldData.image_url);
+                    console.log('✅ Deleted old image_url:', oldData.image_url);
+                }
+                if (oldData.icon_url && req.body.icon_url && oldData.icon_url !== req.body.icon_url) {
+                    await deleteOldImage(oldData.icon_url);
+                    console.log('✅ Deleted old icon_url:', oldData.icon_url);
+                }
+            } catch (deleteError) {
+                console.warn('⚠️ Warning deleting old images:', deleteError.message);
+                // Don't fail the request if image deletion fails
+            }
+        }
+        
         res.json({ success: true, data: data[0] });
     } catch (error) {
         console.error('Error updating astrological service:', error);

@@ -1333,17 +1333,41 @@
             }
         });
 
+        // Helper to try both `/api/...` and `/api/content/...` prefixes
+        async function apiFetch(path, options = {}) {
+            const origin = window.location.origin;
+            const primary = `${origin}/api${path}`;
+            const alt = `${origin}/api/content${path}`;
+
+            try {
+                let res = await fetch(primary, options);
+                if (res.status === 404) {
+                    // try alternative path
+                    res = await fetch(alt, options);
+                }
+                return res;
+            } catch (err) {
+                // primary failed (connection refused?) try alternative
+                try {
+                    return await fetch(alt, options);
+                } catch (err2) {
+                    // rethrow original error for caller to handle
+                    throw err;
+                }
+            }
+        }
+
         // Define editAnnouncement globally BEFORE any onclick handlers are created
         window.editAnnouncement = async function(id) {
             try {
                 console.log('Loading announcement with ID:', id);
                 const idNum = parseInt(id);
-                if (isNaN(idNum)) {
+                if (isNaN(idNum) || idNum <= 0) {
                     throw new Error('Invalid announcement ID');
                 }
                 
-                // Fetch announcement - route is /api/announcements/:id
-                const response = await fetch(`/api/announcements/${idNum}`, {
+                // Fetch announcement - try primary and alternative routes
+                const response = await apiFetch(`/announcements/${idNum}`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1367,7 +1391,7 @@
                 console.log('Announcement data:', announcement);
                 
                 if (!announcement || !announcement.id) {
-                    throw new Error('Announcement not found');
+                    throw new Error('Announcement data is invalid');
                 }
                 
                 // Populate form with announcement data
@@ -1378,20 +1402,28 @@
                 const formContainer = document.getElementById('announcement-form-container');
                 
                 if (!idField || !textField || !activeField || !orderField) {
-                    throw new Error('Announcement form fields not found');
+                    throw new Error('Announcement form fields not found in DOM');
                 }
                 
+                // Fill form fields
                 idField.value = announcement.id;
                 textField.value = announcement.text || '';
                 activeField.checked = announcement.active !== false;
                 orderField.value = announcement.display_order || 0;
                 
-                // Show form
+                // Show form and scroll to it
                 if (formContainer) {
                     formContainer.classList.remove('hidden');
-                    formContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    setTimeout(() => {
+                        formContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 100);
                 } else {
                     throw new Error('Announcement form container not found');
+                }
+                
+                // Show success message
+                if (typeof showNotification === 'function') {
+                    showNotification('Announcement loaded successfully', 'success');
                 }
             } catch (error) {
                 console.error('Error loading announcement:', error);
@@ -1471,7 +1503,7 @@
                     fetch('/api/astrological-services').then(r => r.json()).catch(() => []),
                     fetch('/api/pooja-services').then(r => r.json()).catch(() => []),
                     fetch('/api/expert-solutions').then(r => r.json()).catch(() => []),
-                    fetch('/api/announcements').then(r => r.json()).catch(() => [])
+                    apiFetch('/announcements').then(r => r.json()).catch(() => [])
                 ]);
                 
                 document.getElementById('stat-astro-services').textContent = (Array.isArray(astroServices) ? astroServices : (astroServices.services || [])).length || 0;
@@ -2493,34 +2525,69 @@
         
         async function loadAnnouncements() {
             try {
-                const response = await fetch('/api/announcements');
+                // Load all announcements (active and inactive) for admin
+                const response = await apiFetch('/announcements?active=false');
                 if (response.ok) {
                     const items = await response.json();
                     const list = document.getElementById('announcements-list');
-                    list.innerHTML = items.map(item => `
-                        <div class="p-4 bg-orange-50 rounded-lg flex justify-between items-center">
-                            <div class="flex-1">
-                                <p class="font-medium">${item.text}</p>
-                                <span class="text-xs ${item.active ? 'text-green-600' : 'text-gray-500'}">${item.active ? 'Active' : 'Inactive'}</span>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="editAnnouncement(${item.id})" class="admin-btn-sm admin-btn-success">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button onclick="deleteAnnouncement(${item.id})" class="admin-btn-sm admin-btn-danger">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `).join('');
+                    if (list) {
+                        if (items.length === 0) {
+                            list.innerHTML = '<p class="text-gray-500 text-center py-4">No announcements found. Click "Add New" to create one.</p>';
+                        } else {
+                            list.innerHTML = items.map(item => `
+                                <div class="p-4 bg-orange-50 rounded-lg flex justify-between items-center mb-2">
+                                    <div class="flex-1">
+                                        <p class="font-medium text-gray-800">${item.text || 'No text'}</p>
+                                        <div class="flex items-center gap-2 mt-1">
+                                            <span class="text-xs ${item.active ? 'text-green-600 bg-green-100 px-2 py-1 rounded' : 'text-gray-500 bg-gray-100 px-2 py-1 rounded'}">${item.active ? 'Active' : 'Inactive'}</span>
+                                            <span class="text-xs text-gray-400">Order: ${item.display_order || 0}</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2 ml-4">
+                                        <button onclick="editAnnouncement(${item.id})" class="admin-btn-sm admin-btn-success" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button onclick="deleteAnnouncement(${item.id})" class="admin-btn-sm admin-btn-danger" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('');
+                        }
+                    }
+                } else {
+                    const errorData = await response.json().catch(() => ({ error: 'Failed to load announcements' }));
+                    console.error('Error loading announcements:', errorData);
+                    showNotification(errorData.error || 'Failed to load announcements', 'error');
                 }
             } catch (error) {
                 console.error('Error loading announcements:', error);
+                showNotification('Error loading announcements: ' + (error.message || 'Network error'), 'error');
             }
         }
         
         function showAnnouncementForm() {
-            document.getElementById('announcement-form-container').classList.remove('hidden');
+            // Clear form for new announcement
+            const form = document.getElementById('announcement-form');
+            if (form) form.reset();
+            
+            const idField = document.getElementById('announcement-id');
+            if (idField) idField.value = '';
+            
+            const activeField = document.getElementById('announcement-active');
+            if (activeField) activeField.checked = true;
+            
+            const orderField = document.getElementById('announcement-order');
+            if (orderField) orderField.value = '0';
+            
+            // Show form
+            const formContainer = document.getElementById('announcement-form-container');
+            if (formContainer) {
+                formContainer.classList.remove('hidden');
+                setTimeout(() => {
+                    formContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            }
         }
         
         function cancelAnnouncementEdit() {
@@ -2533,7 +2600,7 @@
         async function deleteAnnouncement(id) {
             if (confirm('Delete this announcement?')) {
                 try {
-                    const response = await fetch(`/api/announcements/${id}`, { method: 'DELETE' });
+                    const response = await apiFetch(`/announcements/${id}`, { method: 'DELETE' });
                     if (response.ok) {
                 loadAnnouncements();
                         showNotification('Announcement deleted successfully', 'success');
@@ -2562,28 +2629,31 @@
                     return;
                 }
                 
-                let response;
-            if (id) {
-                    response = await fetch(`/api/announcements/${id}`, {
-                    method: 'PUT',
+                // Determine method and URL
+                const method = id ? 'PUT' : 'POST';
+                const url = id ? `/announcements/${id}` : '/announcements';
+                
+                // Make API call
+                const response = await apiFetch(url, {
+                    method: method,
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
-            } else {
-                    response = await fetch('/api/announcements', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-            }
             
                 if (response.ok) {
+                    const result = await response.json().catch(() => ({}));
                     showNotification(id ? 'Announcement updated successfully' : 'Announcement added successfully', 'success');
-            cancelAnnouncementEdit();
-            loadAnnouncements();
+                    cancelAnnouncementEdit();
+                    await loadAnnouncements();
                 } else {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Failed to save announcement');
+                    let errorMessage = 'Failed to save announcement';
+                    try {
+                        const error = await response.json();
+                        errorMessage = error.error || error.message || errorMessage;
+                    } catch (e) {
+                        errorMessage = response.statusText || errorMessage;
+                    }
+                    throw new Error(errorMessage);
                 }
             } catch (error) {
                 console.error('Error saving announcement:', error);
@@ -2886,7 +2956,7 @@
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
-                const reviews = await response.json();
+                let reviews = await response.json();
                 const list = document.getElementById('reviews-list');
                 
                 // Handle error response
@@ -2900,23 +2970,56 @@
                     list.innerHTML = '<div class="text-center py-8 text-red-500"><i class="fas fa-exclamation-triangle text-4xl mb-2"></i><p>Error: Invalid response format</p></div>';
                     return;
                 }
+
+                // De-duplicate reviews (by id) and normalize image paths
+                const seen = new Set();
+                reviews = reviews.filter(r => {
+                    const key = r.id || `${r.name || ''}-${r.review_text || ''}`;
+                    if (seen.has(key)) return false;
+                    seen.add(key);
+                    return true;
+                }).map(r => {
+                    const toLocal = (url) => {
+                        if (!url) return '';
+                        if (url.startsWith('/static/') || url.startsWith('data:')) return url;
+                        try {
+                            const u = new URL(url);
+                            const marker = '/storage/v1/object/public/';
+                            let path = u.pathname;
+                            const idx = path.indexOf(marker);
+                            if (idx !== -1) path = path.substring(idx + marker.length);
+                            const parts = path.split('/').filter(Boolean);
+                            const filename = parts.pop();
+                            return filename ? `/static/uploads/${filename}` : '';
+                        } catch (e) {
+                            return '';
+                        }
+                    };
+                    return {
+                        ...r,
+                        user_image_local: r.user_image ? toLocal(r.user_image) : ''
+                    };
+                });
                 
                 if (reviews.length === 0) {
                     list.innerHTML = '<div class="text-center py-8 text-gray-500"><i class="fas fa-star text-4xl mb-2"></i><p>No reviews yet. Add your first client review!</p></div>';
                     return;
                 }
                 
-                list.innerHTML = reviews.map(review => `
+                const defaultAvatar = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%237C3AED"%3E%3Cpath d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/%3E%3C/svg%3E';
+                list.innerHTML = reviews.map(review => {
+                    const initial = (review.name || 'A').charAt(0).toUpperCase();
+                    const imgTag = review.user_image_local
+                        ? `<img src="${review.user_image_local}" class="w-16 h-16 rounded-full object-cover border-2 border-purple-200" onerror="this.src='${defaultAvatar}'">`
+                        : `<div class="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-2xl font-bold">${initial}</div>`;
+                    return `
                     <div class="bg-white border rounded-xl p-4 shadow hover:shadow-lg transition-all duration-300 hover:scale-102 flex gap-4">
-                        ${review.user_image ? 
-                            `<img src="${review.user_image}" class="w-16 h-16 rounded-full object-cover border-2 border-purple-200">` : 
-                            `<div class="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-2xl font-bold">${review.name.charAt(0)}</div>`
-                        }
+                        ${imgTag}
                         <div class="flex-1">
                             <div class="flex items-start justify-between mb-2">
                                 <div>
-                                    <h4 class="font-bold text-lg">${review.name}</h4>
-                                    <div class="text-yellow-500">${'⭐'.repeat(review.rating)}</div>
+                                    <h4 class="font-bold text-lg">${review.name || 'Anonymous'}</h4>
+                                    <div class="text-yellow-500">${'⭐'.repeat(review.rating || 5)}</div>
                                 </div>
                                 <div class="flex gap-2">
                                     <span class="px-2 py-1 text-xs rounded-full ${review.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}">
@@ -2930,11 +3033,11 @@
                                     </button>
                                 </div>
                             </div>
-                            <p class="text-sm text-gray-600">${review.review_text}</p>
+                            <p class="text-sm text-gray-600">${review.review_text || ''}</p>
                             <p class="text-xs text-gray-400 mt-2">Order: ${review.display_order || 0}</p>
                         </div>
                     </div>
-                `).join('');
+                `; }).join('');
             } catch (error) {
                 console.error('Error loading reviews:', error);
                 showNotification('Error loading reviews', 'error');
@@ -3016,41 +3119,88 @@
                 e.preventDefault();
                 
                 const reviewId = document.getElementById('review-id').value;
-                const formData = new FormData();
+                const nameValue = document.getElementById('review-name').value.trim();
+                const reviewTextValue = document.getElementById('review-text').value.trim();
+                const ratingValue = document.getElementById('review-rating').value;
                 
-                formData.append('name', document.getElementById('review-name').value.trim());
-                formData.append('rating', document.getElementById('review-rating').value);
-                formData.append('review_text', document.getElementById('review-text').value.trim());
-                formData.append('active', document.getElementById('review-active').checked);
-                formData.append('display_order', document.getElementById('review-order').value || 0);
+                // Validate required fields
+                if (!nameValue) {
+                    showNotification('Name is required', 'error');
+                    document.getElementById('review-name').focus();
+                    return;
+                }
+                if (!reviewTextValue) {
+                    showNotification('Review text is required', 'error');
+                    document.getElementById('review-text').focus();
+                    return;
+                }
+                if (!ratingValue || ratingValue === '') {
+                    showNotification('Rating is required', 'error');
+                    document.getElementById('review-rating').focus();
+                    return;
+                }
                 
+                const reviewData = {
+                    name: nameValue,
+                    rating: parseInt(ratingValue),
+                    review_text: reviewTextValue,
+                    active: document.getElementById('review-active').checked,
+                    display_order: parseInt(document.getElementById('review-order').value) || 0,
+                    user_image: null
+                };
+                
+                // Handle image
                 const imageFile = document.getElementById('review-image').files[0];
                 if (imageFile) {
-                    formData.append('image', imageFile);
+                    // Upload image first
+                    const uploadFormData = new FormData();
+                    uploadFormData.append('file', imageFile);
+                    uploadFormData.append('folder', 'reviews');
+                    
+                    try {
+                        const uploadResponse = await fetch('/api/upload', {
+                            method: 'POST',
+                            body: uploadFormData
+                        });
+                        
+                        if (uploadResponse.ok) {
+                            const uploadResult = await uploadResponse.json();
+                            reviewData.user_image = uploadResult.url;
+                        }
+                    } catch (uploadError) {
+                        console.error('Error uploading image:', uploadError);
+                    }
                 } else if (document.getElementById('review-image-preview').dataset.currentUrl) {
-                    formData.append('existing_image', document.getElementById('review-image-preview').dataset.currentUrl);
+                    reviewData.user_image = document.getElementById('review-image-preview').dataset.currentUrl;
                 }
                 
                 try {
                     const url = reviewId ? `/api/reviews/${reviewId}` : '/api/reviews';
                     const method = reviewId ? 'PUT' : 'POST';
                     
+                    console.log('Sending review data:', reviewData);
+                    
                     const response = await fetch(url, {
                         method: method,
-                        body: formData
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(reviewData)
                     });
+                    
+                    const responseData = await response.json();
+                    console.log('Response:', responseData);
                     
                     if (response.ok) {
                         showNotification(`Review ${reviewId ? 'updated' : 'added'} successfully`, 'success');
                         cancelReviewEdit();
                         loadReviewsAdmin();
                     } else {
-                        const error = await response.json();
-                        showNotification(error.error || 'Failed to save review', 'error');
+                        showNotification(responseData.error || 'Failed to save review', 'error');
                     }
                 } catch (error) {
                     console.error('Error saving review:', error);
-                    showNotification('Error saving review', 'error');
+                    showNotification('Error saving review: ' + error.message, 'error');
                 }
             });
         });
@@ -3126,12 +3276,12 @@
             container.innerHTML = services.map(service => `
                 <div class="astro-service-card bg-white rounded-xl shadow-md p-4 border border-gray-200 hover:shadow-lg transition-all">
                     <div class="text-center mb-3">
-                        ${service.image_url ? 
-                            `<div class="w-16 h-16 mx-auto mb-2 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center">
-                                <img src="${service.image_url}" alt="${service.title}" class="w-12 h-12 object-contain" style="background: transparent;">
+                        ${service.image_url || service.icon_url ? 
+                            `<div class="w-24 h-24 mx-auto mb-3 flex items-center justify-center">
+                                <img src="${service.image_url || service.icon_url}" alt="${service.title}" class="w-full h-full object-contain" style="background: transparent;" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-star text-purple-600 text-3xl\\'></i>';">
                             </div>` : 
-                            `<div class="w-16 h-16 mx-auto mb-2 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center">
-                                <i class="fas fa-star text-purple-600 text-xl"></i>
+                            `<div class="w-24 h-24 mx-auto mb-3 flex items-center justify-center">
+                                <i class="fas fa-star text-purple-600 text-3xl"></i>
                             </div>`
                         }
                         <h3 class="font-semibold text-gray-800 text-sm">${service.title}</h3>
@@ -3468,12 +3618,12 @@
                     const settings = await response.json();
                     console.log('Loading brand settings:', settings);
                     
-                    // Website Identity - Fixed field mapping
+                    // Website Identity - Load from correct database fields
                     if (document.getElementById('brand-website-name')) {
-                        document.getElementById('brand-website-name').value = settings.name || '';
+                        document.getElementById('brand-website-name').value = settings.business_name || '';
                     }
                     if (document.getElementById('brand-website-subtitle1')) {
-                        document.getElementById('brand-website-subtitle1').value = settings.subtitle1 || '';
+                        document.getElementById('brand-website-subtitle1').value = settings.tagline || settings.subtitle1 || '';
                     }
                     if (document.getElementById('brand-website-subtitle2')) {
                         document.getElementById('brand-website-subtitle2').value = settings.subtitle2 || '';
@@ -3635,7 +3785,8 @@
             }
             
             const data = {
-                name: document.getElementById('brand-website-name')?.value || 'Cosmic Astrology',
+                business_name: document.getElementById('brand-website-name')?.value || 'Cosmic Astrology',
+                tagline: document.getElementById('brand-website-subtitle1')?.value || '',
                 subtitle1: document.getElementById('brand-website-subtitle1')?.value || '',
                 subtitle2: document.getElementById('brand-website-subtitle2')?.value || '',
                 subtitle3: document.getElementById('brand-website-subtitle3')?.value || '',
