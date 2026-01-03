@@ -251,7 +251,7 @@ app.listen(PORT, '0.0.0.0', () => {
 ║   API Endpoints:                                      ║
 ║   • http://localhost:${PORT}/                         ║
 ║   • http://localhost:${PORT}/admin                    ║
-║   • http://localhost:${PORT}/api/...                  ║
+║   • http://localhost:${PORT}/api/.                    ║
 ║                                                       ║
 ╚═══════════════════════════════════════════════════════╝
     `);
