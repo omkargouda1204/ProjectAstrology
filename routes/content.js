@@ -2,6 +2,15 @@ const express = require('express');
 const router = express.Router();
 const { supabase } = require('../config/database');
 
+// Middleware to check Supabase connection
+const checkSupabase = (req, res, next) => {
+    if (!supabase) {
+        console.warn('⚠️ Supabase not configured - returning empty data');
+        return res.json([]);
+    }
+    next();
+};
+
 // Helper function to delete old image from storage (handles local + supabase URLs)
 async function deleteOldImage(imageUrl) {
     if (!imageUrl) return;
@@ -174,22 +183,39 @@ router.get('/gallery-slides', async (req, res) => {
 
 router.get('/business-info', async (req, res) => {
     try {
+        if (!supabase) {
+            console.warn('⚠️ Supabase not configured for business-info');
+            return res.json({});
+        }
         const { data, error } = await supabase.from('business_info').select('*').limit(1).single();
-        if (error && error.code !== 'PGRST116') throw error;
+        if (error && error.code !== 'PGRST116') {
+            console.error('❌ business-info error:', error.message);
+            return res.json({});
+        }
         res.json(data || {});
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('❌ business-info exception:', error);
+        res.json({});
     }
 });
 
 // Brand & Navigation Settings route
 router.get('/navbar-settings', async (req, res) => {
     try {
+        if (!supabase) {
+            console.warn('⚠️ Supabase not configured for navbar-settings');
+            return res.json({ business_name: 'Astrology Services', website_subtitle: 'Divine Guidance for Life' });
+        }
         const { data, error } = await supabase.from('navbar_settings').select('*').limit(1).single();
-        if (error && error.code !== 'PGRST116') throw error;
-        res.json(data || {});
+        if (error && error.code !== 'PGRST116') {
+            console.error('❌ navbar-settings error:', error.message);
+            return res.json({ business_name: 'Astrology Services', website_subtitle: 'Divine Guidance for Life' });
+        }
+        console.log('✅ navbar-settings loaded:', data);
+        res.json(data || { business_name: 'Astrology Services', website_subtitle: 'Divine Guidance for Life' });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('❌ navbar-settings exception:', error);
+        res.json({ business_name: 'Astrology Services', website_subtitle: 'Divine Guidance for Life' });
     }
 });
 
@@ -205,11 +231,20 @@ router.get('/chatbot-config', async (req, res) => {
 
 router.get('/about-section', async (req, res) => {
     try {
+        if (!supabase) {
+            console.warn('⚠️ Supabase not configured for about-section');
+            return res.json({});
+        }
         const { data, error } = await supabase.from('about_section').select('*').limit(1).single();
-        if (error && error.code !== 'PGRST116') throw error;
+        if (error && error.code !== 'PGRST116') {
+            console.error('❌ about-section error:', error.message);
+            return res.json({});
+        }
+        console.log('✅ about-section loaded:', data);
         res.json(data || {});
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('❌ about-section exception:', error);
+        res.json({});
     }
 });
 
@@ -286,11 +321,38 @@ router.get('/pooja-services', async (req, res) => {
 
 router.get('/expert-solutions', async (req, res) => {
     try {
+        if (!supabase) {
+            console.warn('⚠️ Supabase not configured for expert-solutions');
+            return res.json([]);
+        }
         const { data, error } = await supabase.from('expert_solutions').select('*').eq('active', true).order('display_order');
-        if (error) throw error;
+        if (error) {
+            console.error('❌ expert-solutions error:', error.message);
+            return res.json([]);
+        }
         res.json(data || []);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('❌ expert-solutions exception:', error);
+        res.json([]);
+    }
+});
+
+// Add menu-items route (missing alias)
+router.get('/menu-items', async (req, res) => {
+    try {
+        if (!supabase) {
+            console.warn('⚠️ Supabase not configured for menu-items');
+            return res.json([]);
+        }
+        const { data, error } = await supabase.from('menu_items').select('*').eq('active', true).order('display_order');
+        if (error) {
+            console.error('❌ menu-items error:', error.message);
+            return res.json([]);
+        }
+        res.json(data || []);
+    } catch (error) {
+        console.error('❌ menu-items exception:', error);
+        res.json([]);
     }
 });
 
