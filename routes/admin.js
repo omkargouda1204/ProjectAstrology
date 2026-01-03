@@ -13,12 +13,22 @@ router.post('/admin/login', async (req, res) => {
         }
 
         // Get password from admin_credentials table or fallback to env variable
-        let { data: adminData, error: fetchError } = await supabase
-            .from('admin_credentials')
-            .select('password')
-            .single();
-
-        let adminPassword = adminData?.password || process.env.ADMIN_PASSWORD;
+        let adminPassword = process.env.ADMIN_PASSWORD;
+        
+        if (supabase) {
+            try {
+                let { data: adminData, error: fetchError } = await supabase
+                    .from('admin_credentials')
+                    .select('password')
+                    .single();
+                
+                if (adminData?.password) {
+                    adminPassword = adminData.password;
+                }
+            } catch (err) {
+                console.warn('Could not fetch admin password from database, using env variable');
+            }
+        }
 
         // If ADMIN_PASSWORD not set, fall back to a default for local development
         if (!adminPassword) {
