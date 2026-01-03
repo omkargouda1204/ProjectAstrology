@@ -58,89 +58,99 @@ app.use('/static', express.static(path.join(__dirname, 'static')));
 
 // Custom uploads handler with Supabase fallback
 app.get('/uploads/:filename', async (req, res) => {
-    const filename = decodeURIComponent(req.params.filename);
-    const localPath = path.join(__dirname, 'static', 'uploads', filename);
-    
-    console.log(`📥 Request for image: ${filename}`);
-    
-    // First, try to serve from local uploads folder
-    if (fs.existsSync(localPath)) {
-        console.log(`✅ Found locally: ${filename}`);
-        return res.sendFile(localPath);
-    }
-    
-    console.log(`❌ Not found locally: ${filename}, trying Supabase...`);
-    
-    // If not found locally, try to fetch from Supabase bucket
-    if (supabase) {
-        try {
-            const bucketName = process.env.SUPABASE_STORAGE_BUCKET || 'astrology';
-            
-            // Try different possible folders
-            const folders = ['services', 'pooja-services', 'others', 'about', 'gallery-slides', 'hero-slides'];
-            
-            for (const folder of folders) {
-                const storagePath = `${folder}/${filename}`;
-                
-                try {
-                    // Get public URL from Supabase
-                    const { data: urlData } = supabase.storage
-                        .from(bucketName)
-                        .getPublicUrl(storagePath);
-                    
-                    if (urlData && urlData.publicUrl) {
-                        console.log(`🔍 Checking Supabase: ${storagePath}`);
-                        
-                        // Try to fetch from Supabase
-                        const imageResponse = await new Promise((resolve, reject) => {
-                            https.get(urlData.publicUrl, (response) => {
-                                if (response.statusCode === 200) {
-                                    resolve(response);
-                                } else {
-                                    reject(new Error(`Status: ${response.statusCode}`));
-                                }
-                            }).on('error', reject);
-                        });
-                        
-                        // Set appropriate content type
-                        const ext = path.extname(filename).toLowerCase();
-                        const contentTypes = {
-                            '.jpg': 'image/jpeg',
-                            '.jpeg': 'image/jpeg',
-                            '.png': 'image/png',
-                            '.gif': 'image/gif',
-                            '.webp': 'image/webp',
-                            '.avif': 'image/avif',
-                            '.svg': 'image/svg+xml'
-                        };
-                        res.setHeader('Content-Type', contentTypes[ext] || 'image/jpeg');
-                        
-                        console.log(`✅ Found in Supabase: ${storagePath}`);
-                        
-                        // Pipe the image to response
-                        imageResponse.pipe(res);
-                        return;
-                        
-                    }
-                } catch (err) {
-                    // Continue to next folder if this one fails
-                    console.log(`⏭️ Not in ${folder}: ${err.message}`);
-                    continue;
-                }
-            }
-            
-            // If not found in any folder, return 404
-            console.log(`❌ Image not found anywhere: ${filename}`);
-            return res.status(404).send('Image not found');
-            
-        } catch (error) {
-            console.error('❌ Error fetching from Supabase:', error);
+    try {
+        const filename = decodeURIComponent(req.params.filename);
+        const localPath = path.join(__dirname, 'static', 'uploads', filename);
+        
+        console.log(`📥 Image request: ${filename}`);
+        
+        // First, try to serve from local uploads folder
+        if (fs.existsSync(localPath)) {
+            console.log(`✅ Serving from local: ${filename}`);
+            return res.sendFile(localPath);
+        }
+        
+        console.log(`⚠️ Not in local uploads, checking Supabase...`);
+        
+        // If not found locally, try to fetch from Supabase bucket
+        if (!supabase) {
+            console.log(`❌ Supabase not configured`);
             return res.status(404).send('Image not found');
         }
-    } else {
-        // No Supabase connection, return 404
-        console.log(`❌ No Supabase connection`);
-        return res.status(404).send('Image not found in uploads folder');
+        
+        const bucketName = process.env.SUPABASE_STORAGE_BUCKET || 'astrology';
+        const folders = ['services', 'pooja-services', 'others', 'about', 'gallery-slides', 'hero-slides'];
+        
+        // Try each folder
+        for (const folder of folders) {
+            const storagePath = `${folder}/${filename}`;
+            
+            try {
+                // Get public URL from Supabase
+                const { data: urlData } = supabase.storage
+                    .from(bucketName)
+                    .getPublicUrl(storagePath);
+                
+                if (!urlData || !urlData.publicUrl) {
+                    continue;
+                }
+                
+                console.log(`🔍 Trying: ${storagePath}`);
+                
+                // Fetch from Supabase with timeout
+                const imageResponse = await new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        reject(new Error('Request timeout'));
+                    }, 5000);
+                    
+                    https.get(urlData.publicUrl, (response) => {
+                        clearTimeout(timeout);
+                        if (response.statusCode === 200) {
+                            resolve(response);
+                        } else {
+                            reject(new Error(`HTTP ${response.statusCode}`));
+                        }
+                    }).on('error', (err) => {
+                        clearTimeout(timeout);
+                        reject(err);
+                    });
+                });
+                
+                // Set content type based on file extension
+                const ext = path.extname(filename).toLowerCase();
+                const contentTypes = {
+                    '.jpg': 'image/jpeg',
+                    '.jpeg': 'image/jpeg',
+                    '.png': 'image/png',
+                    '.gif': 'image/gif',
+                    '.webp': 'image/webp',
+                    '.avif': 'image/avif',
+                    '.svg': 'image/svg+xml'
+                };
+                
+                const contentType = contentTypes[ext] || 'image/jpeg';
+                res.setHeader('Content-Type', contentType);
+                res.setHeader('Cache-Control', 'public, max-age=31536000');
+                
+                console.log(`✅ Serving from Supabase: ${storagePath}`);
+                
+                // Stream the image to client
+                imageResponse.pipe(res);
+                return;
+                
+            } catch (err) {
+                console.log(`⏭️ ${folder}: ${err.message}`);
+                continue;
+            }
+        }
+        
+        // Image not found in any location
+        console.log(`❌ Image not found: ${filename}`);
+        res.status(404).send('Image not found');
+        
+    } catch (error) {
+        console.error(`❌ Error serving image:`, error);
+        res.status(500).send('Server error');
     }
 });
 
@@ -186,8 +196,28 @@ app.use('/api', chatbotRoutes);
 app.use('/api', servicesRoutes);
 
 // Health check endpoint
-app.get('/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get('/health', async (req, res) => {
+    const health = {
+        status: 'ok',
+        timestamp: new Date().toISOString(),
+        supabase: supabase ? 'connected' : 'not configured'
+    };
+    
+    // Test Supabase connection if available
+    if (supabase) {
+        try {
+            const { data, error } = await supabase.from('navbar_settings').select('count').limit(1);
+            health.database = error ? 'error' : 'connected';
+            if (error) {
+                health.dbError = error.message;
+            }
+        } catch (err) {
+            health.database = 'error';
+            health.dbError = err.message;
+        }
+    }
+    
+    res.json(health);
 });
 
 // 404 handler
