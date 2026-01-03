@@ -204,18 +204,27 @@ router.get('/navbar-settings', async (req, res) => {
     try {
         if (!supabase) {
             console.warn('⚠️ Supabase not configured for navbar-settings');
-            return res.json({ business_name: 'Astrology Services', website_subtitle: 'Divine Guidance for Life' });
+            return res.json({
+                name: 'Astrology Services',
+                subtitle1: 'Divine Guidance for Life',
+            });
         }
         const { data, error } = await supabase.from('navbar_settings').select('*').limit(1).single();
+        let name = data?.business_name || data?.website_name || data?.name || 'Astrology Services';
+        let subtitle1 = data?.subtitle1 || data?.website_subtitle || 'Divine Guidance for Life';
+        const response = { ...data, name, subtitle1 };
         if (error && error.code !== 'PGRST116') {
             console.error('❌ navbar-settings error:', error.message);
-            return res.json({ business_name: 'Astrology Services', website_subtitle: 'Divine Guidance for Life' });
+            return res.json(response);
         }
-        console.log('✅ navbar-settings loaded:', data);
-        res.json(data || { business_name: 'Astrology Services', website_subtitle: 'Divine Guidance for Life' });
+        console.log('✅ navbar-settings loaded:', response);
+        res.json(response);
     } catch (error) {
         console.error('❌ navbar-settings exception:', error);
-        res.json({ business_name: 'Astrology Services', website_subtitle: 'Divine Guidance for Life' });
+        res.json({
+            name: 'Astrology Services',
+            subtitle1: 'Divine Guidance for Life',
+        });
     }
 });
 
