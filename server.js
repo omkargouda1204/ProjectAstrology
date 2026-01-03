@@ -58,13 +58,18 @@ app.use('/static', express.static(path.join(__dirname, 'static')));
 
 // Custom uploads handler with Supabase fallback
 app.get('/uploads/:filename', async (req, res) => {
-    const filename = req.params.filename;
+    const filename = decodeURIComponent(req.params.filename);
     const localPath = path.join(__dirname, 'static', 'uploads', filename);
+    
+    console.log(`📥 Request for image: ${filename}`);
     
     // First, try to serve from local uploads folder
     if (fs.existsSync(localPath)) {
+        console.log(`✅ Found locally: ${filename}`);
         return res.sendFile(localPath);
     }
+    
+    console.log(`❌ Not found locally: ${filename}, trying Supabase...`);
     
     // If not found locally, try to fetch from Supabase bucket
     if (supabase) {
@@ -77,52 +82,65 @@ app.get('/uploads/:filename', async (req, res) => {
             for (const folder of folders) {
                 const storagePath = `${folder}/${filename}`;
                 
-                // Get public URL from Supabase
-                const { data: urlData } = supabase.storage
-                    .from(bucketName)
-                    .getPublicUrl(storagePath);
-                
-                if (urlData && urlData.publicUrl) {
-                    // Download image from Supabase and send to client
-                    https.get(urlData.publicUrl, (response) => {
-                        if (response.statusCode === 200) {
-                            // Set appropriate content type
-                            const ext = path.extname(filename).toLowerCase();
-                            const contentTypes = {
-                                '.jpg': 'image/jpeg',
-                                '.jpeg': 'image/jpeg',
-                                '.png': 'image/png',
-                                '.gif': 'image/gif',
-                                '.webp': 'image/webp',
-                                '.avif': 'image/avif',
-                                '.svg': 'image/svg+xml'
-                            };
-                            res.setHeader('Content-Type', contentTypes[ext] || 'image/jpeg');
-                            
-                            // Pipe the image to response
-                            response.pipe(res);
-                            return;
-                        }
-                    }).on('error', (err) => {
-                        console.error(`Error fetching from Supabase ${storagePath}:`, err.message);
-                    });
+                try {
+                    // Get public URL from Supabase
+                    const { data: urlData } = supabase.storage
+                        .from(bucketName)
+                        .getPublicUrl(storagePath);
                     
-                    // Wait a bit to see if the download succeeds
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    if (res.headersSent) return;
+                    if (urlData && urlData.publicUrl) {
+                        console.log(`🔍 Checking Supabase: ${storagePath}`);
+                        
+                        // Try to fetch from Supabase
+                        const imageResponse = await new Promise((resolve, reject) => {
+                            https.get(urlData.publicUrl, (response) => {
+                                if (response.statusCode === 200) {
+                                    resolve(response);
+                                } else {
+                                    reject(new Error(`Status: ${response.statusCode}`));
+                                }
+                            }).on('error', reject);
+                        });
+                        
+                        // Set appropriate content type
+                        const ext = path.extname(filename).toLowerCase();
+                        const contentTypes = {
+                            '.jpg': 'image/jpeg',
+                            '.jpeg': 'image/jpeg',
+                            '.png': 'image/png',
+                            '.gif': 'image/gif',
+                            '.webp': 'image/webp',
+                            '.avif': 'image/avif',
+                            '.svg': 'image/svg+xml'
+                        };
+                        res.setHeader('Content-Type', contentTypes[ext] || 'image/jpeg');
+                        
+                        console.log(`✅ Found in Supabase: ${storagePath}`);
+                        
+                        // Pipe the image to response
+                        imageResponse.pipe(res);
+                        return;
+                        
+                    }
+                } catch (err) {
+                    // Continue to next folder if this one fails
+                    console.log(`⏭️ Not in ${folder}: ${err.message}`);
+                    continue;
                 }
             }
             
             // If not found in any folder, return 404
-            return res.status(404).json({ error: 'Image not found in uploads folder or Supabase bucket' });
+            console.log(`❌ Image not found anywhere: ${filename}`);
+            return res.status(404).send('Image not found');
             
         } catch (error) {
-            console.error('Error fetching from Supabase:', error);
-            return res.status(404).json({ error: 'Image not found' });
+            console.error('❌ Error fetching from Supabase:', error);
+            return res.status(404).send('Image not found');
         }
     } else {
         // No Supabase connection, return 404
-        return res.status(404).json({ error: 'Image not found in uploads folder' });
+        console.log(`❌ No Supabase connection`);
+        return res.status(404).send('Image not found in uploads folder');
     }
 });
 
