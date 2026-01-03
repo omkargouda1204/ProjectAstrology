@@ -1,10 +1,12 @@
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
+const fs = require('fs');
+const https = require('https');
+const { supabase } = require('./config/database');
 
 // Import routes
 const adminRoutes = require('./routes/admin');
@@ -53,7 +55,94 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Static files
 app.use('/static', express.static(path.join(__dirname, 'static')));
-app.use('/uploads', express.static(path.join(__dirname, 'static/uploads')));
+
+// Custom uploads handler with Supabase fallback
+app.get('/uploads/:filename', async (req, res) => {
+    const filename = decodeURIComponent(req.params.filename);
+    const localPath = path.join(__dirname, 'static', 'uploads', filename);
+    
+    console.log(`📥 Request for image: ${filename}`);
+    
+    // First, try to serve from local uploads folder
+    if (fs.existsSync(localPath)) {
+        console.log(`✅ Found locally: ${filename}`);
+        return res.sendFile(localPath);
+    }
+    
+    console.log(`❌ Not found locally: ${filename}, trying Supabase...`);
+    
+    // If not found locally, try to fetch from Supabase bucket
+    if (supabase) {
+        try {
+            const bucketName = process.env.SUPABASE_STORAGE_BUCKET || 'astrology';
+            
+            // Try different possible folders
+            const folders = ['services', 'pooja-services', 'others', 'about', 'gallery-slides', 'hero-slides'];
+            
+            for (const folder of folders) {
+                const storagePath = `${folder}/${filename}`;
+                
+                try {
+                    // Get public URL from Supabase
+                    const { data: urlData } = supabase.storage
+                        .from(bucketName)
+                        .getPublicUrl(storagePath);
+                    
+                    if (urlData && urlData.publicUrl) {
+                        console.log(`🔍 Checking Supabase: ${storagePath}`);
+                        
+                        // Try to fetch from Supabase
+                        const imageResponse = await new Promise((resolve, reject) => {
+                            https.get(urlData.publicUrl, (response) => {
+                                if (response.statusCode === 200) {
+                                    resolve(response);
+                                } else {
+                                    reject(new Error(`Status: ${response.statusCode}`));
+                                }
+                            }).on('error', reject);
+                        });
+                        
+                        // Set appropriate content type
+                        const ext = path.extname(filename).toLowerCase();
+                        const contentTypes = {
+                            '.jpg': 'image/jpeg',
+                            '.jpeg': 'image/jpeg',
+                            '.png': 'image/png',
+                            '.gif': 'image/gif',
+                            '.webp': 'image/webp',
+                            '.avif': 'image/avif',
+                            '.svg': 'image/svg+xml'
+                        };
+                        res.setHeader('Content-Type', contentTypes[ext] || 'image/jpeg');
+                        
+                        console.log(`✅ Found in Supabase: ${storagePath}`);
+                        
+                        // Pipe the image to response
+                        imageResponse.pipe(res);
+                        return;
+                        
+                    }
+                } catch (err) {
+                    // Continue to next folder if this one fails
+                    console.log(`⏭️ Not in ${folder}: ${err.message}`);
+                    continue;
+                }
+            }
+            
+            // If not found in any folder, return 404
+            console.log(`❌ Image not found anywhere: ${filename}`);
+            return res.status(404).send('Image not found');
+            
+        } catch (error) {
+            console.error('❌ Error fetching from Supabase:', error);
+            return res.status(404).send('Image not found');
+        }
+    } else {
+        // No Supabase connection, return 404
+        console.log(`❌ No Supabase connection`);
+        return res.status(404).send('Image not found in uploads folder');
+    }
+});
 
 // Serve HTML files
 app.get('/', (req, res) => {
