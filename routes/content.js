@@ -210,7 +210,7 @@ router.get('/navbar-settings', async (req, res) => {
             });
         }
         const { data, error } = await supabase.from('navbar_settings').select('*').limit(1).single();
-        let name = data?.business_name || data?.website_name || data?.name || 'Astrology Services';
+        let name = data?.name || data?.website_name || data?.business_name|| 'Astrology Services';
         let subtitle1 = data?.subtitle1 || data?.website_subtitle || 'Divine Guidance for Life';
         const response = { ...data, name, subtitle1 };
         if (error && error.code !== 'PGRST116') {
