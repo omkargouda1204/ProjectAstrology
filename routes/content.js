@@ -210,12 +210,20 @@ router.get('/navbar-settings', async (req, res) => {
             });
         }
         const { data, error } = await supabase.from('navbar_settings').select('*').limit(1).single();
-        let name = data?.name || data?.website_name || data?.business_name|| 'Astrology Services';
-        let subtitle1 = data?.subtitle1 || data?.website_subtitle || 'Divine Guidance for Life';
+        // Always ensure 'name' is set, even if data exists but is empty/null
+        let name = (data?.name && data.name.trim()) || (data?.website_name && data.website_name.trim()) || (data?.business_name && data.business_name.trim()) || 'Astrology Services';
+        let subtitle1 = (data?.subtitle1 && data.subtitle1.trim()) || (data?.website_subtitle && data.website_subtitle.trim()) || 'Divine Guidance for Life';
         const response = { ...data, name, subtitle1 };
         if (error && error.code !== 'PGRST116') {
             console.error('❌ navbar-settings error:', error.message);
             return res.json(response);
+        }
+        // If DB record exists but name is empty, still use fallback
+        if (!name || name === '') {
+            response.name = 'Om Sri Mahakali Bhairavi Astrology Center';
+        }
+        if (!subtitle1 || subtitle1 === '') {
+            response.subtitle1 = 'Divine Guidance for Life';
         }
         console.log('✅ navbar-settings loaded:', response);
         res.json(response);
