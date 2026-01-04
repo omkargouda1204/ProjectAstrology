@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
             <script>
@@ -6036,6 +6036,9 @@
                                 if (parentDiv) parentDiv.remove();
                             });
                             
+                            // Generate booking ID - use result.id or result.booking_id or create a timestamp-based one
+                            const bookingId = result.id || result.booking_id || result.data?.id || `BK${Date.now()}`;
+                            
                             // Show success message with contact options
                             addBotMessage(`✅ <strong>Booking Confirmed!</strong><br><br>
 Thank you <strong>${name}</strong> for booking <strong>${service}</strong>!<br><br>
@@ -6045,13 +6048,13 @@ Thank you <strong>${name}</strong> for booking <strong>${service}</strong>!<br><
 • Service: ${service}<br>
 • DOB: ${dob}<br>
 ${bookingData.message ? '• Question: ' + bookingData.message + '<br>' : ''}
-<br><em>Booking ID: #${result.id}</em><br><br>
+<br><em>Booking ID: #${bookingId}</em><br><br>
 📱 <strong>Contact Us Directly:</strong><br>
 <div style="display: flex; gap: 10px; flex-wrap: wrap; margin: 15px 0;">
-    <a href="https://wa.me/${(globalBusinessInfo?.whatsapp_number || globalBusinessInfo?.phone || '918431729319').replace(/\\D/g, '')}?text=Hi!%20I%20just%20booked%20(ID:%20${result.id})%20for%20${encodeURIComponent(service)}" target="_blank" style="background: #25D366; color: white; padding: 10px 15px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; font-weight: bold; gap: 5px;">
+    <a href="https://wa.me/${(globalBusinessInfo?.whatsapp_number || globalBusinessInfo?.phone || '918431729319').replace(/\\D/g, '')}?text=Hi!%20I%20just%20booked%20(ID:%20${bookingId})%20for%20${encodeURIComponent(service)}" target="_blank" style="background: #25D366; color: white; padding: 10px 15px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; font-weight: bold; gap: 5px;">
         <i class="fab fa-whatsapp"></i> WhatsApp
     </a>
-    <a href="mailto:${globalBusinessInfo?.email || 'omkargouda1204@gmail.com'}?subject=Booking%20Confirmation%20${result.id}&body=Hi,%20I%20booked%20${encodeURIComponent(service)}%20consultation." style="background: #EA4335; color: white; padding: 10px 15px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; font-weight: bold; gap: 5px;">
+    <a href="mailto:${globalBusinessInfo?.email || 'omkargouda1204@gmail.com'}?subject=Booking%20Confirmation%20${bookingId}&body=Hi,%20I%20booked%20${encodeURIComponent(service)}%20consultation." style="background: #EA4335; color: white; padding: 10px 15px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; font-weight: bold; gap: 5px;">
         <i class="fas fa-envelope"></i> Email
     </a>
 </div>
