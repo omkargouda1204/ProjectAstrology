@@ -1255,6 +1255,120 @@
     </div>
 
     <script>
+        // ========================================
+        // GLOBAL IMAGE FALLBACK HELPER
+        // ========================================
+        
+        /**
+         * Converts Supabase storage URLs to direct public URLs
+         * @param {string} url - The Supabase storage URL or local path
+         * @returns {string} - Direct Supabase public URL or original path
+         */
+        function convertToSupabaseUrl(url) {
+            if (!url) return '';
+            
+            // If already a direct Supabase URL, return as-is
+            if (url.includes('supabase.co/storage/v1/object/public/')) {
+                return url;
+            }
+            
+            // Extract filename from various URL patterns
+            let filename = '';
+            try {
+                // Handle local paths like /static/uploads/filename.png or /uploads/filename.png
+                if (url.startsWith('/static/uploads/') || url.startsWith('/uploads/')) {
+                    const parts = url.split('/');
+                    filename = parts[parts.length - 1].split('?')[0]; // Remove query params
+                } else if (url.includes('/storage/v1/object/public/')) {
+                    // Handle Supabase storage paths
+                    const marker = '/storage/v1/object/public/';
+                    const idx = url.indexOf(marker);
+                    if (idx !== -1) {
+                        const pathAfterMarker = url.substring(idx + marker.length);
+                        const parts = pathAfterMarker.split('/');
+                        filename = parts[parts.length - 1].split('?')[0];
+                    }
+                } else {
+                    // Try to extract filename from URL
+                    const urlObj = new URL(url, window.location.origin);
+                    const parts = urlObj.pathname.split('/');
+                    filename = parts[parts.length - 1].split('?')[0];
+                }
+            } catch (e) {
+                console.error('Error parsing URL:', url, e);
+                return url;
+            }
+            
+            if (!filename) return url;
+            
+            // Get Supabase configuration from environment or use defaults
+            const supabaseUrl = window.SUPABASE_URL || 'https://projectastrology.onrender.com';
+            const bucketName = window.SUPABASE_BUCKET || 'astrology';
+            
+            // Try different folder patterns commonly used in the app
+            const folders = ['hero-slides', 'gallery-slides', 'services', 'pooja-services', 'others', 'about'];
+            
+            // Return the first folder path (the backend will try all folders)
+            // We'll rely on the backend /static/uploads/:filename route to handle the lookup
+            return `/static/uploads/${filename}`;
+        }
+        
+        /**
+         * Global image error handler with Supabase fallback
+         * Call this on image onerror events: onerror="handleImageError(this)"
+         * @param {HTMLImageElement} img - The image element that failed to load
+         */
+        function handleImageError(img) {
+            const originalSrc = img.src;
+            
+            // Prevent infinite loop
+            if (img.dataset.retryAttempt) {
+                console.error('Image failed after retry:', originalSrc);
+                // Set a placeholder SVG
+                img.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23667eea%22 width=%22400%22 height=%22300%22/%3E%3Ctext fill=%22white%22 font-size=%2220%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage Not Available%3C/text%3E%3C/svg%3E';
+                return;
+            }
+            
+            // Mark that we've attempted a retry
+            img.dataset.retryAttempt = 'true';
+            
+            // Try the backend proxy route which will check Supabase
+            const filename = originalSrc.split('/').pop().split('?')[0];
+            const fallbackUrl = `/static/uploads/${filename}`;
+            
+            console.log(`🔄 Image failed, trying fallback: ${originalSrc} -> ${fallbackUrl}`);
+            img.src = fallbackUrl;
+        }
+        
+        /**
+         * Preload image with automatic fallback
+         * Returns a promise that resolves when image loads (from either source)
+         * @param {string} src - The primary image source
+         * @returns {Promise<string>} - Resolves with the working URL
+         */
+        function preloadImageWithFallback(src) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                let attempted = false;
+                
+                img.onload = () => resolve(img.src);
+                
+                img.onerror = () => {
+                    if (!attempted) {
+                        attempted = true;
+                        const filename = src.split('/').pop().split('?')[0];
+                        const fallbackUrl = `/static/uploads/${filename}`;
+                        console.log(`🔄 Preload failed, trying: ${fallbackUrl}`);
+                        img.src = fallbackUrl;
+                    } else {
+                        reject(new Error('Image failed to load from all sources'));
+                    }
+                };
+                
+                img.src = src;
+            });
+        }
+        
         // Admin Login
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1526,7 +1640,7 @@
                 container.innerHTML = slides.map(slide => `
                     <div class="bg-white rounded-xl p-6 shadow-lg">
                         <div class="w-full h-48 mb-4 rounded-lg overflow-hidden bg-gray-100">
-                            <img src="${slide.image}?t=${Date.now()}" alt="${slide.title}" class="w-full h-full object-cover object-center" style="object-fit: cover; display: block;" loading="eager" crossorigin="anonymous" onload="console.log('Admin hero slide loaded:', '${slide.image}')" onerror="console.error('Admin hero slide failed:', '${slide.image}'); this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%23667eea%22 width=%22400%22 height=%22300%22/%3E%3Ctext fill=%22white%22 font-size=%2220%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage Not Available%3C/text%3E%3C/svg%3E'">
+                            <img src="${slide.image}?t=${Date.now()}" alt="${slide.title}" class="w-full h-full object-cover object-center" style="object-fit: cover; display: block;" loading="eager" crossorigin="anonymous" onload="console.log('Admin hero slide loaded:', '${slide.image}')" onerror="handleImageError(this)">
                         </div>
                         <h3 class="font-bold text-lg mb-2">${slide.title}</h3>
                         <p class="text-gray-600 mb-4">${slide.description || ''}</p>
@@ -1560,7 +1674,7 @@
                 container.innerHTML = slides.map(slide => `
                     <div class="bg-white rounded-xl overflow-hidden shadow-lg">
                         <div class="w-full h-48 overflow-hidden bg-gray-100">
-                            <img src="${slide.image}?t=${Date.now()}" alt="${slide.title}" class="w-full h-full object-cover object-center" style="object-fit: cover; display: block;" loading="eager" crossorigin="anonymous" onload="console.log('Admin gallery slide loaded:', '${slide.image}')" onerror="console.error('Admin gallery slide failed:', '${slide.image}'); this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22400%22 height=%22300%22%3E%3Crect fill=%22%2364748b%22 width=%22400%22 height=%22300%22/%3E%3Ctext fill=%22white%22 font-size=%2220%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EImage Not Available%3C/text%3E%3C/svg%3E'">
+                            <img src="${slide.image}?t=${Date.now()}" alt="${slide.title}" class="w-full h-full object-cover object-center" style="object-fit: cover; display: block;" loading="eager" crossorigin="anonymous" onload="console.log('Admin gallery slide loaded:', '${slide.image}')" onerror="handleImageError(this)">
                         </div>
                         <div class="p-4">
                             <h4 class="font-semibold mb-2">${slide.title}</h4>
@@ -2342,7 +2456,7 @@
                     // Show image preview if URL exists
                     if (data.img) {
                         document.getElementById('about-image-preview').innerHTML = `
-                            <img src="${data.img}" alt="Astrologer" class="w-48 h-48 object-cover rounded-lg shadow-lg">
+                            <img src="${data.img}" alt="Astrologer" class="w-48 h-48 object-cover rounded-lg shadow-lg" onerror="handleImageError(this)">
                         `;
                     }
                 }
@@ -2679,7 +2793,7 @@
                         <div class="bg-white rounded-xl p-4 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200">
                             ${item.icon_url ? 
                                 `<div class="flex justify-center mb-2">
-                                    <img src="${item.icon_url}?t=${Date.now()}" class="w-16 h-16 object-contain" alt="${item.title}" style="display: block;" loading="eager" crossorigin="anonymous" onload="console.log('Astro service icon loaded:', '${item.icon_url}')" onerror="console.error('Astro service icon failed:', '${item.icon_url}'); this.onerror=null; this.style.display='none';">
+                                    <img src="${item.icon_url}?t=${Date.now()}" class="w-16 h-16 object-contain" alt="${item.title}" style="display: block;" loading="eager" crossorigin="anonymous" onload="console.log('Astro service icon loaded:', '${item.icon_url}')" onerror="handleImageError(this)">
                                 </div>` : 
                                 `<div class="flex justify-center mb-2">
                                     <div class="w-16 h-16 bg-gray-200 rounded flex items-center justify-center">
@@ -2805,7 +2919,7 @@
                 const list = document.getElementById('pooja-services-list');
                 list.innerHTML = items.map(item => `
                     <div class="bg-white border rounded-xl p-4 shadow hover:shadow-lg transition-all duration-300 hover:scale-105">
-                        ${item.image_url ? `<img src="${item.image_url}" class="w-full h-32 object-cover rounded-lg mb-3">` : '<div class="w-full h-32 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg mb-3 flex items-center justify-center"><i class="fas fa-om text-white text-4xl"></i></div>'}
+                        ${item.image_url ? `<img src="${item.image_url}" class="w-full h-32 object-cover rounded-lg mb-3" onerror="handleImageError(this)">` : '<div class="w-full h-32 bg-gradient-to-br from-orange-400 to-red-500 rounded-lg mb-3 flex items-center justify-center"><i class="fas fa-om text-white text-4xl"></i></div>'}
                         <h4 class="font-bold mb-2 text-center">${item.title}</h4>
                         <p class="text-sm text-gray-600 mb-3 line-clamp-3">${item.description || ''}</p>
                         <div class="flex gap-2 justify-center">
@@ -2876,7 +2990,7 @@
                 const list = document.getElementById('expert-solutions-list');
                 list.innerHTML = items.map(item => `
                     <div class="bg-white border rounded-xl p-4 shadow hover:shadow-lg transition-all duration-300 hover:scale-102 flex flex-col md:flex-row gap-4">
-                        ${item.image_url ? `<img src="${item.image_url}" class="w-full md:w-48 h-32 object-cover rounded-lg">` : '<div class="w-full md:w-48 h-32 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center"><i class="fas fa-hands-helping text-white text-4xl"></i></div>'}
+                        ${item.image_url ? `<img src="${item.image_url}" class="w-full md:w-48 h-32 object-cover rounded-lg" onerror="handleImageError(this)">` : '<div class="w-full md:w-48 h-32 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center"><i class="fas fa-hands-helping text-white text-4xl"></i></div>'}
                         <div class="flex-1">
                             <h4 class="font-bold text-lg mb-2">${item.title}</h4>
                             <p class="text-sm text-gray-600 mb-3 line-clamp-3">${item.description || ''}</p>
@@ -3010,7 +3124,7 @@
                 list.innerHTML = reviews.map(review => {
                     const initial = (review.name || 'A').charAt(0).toUpperCase();
                     const imgTag = review.user_image_local
-                        ? `<img src="${review.user_image_local}" class="w-16 h-16 rounded-full object-cover border-2 border-purple-200" onerror="this.src='${defaultAvatar}'">`
+                        ? `<img src="${review.user_image_local}" class="w-16 h-16 rounded-full object-cover border-2 border-purple-200" onerror="handleImageError(this); if(this.dataset.retryAttempt) this.src='${defaultAvatar}';">`
                         : `<div class="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-2xl font-bold">${initial}</div>`;
                     return `
                     <div class="bg-white border rounded-xl p-4 shadow hover:shadow-lg transition-all duration-300 hover:scale-102 flex gap-4">
@@ -3278,7 +3392,7 @@
                     <div class="text-center mb-3">
                         ${service.image_url || service.icon_url ? 
                             `<div class="w-24 h-24 mx-auto mb-3 flex items-center justify-center">
-                                <img src="${service.image_url || service.icon_url}" alt="${service.title}" class="w-full h-full object-contain" style="background: transparent;" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-star text-purple-600 text-3xl\\'></i>';">
+                                <img src="${service.image_url || service.icon_url}" alt="${service.title}" class="w-full h-full object-contain" style="background: transparent;" onerror="handleImageError(this)">
                             </div>` : 
                             `<div class="w-24 h-24 mx-auto mb-3 flex items-center justify-center">
                                 <i class="fas fa-star text-purple-600 text-3xl"></i>
@@ -3656,21 +3770,27 @@
                     
                     if (settings.logo_url) {
                         const logoPreview = document.getElementById('brand-logo-preview');
-                        logoPreview.querySelector('img').src = settings.logo_url;
+                        const img = logoPreview.querySelector('img');
+                        img.src = settings.logo_url;
+                        img.onerror = function() { handleImageError(this); };
                         logoPreview.classList.remove('hidden');
                         logoPreview.dataset.currentUrl = settings.logo_url;
                     }
                     
                     if (settings.astrological_services_bg_url) {
                         const astroBgPreview = document.getElementById('brand-astro-bg-preview');
-                        astroBgPreview.querySelector('img').src = settings.astrological_services_bg_url;
+                        const img = astroBgPreview.querySelector('img');
+                        img.src = settings.astrological_services_bg_url;
+                        img.onerror = function() { handleImageError(this); };
                         astroBgPreview.classList.remove('hidden');
                         astroBgPreview.dataset.currentUrl = settings.astrological_services_bg_url;
                     }
                     
                     if (settings.pooja_services_bg_url) {
                         const poojaBgPreview = document.getElementById('brand-pooja-bg-preview');
-                        poojaBgPreview.querySelector('img').src = settings.pooja_services_bg_url;
+                        const img = poojaBgPreview.querySelector('img');
+                        img.src = settings.pooja_services_bg_url;
+                        img.onerror = function() { handleImageError(this); };
                         poojaBgPreview.classList.remove('hidden');
                         poojaBgPreview.dataset.currentUrl = settings.pooja_services_bg_url;
                     }
