@@ -3652,7 +3652,7 @@
                                  style="display: block !important; visibility: visible !important; opacity: 1 !important; object-fit: cover !important; object-position: center !important;"
                                  loading="lazy"
                                  onload="this.style.display='block'; this.style.visibility='visible'; this.style.opacity='1'; console.log('Pooja image loaded:', '${pooja.title}');"
-                                 onerror="console.error('Pooja image failed:', '${pooja.title}'); this.parentElement.innerHTML='<div class=\\'w-full h-full bg-gradient-to-br from-amber-400 to-red-500 flex items-center justify-center rounded-full\\'><i class=\\'fas fa-om text-white text-2xl sm:text-3xl md:text-4xl\\'></i></div>'">` :
+                                 onerror="if(!this.dataset.retryAttempt) { this.dataset.retryAttempt='true'; const filename='${poojaImageUrl}'.split('/').pop().split('?')[0]; this.src='/static/uploads/'+filename; } else { console.error('Pooja image failed:', '${pooja.title}'); this.parentElement.innerHTML='<div class=\\'w-full h-full bg-gradient-to-br from-amber-400 to-red-500 flex items-center justify-center rounded-full\\'><i class=\\'fas fa-om text-white text-2xl sm:text-3xl md:text-4xl\\'></i></div>'; }">` :
                             `<div class="w-full h-full bg-gradient-to-br from-amber-400 to-red-500 flex items-center justify-center rounded-full">
                                 <i class="fas fa-om text-white text-2xl sm:text-3xl md:text-4xl"></i>
                             </div>`
@@ -3924,11 +3924,19 @@
                 };
                 
                 img.onerror = function() {
-                    console.error(`❌ Failed to load image ${index + 1}:`, slide.imageUrl);
-                    // Keep the slide but show a placeholder
-                    this.style.display = 'block';
-                    this.style.opacity = '0.3';
-                    this.alt = 'Image failed to load';
+                    // Try Supabase fallback route
+                    if (!this.dataset.retryAttempt) {
+                        console.log(`🔄 Retrying hero image ${index + 1} via backend fallback:`, slide.imageUrl);
+                        this.dataset.retryAttempt = 'true';
+                        const filename = slide.imageUrl.split('/').pop().split('?')[0];
+                        this.src = `/static/uploads/${filename}`;
+                    } else {
+                        console.error(`❌ Failed to load image ${index + 1} after retry:`, slide.imageUrl);
+                        // Keep the slide but show a placeholder
+                        this.style.display = 'block';
+                        this.style.opacity = '0.3';
+                        this.alt = 'Image failed to load';
+                    }
                 };
                 
                 // Preload all images to ensure they're available
@@ -4230,11 +4238,19 @@
                                 if (fallback) fallback.style.display = 'none';
                             };
                             aboutImage.onerror = function() {
-                                console.error('❌ About image failed, showing fallback:', imgUrl);
-                                this.style.display = 'none';
-                                if (fallback) {
-                                    fallback.style.display = 'flex';
-                                    fallback.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center rounded-2xl"><i class="fas fa-user-astronaut text-white text-6xl md:text-8xl"></i></div>';
+                                // Try Supabase fallback route
+                                if (!this.dataset.retryAttempt) {
+                                    console.log('🔄 Retrying about image via backend fallback:', imgUrl);
+                                    this.dataset.retryAttempt = 'true';
+                                    const filename = imgUrl.split('/').pop().split('?')[0];
+                                    this.src = `/static/uploads/${filename}`;
+                                } else {
+                                    console.error('❌ About image failed after retry, showing fallback:', imgUrl);
+                                    this.style.display = 'none';
+                                    if (fallback) {
+                                        fallback.style.display = 'flex';
+                                        fallback.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center rounded-2xl"><i class="fas fa-user-astronaut text-white text-6xl md:text-8xl"></i></div>';
+                                    }
                                 }
                             };
                             if (fallback) fallback.style.display = 'none';
@@ -5922,19 +5938,19 @@
             const today = new Date().toISOString().split('T')[0];
             console.log('Max date for DOB:', today);
             addBotMessage(`
-                <div class="booking-form-container" style="background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important;">
-                    <strong>📅 Book Your Consultation</strong><br><br>
-                    <form id="chatbot-booking-form" class="space-y-3" style="background: transparent !important; border: none !important; box-shadow: none !important;">
-                        <input type="text" id="booking-name" placeholder="Your Name *" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333; font-size: 14px;">
-                        <input type="email" id="booking-email" placeholder="Email (Optional)" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333; font-size: 14px;">
-                        <input type="tel" id="booking-phone" placeholder="Phone Number (10 digits) *" required pattern="[6-9][0-9]{9}" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333; font-size: 14px;">
+                <div class="booking-form-container" style="background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; max-width: 100%; width: 100%;">
+                    <strong style="font-size: clamp(14px, 3vw, 16px);">📅 Book Your Consultation</strong><br><br>
+                    <form id="chatbot-booking-form" class="space-y-2 sm:space-y-3" style="background: transparent !important; border: none !important; box-shadow: none !important;">
+                        <input type="text" id="booking-name" placeholder="Your Name *" required class="w-full px-2 sm:px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333; font-size: clamp(12px, 2.5vw, 14px);">
+                        <input type="email" id="booking-email" placeholder="Email (Optional)" class="w-full px-2 sm:px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333; font-size: clamp(12px, 2.5vw, 14px);">
+                        <input type="tel" id="booking-phone" placeholder="Phone Number (10 digits) *" required pattern="[6-9][0-9]{9}" class="w-full px-2 sm:px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333; font-size: clamp(12px, 2.5vw, 14px);">
                         <div>
-                            <label style="display: block; font-size: 14px; color: #333; margin-bottom: 4px; font-weight: 500;">Date of Birth *</label>
-                            <input type="date" id="booking-dob" required max="${today}" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333; font-size: 14px;">
+                            <label style="display: block; font-size: clamp(12px, 2.5vw, 14px); color: #333; margin-bottom: 4px; font-weight: 500;">Date of Birth *</label>
+                            <input type="date" id="booking-dob" required max="${today}" class="w-full px-2 sm:px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333; font-size: clamp(12px, 2.5vw, 14px);">
                         </div>
                         <div>
-                            <label style="display: block; font-size: 14px; color: #333; margin-bottom: 4px; font-weight: 500;">Select Service *</label>
-                            <select id="booking-service" required class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333; font-size: 14px;">
+                            <label style="display: block; font-size: clamp(12px, 2.5vw, 14px); color: #333; margin-bottom: 4px; font-weight: 500;">Select Service *</label>
+                            <select id="booking-service" required class="w-full px-2 sm:px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333; font-size: clamp(12px, 2.5vw, 14px);">
                                 <option value="">Choose a service...</option>
                                 <option value="Kundali Analysis">🔮 Kundali Analysis</option>
                                 <option value="Tarot Reading">🎴 Tarot Reading</option>
@@ -5947,10 +5963,10 @@
                             </select>
                         </div>
                         <div>
-                            <label style="display: block; font-size: 14px; color: #333; margin-bottom: 4px; font-weight: 500;">Message (Optional)</label>
-                            <textarea id="booking-message" placeholder="Tell us about your concerns or questions..." class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" rows="3" style="color: #333; font-size: 14px;"></textarea>
+                            <label style="display: block; font-size: clamp(12px, 2.5vw, 14px); color: #333; margin-bottom: 4px; font-weight: 500;">Message (Optional)</label>
+                            <textarea id="booking-message" placeholder="Tell us about your concerns or questions..." class="w-full px-2 sm:px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" rows="2" style="color: #333; font-size: clamp(12px, 2.5vw, 14px); min-height: 60px;"></textarea>
                         </div>
-                        <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2 rounded-lg font-bold hover:shadow-lg transition">
+                        <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-2 sm:py-2.5 rounded-lg font-bold hover:shadow-lg transition" style="font-size: clamp(12px, 2.5vw, 14px);">
                             📤 Submit Booking
                         </button>
                     </form>
@@ -6028,6 +6044,9 @@
                         const result = await response.json();
                         
                         if (response.ok && result) {
+                            // Clear the form first
+                            form.reset();
+                            
                             // Remove the entire booking form message from chat
                             const messages = document.getElementById('chatbot-messages');
                             const formMessages = messages.querySelectorAll('.booking-form-container');
@@ -6942,12 +6961,43 @@ ${bookingData.message ? '• Question: ' + bookingData.message + '<br>' : ''}
             box-shadow: none !important;
             padding: 0 !important;
             margin: 0 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            overflow: hidden !important;
         }
         
         .booking-form-container form {
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
+            max-width: 100% !important;
+        }
+        
+        .booking-form-container input,
+        .booking-form-container select,
+        .booking-form-container textarea,
+        .booking-form-container button {
+            font-size: clamp(12px, 2.5vw, 14px) !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        
+        .booking-form-container label {
+            font-size: clamp(12px, 2.5vw, 14px) !important;
+        }
+        
+        @media (max-width: 640px) {
+            .booking-form-container {
+                padding: 0 !important;
+            }
+            .booking-form-container input,
+            .booking-form-container select,
+            .booking-form-container textarea {
+                padding: 8px 10px !important;
+            }
+            .booking-form-container button {
+                padding: 10px 12px !important;
+            }
         }
         
         /* Chatbot Input Area */
