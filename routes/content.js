@@ -52,11 +52,19 @@ const crudRoutes = (tableName, routePath) => {
     // GET all
     router.get(`/content/${routePath}`, async (req, res) => {
         try {
+            if (!supabase) {
+                console.warn(`⚠️ Supabase not configured for ${routePath}`);
+                return res.json([]);
+            }
             const { data, error } = await supabase.from(tableName).select('*').eq('active', true).order('display_order');
-            if (error) throw error;
+            if (error) {
+                console.error(`Error fetching ${routePath}:`, error.message);
+                return res.json([]);
+            }
             res.json(data || []);
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            console.error(`Error in ${routePath}:`, error.message);
+            res.json([]);
         }
     });
 
@@ -123,18 +131,49 @@ crudRoutes('astrological_services', 'astrological-services');
 crudRoutes('pooja_services', 'pooja-services');
 crudRoutes('expert_solutions', 'expert-solutions');
 crudRoutes('menu_items', 'menu-items');
-crudRoutes('announcement_bar', 'announcements');
+
+// Announcements route - special handling
+router.get('/announcements', async (req, res) => {
+    try {
+        if (!supabase) {
+            console.warn('⚠️ Supabase not configured for announcements');
+            return res.json([]);
+        }
+        const { data, error } = await supabase
+            .from('announcement_bar')
+            .select('*')
+            .eq('active', true)
+            .order('display_order');
+        if (error) {
+            console.error('Error fetching announcements:', error.message);
+            return res.json([]);
+        }
+        res.json(data || []);
+    } catch (error) {
+        console.error('Error in announcements:', error.message);
+        res.json([]);
+    }
+});
+
 crudRoutes('custom_reviews', 'reviews');
 
 // Single record tables
 const singleRecordGet = (tableName, routePath) => {
     router.get(`/content/${routePath}`, async (req, res) => {
         try {
+            if (!supabase) {
+                console.warn(`⚠️ Supabase not configured for ${routePath}`);
+                return res.json({});
+            }
             const { data, error } = await supabase.from(tableName).select('*').limit(1).single();
-            if (error && error.code !== 'PGRST116') throw error;
+            if (error && error.code !== 'PGRST116') {
+                console.error(`Error fetching ${routePath}:`, error.message);
+                return res.json({});
+            }
             res.json(data || {});
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            console.error(`Error in ${routePath}:`, error.message);
+            res.json({});
         }
     });
 
@@ -205,14 +244,14 @@ router.get('/navbar-settings', async (req, res) => {
         if (!supabase) {
             console.warn('⚠️ Supabase not configured for navbar-settings');
             return res.json({
-                name: 'Astrology Services',
-                subtitle1: 'Divine Guidance for Life',
+                name: 'Om Sri Mahakali Bhairavi Astrology Center',
+                subtitle1: 'Divine Guidance for Life, Destiny, and Prosperity',
             });
         }
         const { data, error } = await supabase.from('navbar_settings').select('*').limit(1).single();
         // Always ensure 'name' is set, even if data exists but is empty/null
-        let name = (data?.name && data.name.trim()) || (data?.website_name && data.website_name.trim()) || (data?.business_name && data.business_name.trim()) || 'Astrology Services';
-        let subtitle1 = (data?.subtitle1 && data.subtitle1.trim()) || (data?.website_subtitle && data.website_subtitle.trim()) || 'Divine Guidance for Life';
+        let name = (data?.name && data.name.trim()) || (data?.website_name && data.website_name.trim()) || (data?.business_name && data.business_name.trim()) || 'Om Sri Mahakali Bhairavi Astrology Center';
+        let subtitle1 = (data?.subtitle1 && data.subtitle1.trim()) || (data?.website_subtitle && data.website_subtitle.trim()) || 'Divine Guidance for Life, Destiny, and Prosperity';
         const response = { ...data, name, subtitle1 };
         if (error && error.code !== 'PGRST116') {
             console.error('❌ navbar-settings error:', error.message);
@@ -626,12 +665,19 @@ router.delete('/announcements/:id', async (req, res) => {
 // Custom Reviews API Endpoints
 router.get('/reviews', async (req, res) => {
     try {
+        if (!supabase) {
+            console.warn('⚠️ Supabase not configured for reviews');
+            return res.json([]);
+        }
         const active = req.query.active === 'true';
         let query = supabase.from('custom_reviews').select('*');
         if (active) query = query.eq('active', true).order('display_order');
 
         const { data, error } = await query;
-        if (error) throw error;
+        if (error) {
+            console.error('Error fetching reviews:', error.message);
+            return res.json([]);
+        }
 
         const normalized = (data || []).map(r => {
             const userImage = r.user_image || '';
@@ -652,7 +698,7 @@ router.get('/reviews', async (req, res) => {
         res.json(normalized);
     } catch (err) {
         console.error('Error fetching reviews:', err);
-        res.status(500).json({ error: 'Failed to fetch reviews' });
+        res.json([]);
     }
 });
 
