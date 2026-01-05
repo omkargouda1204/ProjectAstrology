@@ -42,7 +42,7 @@ router.get('/bookings', async (req, res) => {
 // Create new booking
 router.post('/bookings', async (req, res) => {
     try {
-        const { name, email, phone, service, message, booking_date } = req.body;
+        const { name, email, phone, service, message, booking_date, dob, birth_time, birth_place } = req.body;
 
         // Validate required fields
         if (!name || !phone || !service) {
@@ -57,6 +57,9 @@ router.post('/bookings', async (req, res) => {
             service, 
             message: message || null,
             booking_date: booking_date || null,
+            dob: dob || null,
+            booking_time: birth_time || null,
+            notes: birth_place ? `Birth Place: ${birth_place}` : null,
             status: 'pending' 
         };
         
@@ -93,6 +96,9 @@ router.post('/bookings', async (req, res) => {
                                 <p style="margin: 10px 0; color: #4b5563;"><strong>Service:</strong> ${service}</p>
                                 <p style="margin: 10px 0; color: #4b5563;"><strong>Phone:</strong> ${phone}</p>
                                 ${booking_date ? `<p style="margin: 10px 0; color: #4b5563;"><strong>Preferred Date:</strong> ${new Date(booking_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>` : ''}
+                                ${dob ? `<p style="margin: 10px 0; color: #4b5563;"><strong>Date of Birth:</strong> ${new Date(dob).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>` : ''}
+                                ${birth_time ? `<p style="margin: 10px 0; color: #4b5563;"><strong>Time of Birth:</strong> ${birth_time}</p>` : ''}
+                                ${birth_place ? `<p style="margin: 10px 0; color: #4b5563;"><strong>Place of Birth:</strong> ${birth_place}</p>` : ''}
                                 ${message ? `<p style="margin: 10px 0; color: #4b5563;"><strong>Message:</strong> ${message}</p>` : ''}
                             </div>
                             
@@ -133,6 +139,9 @@ router.post('/bookings', async (req, res) => {
                                     <h3 style="margin-top: 0; color: #667eea;">📋 Booking Information</h3>
                                     <p style="margin: 10px 0; color: #4b5563;"><strong>Service:</strong> ${service}</p>
                                     ${booking_date ? `<p style="margin: 10px 0; color: #4b5563;"><strong>Preferred Date:</strong> ${new Date(booking_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>` : ''}
+                                    ${dob ? `<p style="margin: 10px 0; color: #4b5563;"><strong>Date of Birth:</strong> ${new Date(dob).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>` : ''}
+                                    ${birth_time ? `<p style="margin: 10px 0; color: #4b5563;"><strong>Time of Birth:</strong> ${birth_time}</p>` : ''}
+                                    ${birth_place ? `<p style="margin: 10px 0; color: #4b5563;"><strong>Place of Birth:</strong> ${birth_place}</p>` : ''}
                                     ${message ? `<p style="margin: 10px 0; color: #4b5563;"><strong>Message:</strong> ${message}</p>` : '<p style="margin: 10px 0; color: #9ca3af; font-style: italic;">No message provided</p>'}
                                     <p style="margin: 10px 0; color: #4b5563;"><strong>Booking ID:</strong> #${booking.id}</p>
                                 </div>
