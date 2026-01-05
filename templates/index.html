@@ -6,6 +6,12 @@
             window.globalChatbotConfig = window.globalChatbotConfig || {
                 welcome_message: ''
             };
+            
+            // Clear session storage cache to force fresh data load from database
+            // Uncomment below line to force fresh load, then comment it back
+            sessionStorage.clear();
+            console.log('🔄 Session storage cleared - loading fresh data from database');
+            
             // Clear old cached scripts
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.getRegistrations().then(function(registrations) {
@@ -20,6 +26,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+    <!-- Force reload: v1.2.0 -->
     <title>Sri Mahakali Bhairavi Astrology Center | Best Astrologer in Mysuru | ಶ್ರೀ ಮಹಾಕಾಳಿ ಭೈರವಿ ಜ್ಯೋತಿಷ್ಯ ಕೇಂದ್ರ</title>
     <meta name="description" content="Sri Mahakali Bhairavi Astrology Center - Best astrologer in Mysuru offering expert Vedic astrology services, horoscope reading, kundali matching, kundli reading, birth chart analysis, marriage astrology, career prediction, pooja services, gemstone consultation, vastu consultation, and astrology remedies. Online and offline consultations available. ಶ್ರೀ ಮಹಾಕಾಳಿ ಭೈರವಿ ಜ್ಯೋತಿಷ್ಯ ಕೇಂದ್ರ - ಮೈಸೂರಿನಲ್ಲಿ ಅತ್ಯುತ್ತಮ ಜ್ಯೋತಿಷ್ಯ ಸೇವೆಗಳು.">
     <meta name="og:title" content="Best Astrologer in Mysuru | Vedic Astrology Services | Sri Mahakali Bhairavi">
@@ -3109,48 +3116,65 @@
                 if (navbarSettings) {
                     // Update website name from database (CRITICAL - MUST WORK)
                     const nameEl = document.getElementById('website-name');
-                    if (nameEl && navbarSettings.name) {
-                        nameEl.textContent = navbarSettings.name;
-                        console.log('✅ Website name updated:', navbarSettings.name);
+                    const businessName = navbarSettings.name || navbarSettings.business_name || 'Astrology Center';
+                    if (nameEl) {
+                        nameEl.textContent = businessName;
+                        console.log('✅ Website name updated:', businessName);
                     }
                     
                     // Update subtitle from database (CRITICAL - MUST WORK)
                     const subtitleEl = document.getElementById('website-subtitle');
-                    if (subtitleEl && navbarSettings.subtitle1) {
-                        subtitleEl.textContent = navbarSettings.subtitle1;
-                        console.log('✅ Website subtitle updated:', navbarSettings.subtitle1);
+                    const subtitle = navbarSettings.subtitle1 || navbarSettings.tagline || 'Divine Guidance';
+                    if (subtitleEl) {
+                        subtitleEl.textContent = subtitle;
+                        console.log('✅ Website subtitle updated:', subtitle);
                     }
                     
                     // Update logo - ALWAYS use local /uploads/ URL for faster loading
                     const logoEl = document.getElementById('navbar-logo');
                     if (logoEl && navbarSettings.logo_url) {
-                        // Force local uploads folder path
-                        let logoUrl;
-                        if (navbarSettings.logo_url.startsWith('/uploads/')) {
-                            logoUrl = navbarSettings.logo_url;
-                        } else if (navbarSettings.logo_url.includes('supabase')) {
-                            const filename = navbarSettings.logo_url.split('/').pop().split('?')[0];
+                        // Handle different URL formats
+                        let logoUrl = navbarSettings.logo_url;
+                        
+                        // If it's already a local path, use it as-is
+                        if (logoUrl.startsWith('/static/uploads/') || logoUrl.startsWith('/uploads/')) {
+                            // Use as-is
+                        } else if (logoUrl.includes('supabase')) {
+                            // Extract filename from Supabase URL
+                            const filename = logoUrl.split('/').pop().split('?')[0];
                             logoUrl = `/uploads/${filename}`;
-                        } else {
-                            const filename = navbarSettings.logo_url.split('/').pop();
+                        } else if (!logoUrl.startsWith('http')) {
+                            // Relative path - add /uploads/
+                            const filename = logoUrl.split('/').pop();
                             logoUrl = `/uploads/${filename}`;
                         }
                         
-                        console.log('🖼️ Loading logo from uploads folder:', logoUrl);
+                        console.log('🖼️ Loading logo:', logoUrl);
                         logoEl.src = logoUrl;
+                        logoEl.alt = navbarSettings.logo_alt || 'Logo';
                         logoEl.style.display = 'block';
                         logoEl.style.visibility = 'visible';
                         logoEl.style.opacity = '1';
                         logoEl.loading = 'eager'; // Load immediately
                         
                         logoEl.onerror = function() {
-                            console.error('❌ Logo failed to load from uploads:', logoUrl);
-                            console.log('Trying original URL:', navbarSettings.logo_url);
-                            logoEl.src = navbarSettings.logo_url;
+                            console.error('❌ Logo failed to load:', logoUrl);
+                            // Try without /static/ prefix
+                            if (logoUrl.startsWith('/static/')) {
+                                const newUrl = logoUrl.replace('/static/', '/');
+                                console.log('Trying alternative URL:', newUrl);
+                                logoEl.src = newUrl;
+                            } else {
+                                console.log('Using fallback placeholder');
+                                logoEl.style.display = 'none';
+                            }
                         };
                         logoEl.onload = function() {
-                            console.log('✅ Logo loaded successfully from uploads folder');
+                            console.log('✅ Logo loaded successfully:', logoUrl);
                         };
+                    } else if (logoEl) {
+                        console.warn('⚠️ No logo URL found in navbar settings');
+                        logoEl.style.display = 'none';
                     }
                     
                 }
@@ -3613,26 +3637,57 @@
                 if (cachedPooja) {
                     const poojas = JSON.parse(cachedPooja);
                     console.log('✅ Loaded pooja services from session storage (cached):', poojas.length);
-                    renderPoojaServices(poojas);
+                    renderPoojaServices(poojas, false); // false = from cache, don't show defaults
                     return;
                 }
                 
                 const response = await fetch('/api/content/pooja-services');
                 if (response.ok) {
                     const poojas = await response.json();
+                    console.log('📊 Pooja services API response:', poojas);
                     // Save to session storage
                     sessionStorage.setItem('poojaServices', JSON.stringify(poojas));
-                    console.log('✅ Pooja services loaded from database and cached:', poojas.length);
-                    renderPoojaServices(poojas);
+                    console.log('✅ Pooja services loaded from database:', poojas.length, 'items');
+                    renderPoojaServices(poojas, true); // true = from DB, can show defaults if empty
+                } else {
+                    console.warn('⚠️ Failed to load pooja services from database');
+                    renderPoojaServices([], true);
                 }
             } catch (error) {
                 console.error('Error loading pooja services:', error);
+                renderPoojaServices([], true);
             }
         }
         
-        function renderPoojaServices(poojas) {
+        function renderPoojaServices(poojas, showDefaults = false) {
             const grid = document.getElementById('pooja-services-grid');
             grid.innerHTML = '';
+            
+            // Only show defaults if database is empty AND showDefaults is true
+            if (showDefaults && (!poojas || poojas.length === 0)) {
+                console.log('📦 No pooja services in database, showing placeholder content');
+                poojas = [
+                    { title: 'Ganesh Puja', description: 'Remove obstacles and bring success' },
+                    { title: 'Navagraha Puja', description: 'Planetary harmony and balance' },
+                    { title: 'Lakshmi Puja', description: 'Wealth and prosperity' },
+                    { title: 'Shani Puja', description: 'Saturn remedies and blessings' },
+                    { title: 'Hanuman Puja', description: 'Strength and courage' },
+                    { title: 'Saraswati Puja', description: 'Knowledge and wisdom' }
+                ];
+            } else if (!poojas || poojas.length === 0) {
+                console.log('⚠️ No pooja services available');
+                return;
+            }
+            
+            // Add default content if no poojas exist
+            if (!poojas || poojas.length === 0) {
+                poojas = [
+                    { title: 'Ganesh Puja', description: 'Remove obstacles', image_url: 'https://images.unsplash.com/photo-1604608672516-e1e8e1389f1c?w=400' },
+                    { title: 'Navagraha Puja', description: 'Planetary harmony', image_url: 'https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?w=400' },
+                    { title: 'Lakshmi Puja', description: 'Wealth & prosperity', image_url: 'https://images.unsplash.com/photo-1545241047-6083a3684587?w=400' },
+                    { title: 'Shani Puja', description: 'Saturn remedies', image_url: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=400' }
+                ];
+            }
             
             poojas.forEach((pooja, index) => {
                 const card = document.createElement('div');
@@ -3675,24 +3730,29 @@
                 if (cachedSolutions) {
                     const solutions = JSON.parse(cachedSolutions);
                     console.log('✅ Loaded expert solutions from session storage (cached):', solutions.length);
-                    renderExpertSolutions(solutions);
+                    renderExpertSolutions(solutions, false); // false = from cache
                     return;
                 }
                 
                 const response = await fetch('/api/content/expert-solutions');
                 if (response.ok) {
                     const solutions = await response.json();
+                    console.log('📊 Expert solutions API response:', solutions);
                     // Save to session storage
                     sessionStorage.setItem('expertSolutions', JSON.stringify(solutions));
-                    console.log('✅ Expert solutions loaded from database and cached:', solutions.length);
-                    renderExpertSolutions(solutions);
+                    console.log('✅ Expert solutions loaded from database:', solutions.length, 'items');
+                    renderExpertSolutions(solutions, true); // true = from DB, can show defaults if empty
+                } else {
+                    console.warn('⚠️ Failed to load expert solutions from database');
+                    renderExpertSolutions([], true);
                 }
             } catch (error) {
                 console.error('Error loading expert solutions:', error);
+                renderExpertSolutions([], true);
             }
         }
         
-        function renderExpertSolutions(solutions) {
+        function renderExpertSolutions(solutions, showDefaults = false) {
             const grid = document.getElementById('expert-solutions-grid');
             if (!grid) {
                 console.error('❌ Expert solutions grid not found');
@@ -3700,6 +3760,19 @@
             }
             if (!Array.isArray(solutions)) {
                 console.error('❌ Expert solutions data invalid:', solutions);
+                return;
+            }
+
+            // Only show defaults if database is empty AND showDefaults is true
+            if (showDefaults && solutions.length === 0) {
+                console.log('📦 No expert solutions in database, showing placeholder content');
+                solutions = [
+                    { title: 'Marriage Problems', description: 'Expert guidance for marital harmony and relationship issues' },
+                    { title: 'Career Guidance', description: 'Find the right career path through astrological insights' },
+                    { title: 'Business Problems', description: 'Overcome business challenges with astrological remedies' }
+                ];
+            } else if (solutions.length === 0) {
+                console.log('⚠️ No expert solutions available');
                 return;
             }
 
@@ -4303,7 +4376,7 @@
                 if (cachedGallery) {
                     const gallerySlides = JSON.parse(cachedGallery);
                     console.log('✅ Loaded gallery slides from session storage (cached):', gallerySlides.length, 'slides');
-                    renderGallerySlides(gallerySlides);
+                    renderGallerySlides(gallerySlides, false); // false = from cache
                     return;
                 }
                 
@@ -4333,19 +4406,25 @@
                     console.error('Invalid gallery slides data format:', data);
                 }
                 
-                renderGallerySlides(gallerySlides);
+                renderGallerySlides(gallerySlides, true); // true = from DB, can show defaults
             } catch (error) {
                 console.error('Error loading gallery slides:', error);
-                renderGallerySlides([]);
+                renderGallerySlides([], true);
             }
         }
 
-        function renderGallerySlides(slides) {
+        function renderGallerySlides(slides, showDefaults = false) {
             const container = document.getElementById('gallery-slides-container');
             container.innerHTML = '';
             
-            if (slides.length === 0) {
-                container.innerHTML = '<div class="w-full text-center py-12 text-gray-500"><p class="text-xl">No gallery images available yet.</p></div>';
+            // Only show defaults if database is empty AND showDefaults is true
+            if (showDefaults && (!slides || slides.length === 0)) {
+                console.log('📦 No gallery slides in database, showing placeholder content');
+                // No default images - let admin add them
+                container.innerHTML = '<div class="w-full text-center py-12 text-gray-500"><p class="text-lg">No gallery images available. Please add images through the admin panel.</p></div>';
+                return;
+            } else if (!slides || slides.length === 0) {
+                console.log('⚠️ No gallery slides available');
                 return;
             }
             
@@ -7142,6 +7221,636 @@ ${bookingData.message ? '• Question: ' + bookingData.message + '<br>' : ''}
             }
         }
     </style>
+
+    <!-- Booking Form Modal Styles -->
+    <style>
+        /* Modal Overlay */
+        .booking-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .booking-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Modal Container */
+        .booking-modal {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 480px;
+            width: 92%;
+            max-height: 85vh;
+            overflow-y: auto;
+            transform: scale(0.8) translateY(-20px);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .booking-modal-overlay.active .booking-modal {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Modal Header */
+        .booking-modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            border-radius: 16px 16px 0 0;
+            position: relative;
+        }
+
+        .booking-modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .booking-modal-header p {
+            margin: 0.5rem 0 0 0;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Close Button */
+        .booking-close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+
+        .booking-close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Modal Body */
+        .booking-modal-body {
+            padding: 2rem;
+        }
+
+        /* Form Styles */
+        .booking-form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .booking-form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .booking-form-group label .required {
+            color: #e53e3e;
+            margin-left: 0.2rem;
+        }
+
+        .booking-form-group input,
+        .booking-form-group select,
+        .booking-form-group textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            font-family: inherit;
+        }
+
+        .booking-form-group input:focus,
+        .booking-form-group select:focus,
+        .booking-form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .booking-form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .booking-form-error {
+            color: #e53e3e;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .booking-form-group.error input,
+        .booking-form-group.error select {
+            border-color: #e53e3e;
+        }
+
+        .booking-form-group.error .booking-form-error {
+            display: block;
+        }
+
+        /* Buttons */
+        .booking-form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .booking-btn {
+            flex: 1;
+            padding: 0.875rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .booking-btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .booking-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .booking-btn-secondary {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+        }
+
+        .booking-btn-secondary:hover {
+            background: #edf2f7;
+        }
+
+        /* Success Message */
+        .booking-success-message {
+            display: none;
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .booking-success-message.active {
+            display: block;
+        }
+
+        .booking-success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            animation: successPop 0.5s ease;
+        }
+
+        @keyframes successPop {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .booking-success-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .booking-success-message h3 {
+            color: #2d3748;
+            font-size: 1.5rem;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .booking-success-message p {
+            color: #718096;
+            margin: 0 0 2rem 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .booking-modal {
+                max-width: 94%;
+                max-height: 88vh;
+                width: 94%;
+            }
+
+            .booking-modal-header {
+                padding: 1.25rem 1.5rem;
+            }
+
+            .booking-modal-header h2 {
+                font-size: 1.25rem;
+            }
+
+            .booking-modal-body {
+                padding: 1.5rem;
+            }
+
+            .booking-form-actions {
+                flex-direction: column;
+            }
+
+            .booking-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .booking-modal {
+                width: 96%;
+                max-width: 96%;
+                max-height: 92vh;
+            }
+
+            .booking-modal-header {
+                padding: 1rem 1.25rem;
+            }
+
+            .booking-modal-header h2 {
+                font-size: 1.1rem;
+            }
+
+            .booking-modal-body {
+                padding: 1.25rem;
+            }
+
+            .booking-form-group {
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* Scrollbar Styling */
+        .booking-modal::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .booking-modal::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 0 16px 16px 0;
+        }
+
+        .booking-modal::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 10px;
+        }
+
+        .booking-modal::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+    </style>
+
+    <!-- Booking Form Modal HTML -->
+    <div class="booking-modal-overlay" id="bookingModal">
+        <div class="booking-modal">
+            <div class="booking-modal-header">
+                <button class="booking-close-btn" onclick="closeBookingModal()" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+                <h2>Book Your Consultation</h2>
+                <p>Fill in the details below and we'll get back to you soon</p>
+            </div>
+            
+            <div class="booking-modal-body">
+                <form id="bookingForm" class="booking-form">
+                    <div class="booking-form-group">
+                        <label for="booking-name">
+                            Full Name<span class="required">*</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="booking-name" 
+                            name="name" 
+                            placeholder="Enter your full name"
+                            required
+                        >
+                        <div class="booking-form-error">Please enter your name</div>
+                    </div>
+
+                    <div class="booking-form-group">
+                        <label for="booking-mobile">
+                            Mobile Number<span class="required">*</span>
+                        </label>
+                        <input 
+                            type="tel" 
+                            id="booking-mobile" 
+                            name="phone" 
+                            placeholder="Enter 10-digit mobile number"
+                            pattern="[0-9]{10}"
+                            required
+                        >
+                        <div class="booking-form-error">Please enter a valid 10-digit mobile number</div>
+                    </div>
+
+                    <div class="booking-form-group">
+                        <label for="booking-email">
+                            Email Address
+                        </label>
+                        <input 
+                            type="email" 
+                            id="booking-email" 
+                            name="email" 
+                            placeholder="Enter your email (optional)"
+                        >
+                        <div class="booking-form-error">Please enter a valid email address</div>
+                    </div>
+
+                    <div class="booking-form-group">
+                        <label for="booking-service">
+                            Service<span class="required">*</span>
+                        </label>
+                        <select id="booking-service" name="service" required>
+                            <option value="">Select a service</option>
+                            <option value="Horoscope Reading">Horoscope Reading</option>
+                            <option value="Kundali Matching">Kundali Matching</option>
+                            <option value="Birth Chart Analysis">Birth Chart Analysis</option>
+                            <option value="Marriage Consultation">Marriage Consultation</option>
+                            <option value="Career Guidance">Career Guidance</option>
+                            <option value="Gemstone Consultation">Gemstone Consultation</option>
+                            <option value="Vastu Consultation">Vastu Consultation</option>
+                            <option value="Pooja Services">Pooja Services</option>
+                            <option value="General Consultation">General Consultation</option>
+                        </select>
+                        <div class="booking-form-error">Please select a service</div>
+                    </div>
+
+                    <div class="booking-form-group">
+                        <label for="booking-date">
+                            Consultation Date<span class="required">*</span>
+                        </label>
+                        <input 
+                            type="date" 
+                            id="booking-date" 
+                            name="date_of_birth" 
+                            required
+                        >
+                        <div class="booking-form-error">Please select a valid date (today or future only)</div>
+                    </div>
+
+                    <div class="booking-form-group">
+                        <label for="booking-message">
+                            Message
+                        </label>
+                        <textarea 
+                            id="booking-message" 
+                            name="message" 
+                            placeholder="Tell us more about your requirements (optional)"
+                        ></textarea>
+                    </div>
+
+                    <div class="booking-form-actions">
+                        <button type="button" class="booking-btn booking-btn-secondary" onclick="closeBookingModal()">
+                            Cancel
+                        </button>
+                        <button type="submit" class="booking-btn booking-btn-primary">
+                            <i class="fas fa-calendar-check"></i> Book Now
+                        </button>
+                    </div>
+                </form>
+
+                <div class="booking-success-message" id="bookingSuccess">
+                    <div class="booking-success-icon">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h3>Booking Submitted!</h3>
+                    <p>Thank you for booking with us. We'll contact you shortly to confirm your appointment.</p>
+                    <button class="booking-btn booking-btn-primary" onclick="closeBookingModal()">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Form JavaScript -->
+    <script>
+        // Show modal automatically on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            // Show booking modal after a slight delay for better UX
+            setTimeout(function() {
+                openBookingModal();
+            }, 500);
+
+            // Set minimum date to today and validate date selection
+            const dateInput = document.getElementById('booking-date');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const todayStr = today.toISOString().split('T')[0];
+            dateInput.setAttribute('min', todayStr);
+            
+            // Prevent manual entry of past dates
+            dateInput.addEventListener('change', function() {
+                const selectedDate = new Date(this.value);
+                selectedDate.setHours(0, 0, 0, 0);
+                
+                if (selectedDate < today) {
+                    this.value = todayStr;
+                    this.closest('.booking-form-group').classList.add('error');
+                    alert('Please select today or a future date only');
+                } else {
+                    this.closest('.booking-form-group').classList.remove('error');
+                }
+            });
+        });
+
+        // Open booking modal
+        function openBookingModal() {
+            const modal = document.getElementById('bookingModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close booking modal
+        function closeBookingModal() {
+            const modal = document.getElementById('bookingModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+            
+            // Reset form and hide success message after modal closes
+            setTimeout(function() {
+                resetBookingForm();
+            }, 300);
+        }
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('bookingModal');
+            if (event.target === modal) {
+                closeBookingModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeBookingModal();
+            }
+        });
+
+        // Form validation and submission
+        document.getElementById('bookingForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            // Clear previous errors
+            document.querySelectorAll('.booking-form-group').forEach(function(group) {
+                group.classList.remove('error');
+            });
+
+            let isValid = true;
+
+            // Validate Name
+            const nameInput = document.getElementById('booking-name');
+            if (!nameInput.value.trim()) {
+                nameInput.closest('.booking-form-group').classList.add('error');
+                isValid = false;
+            }
+
+            // Validate Mobile Number
+            const mobileInput = document.getElementById('booking-mobile');
+            const mobilePattern = /^[0-9]{10}$/;
+            if (!mobilePattern.test(mobileInput.value.trim())) {
+                mobileInput.closest('.booking-form-group').classList.add('error');
+                isValid = false;
+            }
+
+            // Validate Email (if provided)
+            const emailInput = document.getElementById('booking-email');
+            if (emailInput.value.trim()) {
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(emailInput.value.trim())) {
+                    emailInput.closest('.booking-form-group').classList.add('error');
+                    isValid = false;
+                }
+            }
+
+            // Validate Service
+            const serviceInput = document.getElementById('booking-service');
+            if (!serviceInput.value) {
+                serviceInput.closest('.booking-form-group').classList.add('error');
+                isValid = false;
+            }
+
+            // Validate Date
+            const dateInput = document.getElementById('booking-date');
+            if (!dateInput.value) {
+                dateInput.closest('.booking-form-group').classList.add('error');
+                isValid = false;
+            } else {
+                // Check if date is today or in the future
+                const selectedDate = new Date(dateInput.value);
+                selectedDate.setHours(0, 0, 0, 0);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                if (selectedDate < today) {
+                    dateInput.closest('.booking-form-group').classList.add('error');
+                    isValid = false;
+                    alert('Please select today or a future date only');
+                }
+            }
+
+            if (!isValid) {
+                return;
+            }
+
+            // Collect form data
+            const formData = {
+                name: nameInput.value.trim(),
+                phone: mobileInput.value.trim(),
+                email: emailInput.value.trim() || null,
+                service: serviceInput.value,
+                booking_date: dateInput.value,
+                message: document.getElementById('booking-message').value.trim() || null
+            };
+
+            console.log('📤 Submitting booking:', formData);
+
+            // Show loading state
+            const submitBtn = document.querySelector('.booking-btn-primary');
+            const originalBtnText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+            // Submit booking to API
+            fetch('/api/bookings', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.error || 'Failed to submit booking');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('✅ Booking submitted successfully:', data);
+                showSuccessMessage();
+            })
+            .catch(error => {
+                console.error('❌ Booking error:', error);
+                alert('Failed to submit booking: ' + error.message + '. Please try again or contact us directly.');
+            })
+            .finally(() => {
+                // Restore button state
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+            });
+        });
+
+        // Show success message
+        function showSuccessMessage() {
+            document.getElementById('bookingForm').style.display = 'none';
+            document.getElementById('bookingSuccess').classList.add('active');
+        }
+
+        // Reset form
+        function resetBookingForm() {
+            document.getElementById('bookingForm').reset();
+            document.getElementById('bookingForm').style.display = 'block';
+            document.getElementById('bookingSuccess').classList.remove('active');
+            
+            // Clear all errors
+            document.querySelectorAll('.booking-form-group').forEach(function(group) {
+                group.classList.remove('error');
+            });
+        }
+    </script>
 
 </body>
 </html>
