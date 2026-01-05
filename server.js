@@ -1,3 +1,6 @@
+// Load environment variables first
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -6,7 +9,7 @@ const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
 const fs = require('fs');
 const https = require('https');
-const { supabase } = require('./config/database');
+const { supabase, initDB } = require('./config/database');
 
 // Import routes
 const adminRoutes = require('./routes/admin');
@@ -154,6 +157,104 @@ app.get('/uploads/:filename', async (req, res) => {
     }
 });
 
+// Static uploads handler - mirrors /uploads/:filename for /static/uploads/:filename paths
+app.get('/static/uploads/:filename', async (req, res) => {
+    try {
+        const filename = decodeURIComponent(req.params.filename);
+        const localPath = path.join(__dirname, 'static', 'uploads', filename);
+        
+        console.log(`📥 Static image request: ${filename}`);
+        
+        // First, try to serve from local uploads folder
+        if (fs.existsSync(localPath)) {
+            console.log(`✅ Serving from local: ${filename}`);
+            return res.sendFile(localPath);
+        }
+        
+        console.log(`⚠️ Not in local uploads, checking Supabase...`);
+        
+        // If not found locally, try to fetch from Supabase bucket
+        if (!supabase) {
+            console.log(`❌ Supabase not configured`);
+            return res.status(404).send('Image not found');
+        }
+        
+        const bucketName = process.env.SUPABASE_STORAGE_BUCKET || 'astrology';
+        const folders = ['services', 'pooja-services', 'others', 'about', 'gallery-slides', 'hero-slides'];
+        
+        // Try each folder
+        for (const folder of folders) {
+            const storagePath = `${folder}/${filename}`;
+            
+            try {
+                // Get public URL from Supabase
+                const { data: urlData } = supabase.storage
+                    .from(bucketName)
+                    .getPublicUrl(storagePath);
+                
+                if (!urlData || !urlData.publicUrl) {
+                    continue;
+                }
+                
+                console.log(`🔍 Trying: ${storagePath}`);
+                
+                // Fetch from Supabase with timeout
+                const imageResponse = await new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        reject(new Error('Request timeout'));
+                    }, 5000);
+                    
+                    https.get(urlData.publicUrl, (response) => {
+                        clearTimeout(timeout);
+                        if (response.statusCode === 200) {
+                            resolve(response);
+                        } else {
+                            reject(new Error(`HTTP ${response.statusCode}`));
+                        }
+                    }).on('error', (err) => {
+                        clearTimeout(timeout);
+                        reject(err);
+                    });
+                });
+                
+                // Set content type based on file extension
+                const ext = path.extname(filename).toLowerCase();
+                const contentTypes = {
+                    '.jpg': 'image/jpeg',
+                    '.jpeg': 'image/jpeg',
+                    '.png': 'image/png',
+                    '.gif': 'image/gif',
+                    '.webp': 'image/webp',
+                    '.avif': 'image/avif',
+                    '.svg': 'image/svg+xml'
+                };
+                
+                const contentType = contentTypes[ext] || 'image/jpeg';
+                res.setHeader('Content-Type', contentType);
+                res.setHeader('Cache-Control', 'public, max-age=31536000');
+                
+                console.log(`✅ Serving from Supabase: ${storagePath}`);
+                
+                // Stream the image to client
+                imageResponse.pipe(res);
+                return;
+                
+            } catch (err) {
+                console.log(`⏭️ ${folder}: ${err.message}`);
+                continue;
+            }
+        }
+        
+        // Image not found in any location
+        console.log(`❌ Image not found: ${filename}`);
+        res.status(404).send('Image not found');
+        
+    } catch (error) {
+        console.error(`❌ Error serving static image:`, error);
+        res.status(500).send('Server error');
+    }
+});
+
 // Serve HTML files
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'templates', 'index.html'));
@@ -238,8 +339,10 @@ app.use((err, req, res, next) => {
 // START SERVER
 // ========================================
 
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`
+// Initialize database connection
+initDB().then(() => {
+    app.listen(PORT, '0.0.0.0', () => {
+        console.log(`
 ╔═══════════════════════════════════════════════════════╗
 ║                                                       ║
 ║   🌙 Cosmic Astrology Backend Server                 ║
@@ -251,10 +354,11 @@ app.listen(PORT, '0.0.0.0', () => {
 ║   API Endpoints:                                      ║
 ║   • http://localhost:${PORT}/                         ║
 ║   • http://localhost:${PORT}/admin                    ║
-║   • http://localhost:${PORT}/api/.                    ║
+║   • http://localhost:${PORT}/api/...                  ║
 ║                                                       ║
 ╚═══════════════════════════════════════════════════════╝
-    `);
+        `);
+    });
 });
 
 // Graceful shutdown
