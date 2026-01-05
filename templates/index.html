@@ -5417,13 +5417,15 @@
                 if (imageSource) {
                     const converted = convertToLocalUrl(imageSource);
                     avatarHTML = `
-                        <img src="${converted}" alt="${name}" 
-                             class="w-full h-full object-cover" 
-                             loading="lazy" 
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="w-full h-full flex items-center justify-center text-white font-bold text-xl" 
-                             style="display: none; background: linear-gradient(135deg, ${color1}, ${color2});">
-                            ${name.charAt(0).toUpperCase()}
+                        <div class="w-full h-full relative">
+                            <img src="${converted}" alt="${name}" 
+                                 class="w-full h-full object-cover absolute inset-0" 
+                                 loading="lazy" 
+                                 onerror="this.style.display='none';">
+                            <div class="w-full h-full flex items-center justify-center text-white font-bold text-xl" 
+                                 style="background: linear-gradient(135deg, ${color1}, ${color2});">
+                                ${name.charAt(0).toUpperCase()}
+                            </div>
                         </div>
                     `;
                 } else {
@@ -6024,8 +6026,20 @@
                         <input type="email" id="booking-email" placeholder="Email (Optional)" class="w-full px-2 sm:px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333; font-size: clamp(12px, 2.5vw, 14px);">
                         <input type="tel" id="booking-phone" placeholder="Phone Number (10 digits) *" required pattern="[6-9][0-9]{9}" class="w-full px-2 sm:px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333; font-size: clamp(12px, 2.5vw, 14px);">
                         <div>
-                            <label style="display: block; font-size: clamp(12px, 2.5vw, 14px); color: #333; margin-bottom: 4px; font-weight: 500;">Date of Birth *</label>
+                            <label style="display: block; font-size: clamp(12px, 2.5vw, 14px); color: #333; margin-bottom: 4px; font-weight: 500;">📅 Date of Birth *</label>
                             <input type="date" id="booking-dob" required max="${today}" class="w-full px-2 sm:px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333; font-size: clamp(12px, 2.5vw, 14px);">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: clamp(12px, 2.5vw, 14px); color: #333; margin-bottom: 4px; font-weight: 500;">🕐 Time of Birth *</label>
+                            <input type="time" id="booking-time" required class="w-full px-2 sm:px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333; font-size: clamp(12px, 2.5vw, 14px);">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: clamp(12px, 2.5vw, 14px); color: #333; margin-bottom: 4px; font-weight: 500;">📍 Place of Birth *</label>
+                            <input type="text" id="booking-place" placeholder="City, State" required class="w-full px-2 sm:px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333; font-size: clamp(12px, 2.5vw, 14px);">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: clamp(12px, 2.5vw, 14px); color: #333; margin-bottom: 4px; font-weight: 500;">📆 Preferred Booking Day *</label>
+                            <input type="date" id="booking-day" required min="${today}" class="w-full px-2 sm:px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500" style="color: #333; font-size: clamp(12px, 2.5vw, 14px);">
                         </div>
                         <div>
                             <label style="display: block; font-size: clamp(12px, 2.5vw, 14px); color: #333; margin-bottom: 4px; font-weight: 500;">Select Service *</label>
@@ -6063,6 +6077,9 @@
                     const email = document.getElementById('booking-email').value.trim();
                     const phone = document.getElementById('booking-phone').value.trim();
                     const dob = document.getElementById('booking-dob').value;
+                    const birthTime = document.getElementById('booking-time').value;
+                    const birthPlace = document.getElementById('booking-place').value.trim();
+                    const bookingDay = document.getElementById('booking-day').value;
                     const service = document.getElementById('booking-service').value;
                     
                     // Name validation - at least 2 letters, only letters and spaces
@@ -6099,11 +6116,34 @@
                         return;
                     }
                     
+                    // Birth time validation
+                    if (!birthTime) {
+                        addBotMessage('❌ Please enter your time of birth');
+                        return;
+                    }
+                    
+                    // Birth place validation
+                    if (birthPlace.length < 2) {
+                        addBotMessage('❌ Please enter a valid place of birth');
+                        return;
+                    }
+                    
+                    // Booking day validation
+                    const bookingDate = new Date(bookingDay);
+                    bookingDate.setHours(0, 0, 0, 0);
+                    if (bookingDate < today) {
+                        addBotMessage('❌ Booking day must be today or a future date');
+                        return;
+                    }
+                    
                     const bookingData = {
                         name: name,
                         email: email || null,
                         phone: phone,
                         dob: dob,
+                        birth_time: birthTime,
+                        birth_place: birthPlace,
+                        booking_date: bookingDay,
                         service: service,
                         subject: service,
                         message: document.getElementById('booking-message').value.trim() || null
@@ -6139,17 +6179,22 @@
                             
                             // Show success message with contact options
                             addBotMessage(`✅ <strong>Booking Confirmed!</strong><br><br>
+                            // Show success message with contact options
+                            addBotMessage(`✅ <strong>Booking Confirmed!</strong><br><br>
 Thank you <strong>${name}</strong> for booking <strong>${service}</strong>!<br><br>
 📋 <strong>Booking Details:</strong><br>
-• Name: ${name}<br>
-• Phone: ${phone}<br>
-• Service: ${service}<br>
-• DOB: ${dob}<br>
-${bookingData.message ? '• Question: ' + bookingData.message + '<br>' : ''}
+• <strong>Name:</strong> ${name}<br>
+• <strong>Phone:</strong> ${phone}<br>
+• <strong>Service:</strong> ${service}<br>
+• <strong>Date of Birth:</strong> ${dob}<br>
+• <strong>Time of Birth:</strong> ${bookingData.birth_time || '-'}<br>
+• <strong>Place of Birth:</strong> ${bookingData.birth_place || '-'}<br>
+• <strong>Preferred Booking Day:</strong> ${bookingData.booking_date || '-'}<br>
+${bookingData.message ? '• <strong>Question:</strong> ' + bookingData.message + '<br>' : ''}
 <br><em>Booking ID: #${bookingId}</em><br><br>
 📱 <strong>Contact Us Directly:</strong><br>
 <div style="display: flex; gap: 10px; flex-wrap: wrap; margin: 15px 0;">
-    <a href="https://wa.me/${(globalBusinessInfo?.whatsapp_number || globalBusinessInfo?.phone || '918431729319').replace(/\\D/g, '')}?text=Hi!%20I%20just%20booked%20(ID:%20${bookingId})%20for%20${encodeURIComponent(service)}" target="_blank" style="background: #25D366; color: white; padding: 10px 15px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; font-weight: bold; gap: 5px;">
+    <a href="https://wa.me/${(globalBusinessInfo?.whatsapp_number || globalBusinessInfo?.phone || '918431729319').replace(/\D/g, '')}?text=Hi!%20I%20just%20booked%20(ID:%20${bookingId})%20for%20${encodeURIComponent(service)}" target="_blank" style="background: #25D366; color: white; padding: 10px 15px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; font-weight: bold; gap: 5px;">
         <i class="fab fa-whatsapp"></i> WhatsApp
     </a>
     <a href="mailto:${globalBusinessInfo?.email || 'omkargouda1204@gmail.com'}?subject=Booking%20Confirmation%20${bookingId}&body=Hi,%20I%20booked%20${encodeURIComponent(service)}%20consultation." style="background: #EA4335; color: white; padding: 10px 15px; border-radius: 20px; text-decoration: none; display: inline-flex; align-items: center; font-weight: bold; gap: 5px;">
