@@ -23,6 +23,10 @@ const createTransporter = () => {
 // Get all bookings
 router.get('/bookings', async (req, res) => {
     try {
+        if (!supabase) {
+            console.warn('⚠️ Supabase not configured for bookings');
+            return res.json([]);
+        }
         const { data, error } = await supabase
             .from('bookings')
             .select('*')
@@ -38,23 +42,33 @@ router.get('/bookings', async (req, res) => {
 // Create new booking
 router.post('/bookings', async (req, res) => {
     try {
-        const { name, email, phone, date_of_birth, service, message } = req.body;
+        const { name, email, phone, service, message, booking_date } = req.body;
 
         // Validate required fields
-        if (!name || !email || !service) {
-            return res.status(400).json({ error: 'Missing required fields' });
+        if (!name || !phone || !service) {
+            return res.status(400).json({ error: 'Missing required fields: name, phone, and service are required' });
         }
 
-        // Insert booking into database (date_of_birth is optional)
-        const insertData = { name, email, phone, service, message, status: 'pending' };
-        if (date_of_birth) insertData.date_of_birth = date_of_birth;
+        // Insert booking into database
+        const insertData = { 
+            name, 
+            email: email || null,
+            phone, 
+            service, 
+            message: message || null,
+            booking_date: booking_date || null,
+            status: 'pending' 
+        };
         
         const { data, error } = await supabase
             .from('bookings')
             .insert([insertData])
             .select();
         
-        if (error) throw error;
+        if (error) {
+            console.error('Error creating booking:', error);
+            throw error;
+        }
         const booking = data[0];
 
         // Send confirmation email to customer
@@ -62,27 +76,34 @@ router.post('/bookings', async (req, res) => {
             const transporter = createTransporter();
             
             await transporter.sendMail({
-                from: process.env.EMAIL_FROM,
+                from: process.env.EMAIL_FROM || 'noreply@astrology.com',
                 to: email,
-                subject: 'Booking Confirmation - Cosmic Astrology',
+                subject: 'Booking Confirmation - Astrology Services',
                 html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                        <h2 style="color: #7C3AED;">Booking Confirmation</h2>
-                        <p>Dear ${name},</p>
-                        <p>Thank you for booking with Cosmic Astrology. We have received your booking request.</p>
-                        
-                        <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                            <h3 style="margin-top: 0;">Booking Details:</h3>
-                            <p><strong>Service:</strong> ${service}</p>
-                            ${date_of_birth ? `<p><strong>Date of Birth:</strong> ${date_of_birth}</p>` : ''}
-                            <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
-                            ${message ? `<p><strong>Message:</strong> ${message}</p>` : ''}
+                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
+                            <h1 style="color: white; margin: 0;">🌙 Booking Confirmed</h1>
                         </div>
-                        
-                        <p>We will contact you shortly to confirm your appointment.</p>
-                        <p>If you have any questions, please don't hesitate to contact us.</p>
-                        
-                        <p>Best regards,<br>Cosmic Astrology Team</p>
+                        <div style="background: white; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+                            <p style="font-size: 16px; color: #374151;">Dear <strong>${name}</strong>,</p>
+                            <p style="font-size: 16px; color: #374151;">Thank you for booking with us. We have received your booking request and will contact you shortly.</p>
+                            
+                            <div style="background: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea;">
+                                <h3 style="margin-top: 0; color: #667eea;">📋 Booking Details</h3>
+                                <p style="margin: 10px 0; color: #4b5563;"><strong>Service:</strong> ${service}</p>
+                                <p style="margin: 10px 0; color: #4b5563;"><strong>Phone:</strong> ${phone}</p>
+                                ${booking_date ? `<p style="margin: 10px 0; color: #4b5563;"><strong>Preferred Date:</strong> ${new Date(booking_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>` : ''}
+                                ${message ? `<p style="margin: 10px 0; color: #4b5563;"><strong>Message:</strong> ${message}</p>` : ''}
+                            </div>
+                            
+                            <p style="font-size: 14px; color: #6b7280; margin-top: 20px;">We will contact you shortly to confirm your appointment details.</p>
+                            <p style="font-size: 14px; color: #6b7280;">If you have any questions, please don't hesitate to contact us.</p>
+                            
+                            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+                                <p style="font-size: 14px; color: #9ca3af; margin: 0;">Best regards,</p>
+                                <p style="font-size: 14px; color: #667eea; font-weight: bold; margin: 5px 0 0 0;">Astrology Services Team</p>
+                            </div>
+                        </div>
                     </div>
                 `
             });
@@ -90,19 +111,44 @@ router.post('/bookings', async (req, res) => {
             // Send notification to admin
             if (process.env.BOOKING_NOTIFICATION_EMAIL) {
                 await transporter.sendMail({
-                    from: process.env.EMAIL_FROM,
+                    from: process.env.EMAIL_FROM || 'noreply@astrology.com',
                     to: process.env.BOOKING_NOTIFICATION_EMAIL,
-                    subject: 'New Booking Received',
+                    subject: `📥 New Booking: ${service}`,
                     html: `
-                        <div style="font-family: Arial, sans-serif;">
-                            <h2>New Booking Received</h2>
-                            <p><strong>Name:</strong> ${name}</p>
-                            <p><strong>Email:</strong> ${email}</p>
-                            <p><strong>Phone:</strong> ${phone || 'Not provided'}</p>
-                            <p><strong>Service:</strong> ${service}</p>
-                            ${date_of_birth ? `<p><strong>Date of Birth:</strong> ${date_of_birth}</p>` : ''}
-                            ${message ? `<p><strong>Message:</strong> ${message}</p>` : ''}
-                            <p><strong>Booking ID:</strong> ${booking.id}</p>
+                        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                            <div style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
+                                <h1 style="color: white; margin: 0;">🔔 New Booking Alert</h1>
+                            </div>
+                            <div style="background: white; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
+                                <p style="font-size: 16px; color: #374151; font-weight: bold;">You have received a new booking request!</p>
+                                
+                                <div style="background: #fef3c7; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+                                    <h3 style="margin-top: 0; color: #f59e0b;">👤 Customer Details</h3>
+                                    <p style="margin: 10px 0; color: #4b5563;"><strong>Name:</strong> ${name}</p>
+                                    <p style="margin: 10px 0; color: #4b5563;"><strong>Phone:</strong> <a href="tel:${phone}" style="color: #667eea;">${phone}</a></p>
+                                    ${email ? `<p style="margin: 10px 0; color: #4b5563;"><strong>Email:</strong> <a href="mailto:${email}" style="color: #667eea;">${email}</a></p>` : ''}
+                                </div>
+                                
+                                <div style="background: #e0e7ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #667eea;">
+                                    <h3 style="margin-top: 0; color: #667eea;">📋 Booking Information</h3>
+                                    <p style="margin: 10px 0; color: #4b5563;"><strong>Service:</strong> ${service}</p>
+                                    ${booking_date ? `<p style="margin: 10px 0; color: #4b5563;"><strong>Preferred Date:</strong> ${new Date(booking_date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>` : ''}
+                                    ${message ? `<p style="margin: 10px 0; color: #4b5563;"><strong>Message:</strong> ${message}</p>` : '<p style="margin: 10px 0; color: #9ca3af; font-style: italic;">No message provided</p>'}
+                                    <p style="margin: 10px 0; color: #4b5563;"><strong>Booking ID:</strong> #${booking.id}</p>
+                                </div>
+                                
+                                <div style="margin-top: 30px; padding: 20px; background: #dcfce7; border-radius: 8px;">
+                                    <p style="font-size: 14px; color: #166534; margin: 0; text-align: center;">
+                                        <strong>👉 Action Required:</strong> Please contact the customer to confirm their appointment.
+                                    </p>
+                                </div>
+                                
+                                <div style="margin-top: 20px; text-align: center;">
+                                    <a href="http://localhost:3000/admin" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block; font-weight: bold;">
+                                        View in Admin Dashboard
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     `
                 });
@@ -163,6 +209,10 @@ router.delete('/bookings/:id', async (req, res) => {
 // Get all contact messages
 router.get('/contact-messages', async (req, res) => {
     try {
+        if (!supabase) {
+            console.warn('⚠️ Supabase not configured for contact-messages');
+            return res.json([]);
+        }
         const { data, error } = await supabase
             .from('contact_messages')
             .select('*')
