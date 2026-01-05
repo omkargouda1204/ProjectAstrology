@@ -1742,6 +1742,9 @@
                         <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg p-4 mb-4">
                             <p class="text-sm text-gray-700 mb-2"><strong><i class="fas fa-star text-purple-600 mr-2"></i>Service:</strong> ${booking.service || 'N/A'}</p>
                             <p class="text-sm text-gray-700 mb-2"><strong><i class="fas fa-calendar text-purple-600 mr-2"></i>Preferred Date:</strong> ${bookingDate}</p>
+                            ${booking.dob ? `<p class="text-sm text-gray-700 mb-2"><strong><i class="fas fa-birthday-cake text-purple-600 mr-2"></i>Date of Birth:</strong> ${new Date(booking.dob).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>` : ''}
+                            ${booking.booking_time ? `<p class="text-sm text-gray-700 mb-2"><strong><i class="fas fa-clock text-purple-600 mr-2"></i>Birth Time:</strong> ${booking.booking_time}</p>` : ''}
+                            ${booking.notes && booking.notes.includes('Birth Place:') ? `<p class="text-sm text-gray-700 mb-2"><strong><i class="fas fa-map-marker-alt text-purple-600 mr-2"></i>${booking.notes}</strong></p>` : ''}
                             ${booking.message ? `<p class="text-sm text-gray-700"><strong><i class="fas fa-comment text-purple-600 mr-2"></i>Message:</strong> ${booking.message}</p>` : ''}
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 mb-3">
@@ -1772,22 +1775,6 @@
                         </button>
                     </div>
                 `}).join('');
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mb-3">
-                            <a href="javascript:void(0)" onclick="openWhatsAppBooking('${booking.phone.replace(/[^0-9]/g, '')}', '${booking.name}', '${booking.service || 'consultation'}', '${booking.booking_date || 'TBD'}')" class="btn btn-success text-center" style="background: #25D366; color: white; padding: 10px; border-radius: 8px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
-                                <i class="fab fa-whatsapp"></i><span>WhatsApp</span>
-                            </a>
-                            <a href="tel:${booking.phone}" class="btn text-center" style="background: linear-gradient(to right, #7C3AED, #EC4899); color: white; padding: 10px; border-radius: 8px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                <i class="fas fa-phone"></i><span>Call</span>
-                            </a>
-                            ${booking.email ? `<a href="mailto:${booking.email}" class="btn text-center" style="background: linear-gradient(to right, #10B981, #3B82F6); color: white; padding: 10px; border-radius: 8px; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                <i class="fas fa-envelope"></i><span>Email</span>
-                            </a>` : ''}
-                        </div>
-                        <button onclick="deleteBooking(${booking.id})" class="btn btn-danger w-full">
-                            <i class="fas fa-trash mr-2"></i>Delete
-                        </button>
-                    </div>
-                `).join('');
             } catch (error) {
                 console.error('Error loading bookings:', error);
             }
