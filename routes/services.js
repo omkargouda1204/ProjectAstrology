@@ -55,6 +55,10 @@ async function deleteOldImage(imageUrl) {
 // Get all astrological services (latest first)
 router.get('/astrological-services', async (req, res) => {
     try {
+        if (!supabase) {
+            console.warn('⚠️ Supabase not configured for astrological-services');
+            return res.json([]);
+        }
         const { data, error} = await supabase
             .from('astrological_services')
             .select('*')
@@ -62,10 +66,14 @@ router.get('/astrological-services', async (req, res) => {
             .order('updated_at', { ascending: false })
             .order('display_order', { ascending: true });
             
-        if (error) throw error;
+        if (error) {
+            console.error('Error fetching astrological-services:', error.message);
+            return res.json([]);
+        }
         res.json(data || []);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error in astrological-services:', error.message);
+        res.json([]);
     }
 });
 
